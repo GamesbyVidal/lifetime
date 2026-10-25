@@ -295,13 +295,13 @@ function newLife(name, skin, hair, goal, gen, bonus){
 
 function stage(age){
   if (age < 5) return 'baby';
-  if (age < 13) return 'kid';
+  if (age < 14) return 'kid';
   if (age < 18) return 'teen';
   if (age < 23) return 'young';
   if (age < 65) return 'adult';
   return 'senior';
 }
-const STAGE_NAMES = {baby:'Baby', kid:'Kid', teen:'Teenager', young:'Young adult', adult:'Adult', senior:'Golden years'};
+const STAGE_NAMES = {baby:'Baby', kid:'Kid', teen:'High schooler', young:'Young adult', adult:'Adult', senior:'Golden years'};
 
 function today(){ const d = new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
 function canCheckIn(){ return S.testMode || S.lastDate !== today(); }
