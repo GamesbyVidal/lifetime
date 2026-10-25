@@ -352,7 +352,7 @@ function checkIn(mins){
   let earned = 0;
   if (S.pay > 0) { earned = Math.round(S.pay * (met ? 0.3 : 0.1)); S.money += earned; } // what they manage to save
 
-  const ms = milestone(S.age);
+  const ms = milestone(S.age, met);
   if (ms && ms.fx) applyFx(ms.fx);
 
   const entry = {age:S.age, date:today(), mins, goal:g, tier, emoji:ev[0], text:ev[1], fx: shown, earned, notes, ms: ms ? {emoji:ms.emoji, title:ms.title, text:ms.text} : null};
@@ -378,13 +378,18 @@ function applyFx(fx){
 }
 
 // ============ BIG LIFE MOMENTS ============
-function milestone(age){
+// A big life moment only goes well if you hit your goal that day AND the stats are good enough.
+function milestone(age, met){
   const avg = (S.h + S.s + S.j) / 3;
-  if (age === 5) return S.j >= 50
+  if (age === 5) return met && S.j >= 50
     ? {emoji:'🎒', title:'First day of school', text:'Walked in like they owned the place. Made three friends by lunch.', fx:{j:4}}
-    : {emoji:'🎒', title:'First day of school', text:'Cried at the door for twenty minutes. Eventually made one friend.', fx:{}};
+    : {emoji:'🎒', title:'First day of school', text:'Cried at the door for twenty minutes. Eventually made one friend.', fx:{j:-3}};
 
   if (age === 10) {
+    if (!met) {
+      S.talent = 'gamer';
+      return {emoji:'🕹️', title:'Talent discovered: Video games', text:'Can beat any level in under a minute. Cannot do a single push-up.', fx:{h:-3}};
+    }
     const top = [['h',S.h],['s',S.s],['j',S.j]].sort((a,b) => b[1]-a[1])[0][0];
     S.talent = {h:'athlete', s:'scientist', j:'performer'}[top];
     return {
@@ -394,52 +399,63 @@ function milestone(age){
     }[top];
   }
 
-  if (age === 16) return (S.h + S.s)/2 >= 50
+  if (age === 16) return met && (S.h + S.s)/2 >= 50
     ? {emoji:'🚗', title:'Driving test', text:'Passed on the first try! Freedom!', fx:{j:8}}
     : {emoji:'🚧', title:'Driving test', text:'Failed. Ran over a cone. Then a second cone. Then the mailbox.', fx:{j:-5}};
 
   if (age === 18) {
-    if (S.s >= 75) { S.edu = 'Starfield University'; S.eduTier = 3; return {emoji:'🎓', title:'Got into their dream school!', text:'Accepted to Starfield University, one of the best in the world.', fx:{j:10}}; }
-    if (S.s >= 55) { S.edu = 'State University'; S.eduTier = 2; return {emoji:'🎓', title:'Off to college', text:'Accepted to State University. Go Mighty Moose!', fx:{j:6}}; }
-    if (S.s >= 35) { S.edu = 'Community College'; S.eduTier = 1; return {emoji:'📘', title:'Community college', text:'Didn\'t get into the big schools, but enrolled at the community college.', fx:{}}; }
+    let tier = S.s >= 75 ? 3 : S.s >= 55 ? 2 : S.s >= 35 ? 1 : 0;
+    const bombed = !met && tier > 0;
+    if (bombed) tier--;
+    const why = bombed ? 'Stayed up scrolling the night before the entrance exam and bombed it. ' : '';
+    if (tier === 3) { S.edu = 'Starfield University'; S.eduTier = 3; return {emoji:'🎓', title:'Got into their dream school!', text:'Accepted to Starfield University, one of the best in the world.', fx:{j:10}}; }
+    if (tier === 2) { S.edu = 'State University'; S.eduTier = 2; return {emoji:'🎓', title:'Off to college', text:why+'Accepted to State University. Go Mighty Moose!', fx:{j: bombed ? 0 : 6}}; }
+    if (tier === 1) { S.edu = 'Community College'; S.eduTier = 1; return {emoji:'📘', title:'Community college', text:why+'Didn\'t get into the big schools, but enrolled at the community college.', fx:{j: bombed ? -3 : 0}}; }
     S.job = 'Burger Barn cashier'; S.pay = 20;
-    return {emoji:'🍔', title:'No college', text:'Grades were too low to get in anywhere. Now working the fryer at Burger Barn.', fx:{j:-6}};
+    return {emoji:'🍔', title:'No college', text:why+(bombed ? 'Now working the fryer at Burger Barn.' : 'Grades were too low to get in anywhere. Now working the fryer at Burger Barn.'), fx:{j:-6}};
   }
 
   if (age === 22) {
-    const score = S.s*0.6 + S.h*0.2 + S.j*0.2 + S.eduTier*8;
+    let score = S.s*0.6 + S.h*0.2 + S.j*0.2 + S.eduTier*8;
+    if (!met) score -= 20;
+    const why = met ? '' : 'Overslept the big interview after scrolling all night. ';
     let job, pay, text;
-    if (S.talent === 'athlete' && S.h >= 85) { job='Pro soccer player'; pay=900; text='Signed with a pro team! Their face is on a cereal box.'; }
-    else if (S.talent === 'scientist' && S.s >= 85 && S.eduTier >= 2) { job='Rocket scientist'; pay=250; text='Hired by a space company to build rockets. Literally rocket science.'; }
-    else if (S.talent === 'performer' && S.j >= 85) { job='Movie star'; pay=1000; text='Discovered at a coffee shop. Now starring in a superhero movie.'; }
+    if (met && S.talent === 'athlete' && S.h >= 85) { job='Pro soccer player'; pay=900; text='Signed with a pro team! Their face is on a cereal box.'; }
+    else if (met && S.talent === 'scientist' && S.s >= 85 && S.eduTier >= 2) { job='Rocket scientist'; pay=250; text='Hired by a space company to build rockets. Literally rocket science.'; }
+    else if (met && S.talent === 'performer' && S.j >= 85) { job='Movie star'; pay=1000; text='Discovered at a coffee shop. Now starring in a superhero movie.'; }
     else if (score >= 80) { [job,pay] = pick([['Doctor',220],['Software engineer',180],['Airline pilot',200]]); text='Landed a dream job as a '+job.toLowerCase()+'.'; }
     else if (score >= 65) { [job,pay] = pick([['Architect',110],['Video game designer',120],['Nurse',95]]); text='Got a great job as a '+job.toLowerCase()+'.'; }
-    else if (score >= 50) { [job,pay] = pick([['Electrician',80],['Teacher',65],['Chef',60]]); text='Found a solid job as a '+job.toLowerCase()+'.'; }
-    else if (score >= 35) { [job,pay] = pick([['Delivery driver',45],['Call center agent',38]]); text='Took a job as a '+job.toLowerCase()+'. It pays the bills. Mostly.'; }
-    else { job='Seasonal mall Santa'; pay=20; text='The only job they could get: mall Santa. It\'s July.'; }
+    else if (score >= 50) { [job,pay] = pick([['Electrician',80],['Teacher',65],['Chef',60]]); text=why+'Found a job as a '+job.toLowerCase()+'.'; }
+    else if (score >= 35) { [job,pay] = pick([['Delivery driver',45],['Call center agent',38]]); text=why+'Took a job as a '+job.toLowerCase()+'. It pays the bills. Mostly.'; }
+    else { job='Seasonal mall Santa'; pay=20; text=why+'The only job they could get: mall Santa. It\'s July.'; }
     S.job = job; S.pay = pay;
-    return {emoji:'💼', title:'First real job: '+job, text, fx:{j: pay >= 100 ? 8 : pay >= 50 ? 3 : -4}};
+    return {emoji:'💼', title:'First real job: '+job, text, fx:{j: !met ? -4 : pay >= 100 ? 8 : pay >= 50 ? 3 : -4}};
   }
 
   if (age === 28) {
-    if (S.j >= 60) { S.partner = pick(['Sam','Alex','Jordan','Riley','Casey','Morgan']); return {emoji:'💞', title:'Found their person', text:'Met '+S.partner+' at a rock climbing gym. It was love at first belay.', fx:{j:12}}; }
+    if (met && S.j >= 60) { S.partner = pick(['Sam','Alex','Jordan','Riley','Casey','Morgan']); return {emoji:'💞', title:'Found their person', text:'Met '+S.partner+' at a rock climbing gym. It was love at first belay.', fx:{j:12}}; }
     return {emoji:'🐈', title:'Still single', text:'Adopted a cat named Gerald instead. Gerald does not like them.', fx:{j:-2}};
   }
 
   if (age === 35 && S.job) {
-    if (avg >= 65) { S.pay = Math.round(S.pay*1.6); S.job = 'Senior ' + S.job.toLowerCase(); return {emoji:'🚀', title:'Big promotion!', text:'Promoted to '+S.job+'. Corner office unlocked.', fx:{j:8}}; }
-    if (avg < 35) { S.pay = Math.round(S.pay*0.5); return {emoji:'📦', title:'Fired!', text:'Got caught scrolling during the big meeting. Now doing part time work.', fx:{j:-10}}; }
+    if (met && avg >= 65) { S.pay = Math.round(S.pay*1.6); S.job = 'Senior ' + S.job.toLowerCase(); return {emoji:'🚀', title:'Big promotion!', text:'Promoted to '+S.job+'. Corner office unlocked.', fx:{j:8}}; }
+    if (avg < 35 || (!met && avg < 50)) { S.pay = Math.round(S.pay*0.5); return {emoji:'📦', title:'Fired!', text:'Got caught scrolling during the big meeting. Now doing part time work.', fx:{j:-10}}; }
+    if (!met) return {emoji:'🪑', title:'Passed over', text:'The promotion went to the coworker who doesn\'t check their phone in meetings.', fx:{j:-5}};
   }
 
-  if (age === 45) return S.h >= 60
+  if (age === 45) return met && S.h >= 60
     ? {emoji:'🏅', title:'Midlife glow up', text:'Ran a full marathon at 45. Kids are mildly impressed.', fx:{j:6}}
     : {emoji:'🏍️', title:'Midlife crisis', text:'Bought a motorcycle. Can\'t ride it. It lives in the garage now.', fx:{j:-4}};
 
   if (age === 65) {
-    if (S.money >= 2000) { S.job = 'Retired'; S.pay = 0; return {emoji:'🏝️', title:'Retired in style', text:'Retired to a beach house in Hawaii. Wears flip flops full time.', fx:{j:12}}; }
-    if (S.money >= 700) { S.job = 'Retired'; S.pay = 0; return {emoji:'🌻', title:'Happy retirement', text:'Retired comfortably with a big garden and a porch swing.', fx:{j:8}}; }
+    let tier = S.money >= 2000 ? 2 : S.money >= 700 ? 1 : 0;
+    const scammed = !met && tier > 0;
+    if (scammed) { tier--; S.money = Math.round(S.money * 0.6); }
+    const why = scammed ? 'Lost a big chunk of savings to an online scam right before retiring. ' : '';
+    if (tier === 2) { S.job = 'Retired'; S.pay = 0; return {emoji:'🏝️', title:'Retired in style', text:'Retired to a beach house in Hawaii. Wears flip flops full time.', fx:{j:12}}; }
+    if (tier === 1) { S.job = 'Retired'; S.pay = 0; return {emoji:'🌻', title: scammed ? 'Retired, barely' : 'Happy retirement', text: scammed ? why+'Still retired, but the garden got a lot smaller.' : 'Retired comfortably with a big garden and a porch swing.', fx:{j: scammed ? -3 : 8}}; }
     S.job = 'Mega-Mart greeter'; S.pay = 25;
-    return {emoji:'🛒', title:'Can\'t afford to retire', text:'Didn\'t save enough. Now a greeter at Mega-Mart. Waves a lot.', fx:{j:-6}};
+    return {emoji:'🛒', title:'Can\'t afford to retire', text:why+'Didn\'t save enough. Now a greeter at Mega-Mart. Waves a lot.', fx:{j:-6}};
   }
   return null;
 }
