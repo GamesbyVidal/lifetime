@@ -40,7 +40,7 @@ button{font-family:inherit;cursor:pointer}
 .streak{background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;font-weight:600}
 .card{background:var(--card);border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(20,10,60,.25)}
 .hero{text-align:center;padding-top:8px;background:linear-gradient(180deg,#e9f5ff,#fff 70%)}
-.hero svg{width:200px;height:220px;display:block;margin:0 auto}
+.hero svg{width:220px;height:264px;display:block;margin:0 auto}
 .bob{animation:bob 2.4s ease-in-out infinite;transform-origin:100px 230px}
 @keyframes bob{50%{transform:translateY(-4px)}}
 .name{font-size:26px;font-weight:700;margin:2px 0 0}
@@ -505,41 +505,77 @@ function lifeTitle(score){
 }
 
 // ============ CHARACTER DRAWING ============
+// Big-eyed cartoon style. Looks happy after a good year and tired, phone in hand, after a missed one.
 function charSVG(c){
   const st = stage(c.age);
-  const sc = {baby:.55, kid:.72, middle:.8, teen:.86, young:.95, adult:1, senior:.94}[st];
-  const hair = st === 'senior' ? '#d6d6d6' : c.hair;
-  const shirt = {baby:'#ffd36e', kid:'#5bc0eb', middle:'#00bbf9', teen:'#9b5de5', young:'#f15bb5', adult:'#2a9d8f', senior:'#e76f51'}[st];
-  const pants = st === 'adult' && c.job && c.pay >= 100 ? '#2d3142' : '#3a6ea5';
-  const arm = 7 + c.h/14;               // stronger = thicker arms
-  const bodyW = c.h < 35 ? 66 : 56;     // unhealthy = rounder
-  const bx = 100 - bodyW/2;
-  const mouth = c.j >= 60 ? '<path d="M86 94 Q100 108 114 94" stroke="#3a2a2a" stroke-width="4" fill="none" stroke-linecap="round"/>'
-             : c.j >= 35 ? '<path d="M89 98 L111 98" stroke="#3a2a2a" stroke-width="4" stroke-linecap="round"/>'
-             : '<path d="M87 103 Q100 92 113 103" stroke="#3a2a2a" stroke-width="4" fill="none" stroke-linecap="round"/>';
-  let hairPath = st === 'baby'
-    ? '<path d="M98 47 q8 -10 14 -2 q-8 -2 -10 6" stroke="'+hair+'" stroke-width="5" fill="none" stroke-linecap="round"/>'
-    : '<path d="M64 82 Q62 40 100 40 Q138 40 136 82 Q130 60 100 58 Q72 60 64 82Z" fill="'+hair+'"/>';
-  const glasses = c.s >= 70 ? '<g stroke="#222" stroke-width="3" fill="rgba(255,255,255,.25)"><circle cx="87" cy="83" r="10"/><circle cx="113" cy="83" r="10"/><path d="M97 83 L103 83"/></g>' : '';
-  const cheeks = c.j >= 60 ? '<circle cx="78" cy="94" r="5" fill="#ff9aa2" opacity=".6"/><circle cx="122" cy="94" r="5" fill="#ff9aa2" opacity=".6"/>' : '';
-  let extra = '';
-  if (st === 'young' && c.edu) extra += '<path d="M62 50 L100 34 L138 50 L100 66Z" fill="#222"/><rect x="86" y="50" width="28" height="12" fill="#222"/><path d="M136 50 L138 70" stroke="#f5b700" stroke-width="3"/><circle cx="138" cy="72" r="4" fill="#f5b700"/>';
-  if (st === 'adult' && c.job && c.pay >= 60) extra += '<path d="M100 116 L93 124 L100 156 L107 124Z" fill="#c1121f"/>';
-  if (st === 'senior') extra += '<path d="M'+(140+arm/2)+' 168 L'+(146+arm/2)+' 228 M'+(140+arm/2)+' 168 q0 -10 -8 -8" stroke="#7a4b2a" stroke-width="5" fill="none" stroke-linecap="round"/>';
-  const sad = c.j < 30 ? '<g transform="translate(140 22)"><ellipse cx="0" cy="0" rx="16" ry="10" fill="#b8c2cc"/><ellipse cx="12" cy="2" rx="12" ry="8" fill="#b8c2cc"/><path d="M-4 14 l-2 6 M6 14 l-2 6" stroke="#4da3ff" stroke-width="3" stroke-linecap="round"/></g>' : '';
-  const sparkle = c.j >= 85 ? '<text x="30" y="60" font-size="22">✨</text><text x="150" y="110" font-size="18">✨</text>' : '';
-  return '<svg viewBox="0 0 200 240" aria-label="'+c.name+'">'+
-    '<ellipse cx="100" cy="232" rx="'+(40*sc)+'" ry="7" fill="rgba(0,0,0,.12)"/>'+ sad + sparkle +
-    '<g class="bob"><g transform="translate(100 230) scale('+sc+') translate(-100 -230)">'+
-      '<rect x="84" y="168" width="13" height="58" rx="6" fill="'+pants+'"/><rect x="103" y="168" width="13" height="58" rx="6" fill="'+pants+'"/>'+
-      '<ellipse cx="89" cy="227" rx="11" ry="6" fill="#333"/><ellipse cx="111" cy="227" rx="11" ry="6" fill="#333"/>'+
-      '<rect x="'+(bx-arm+4)+'" y="118" width="'+arm+'" height="52" rx="'+(arm/2)+'" fill="'+shirt+'" transform="rotate(8 '+(bx)+' 120)"/>'+
-      '<rect x="'+(bx+bodyW-4)+'" y="118" width="'+arm+'" height="52" rx="'+(arm/2)+'" fill="'+shirt+'" transform="rotate(-8 '+(bx+bodyW)+' 120)"/>'+
-      '<rect x="'+bx+'" y="112" width="'+bodyW+'" height="66" rx="22" fill="'+shirt+'"/>'+
-      '<circle cx="100" cy="80" r="35" fill="'+c.skin+'"/>'+ hairPath +
-      '<circle cx="87" cy="83" r="4.5" fill="#222"/><circle cx="113" cy="83" r="4.5" fill="#222"/>'+
-      glasses + cheeks + mouth + extra +
-    '</g></g></svg>';
+  const last = c.log && c.log.length ? c.log[c.log.length-1] : null;
+  const sad = (last && !(last.tier === 'good' || last.tier === 'great')) || c.j < 30;
+  const O = '#3b2a4a', W = 'stroke="'+O+'" stroke-width="3.5"';
+  const sc = {baby:.62, kid:.8, middle:.86, teen:.92, young:.97, adult:1, senior:.95}[st];
+  const hair = st === 'senior' ? '#e9e7ef' : c.hair;
+  const dressy = (st === 'adult' && c.job && c.pay >= 60);
+  let shirt = {baby:'#ffd36e', kid:'#ffb627', middle:'#00bbf9', teen:'#7b61ff', young:'#f15bb5', adult: dressy ? '#2f3e6e' : '#2a9d8f', senior:'#e07a5f'}[st];
+  if (sad) shirt = '#9a98a6';
+  const pants = dressy && !sad ? '#232a45' : '#4a6fa5';
+  const bodyX = c.h < 35 ? 62 : 68, bodyW = c.h < 35 ? 76 : 64;   // unhealthy = rounder
+  const arm = 13 + c.h/25;                                          // stronger = thicker arms
+  let g = '', b = '';
+
+  // background mood: warm glow or a little rain cloud
+  if (!sad) g += '<circle cx="100" cy="122" r="86" fill="#fff6c9" opacity=".75"/>';
+  else g += '<g><ellipse cx="146" cy="26" rx="26" ry="14" fill="#a9b0bb"/><ellipse cx="124" cy="30" rx="18" ry="11" fill="#a9b0bb"/><path d="M128 44 l-3 8 M142 44 l-3 8 M156 44 l-3 8" stroke="#5aa9ff" stroke-width="3" stroke-linecap="round"/></g>';
+  g += '<ellipse cx="100" cy="230" rx="'+(46*sc)+'" ry="7" fill="rgba(0,0,0,.12)"/>';
+
+  b += '<g transform="translate(100 230) scale('+sc+') translate(-100 -230)">';
+  if (st === 'teen' || (st === 'young' && !c.edu)) b += '<ellipse cx="100" cy="122" rx="40" ry="16" fill="'+shirt+'" '+W+'/>'; // hood
+  // legs and shoes
+  const legH = st === 'baby' ? 26 : 40;
+  b += '<rect x="80" y="'+(216-legH)+'" width="15" height="'+legH+'" rx="7" fill="'+(st === 'baby' ? shirt : pants)+'" '+W+'/><rect x="105" y="'+(216-legH)+'" width="15" height="'+legH+'" rx="7" fill="'+(st === 'baby' ? shirt : pants)+'" '+W+'/>';
+  b += '<ellipse cx="86" cy="218" rx="13" ry="7" fill="#fff" '+W+'/><ellipse cx="114" cy="218" rx="13" ry="7" fill="#fff" '+W+'/>';
+  const bodyY = st === 'baby' ? 128 : 118, bodyH = st === 'baby' ? 66 : 66;
+  // arms (a missed year means the phone is in their hand, glowing at their face)
+  const ay = sad ? bodyY + 14 : bodyY + 10;
+  b += '<rect x="'+(bodyX-arm+4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate('+(sad?4:14)+' '+(bodyX+4)+' '+ay+')"/>';
+  if (sad && st !== 'baby') b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="40" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate(-40 '+(bodyX+bodyW+4)+' '+ay+')"/><rect x="146" y="128" width="16" height="26" rx="3" fill="#222" stroke="'+O+'" stroke-width="2.5"/><rect x="148" y="131" width="12" height="18" fill="#7fd1ff"/><path d="M146 132 L112 104 L112 120Z" fill="#7fd1ff" opacity=".35"/>';
+  else b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate(-14 '+(bodyX+bodyW-4)+' '+ay+')"/>';
+  // body and outfit details
+  b += '<rect x="'+bodyX+'" y="'+bodyY+'" width="'+bodyW+'" height="'+bodyH+'" rx="24" fill="'+shirt+'" '+W+'/>';
+  if (!sad) {
+    if (st === 'kid') b += '<path d="M78 124 L78 176 M122 124 L122 176" stroke="#e85d75" stroke-width="5"/><path d="M100 140 l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z" fill="#fff"/>';
+    if (st === 'middle') b += '<path d="M78 124 L78 176 M122 124 L122 176" stroke="#ff7a59" stroke-width="5"/><path d="M88 150 h24" stroke="#fff" stroke-width="5" stroke-linecap="round"/>';
+    if (st === 'teen' || (st === 'young' && !c.edu)) b += '<path d="M92 126 l-2 22 M108 126 l2 22" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M70 120 Q100 108 130 120" stroke="'+O+'" stroke-width="6" fill="none"/><circle cx="70" cy="120" r="9" fill="#ff5d8f" stroke="'+O+'" stroke-width="3"/><circle cx="130" cy="120" r="9" fill="#ff5d8f" stroke="'+O+'" stroke-width="3"/>';
+    if (st === 'young' && c.edu) b += '<path d="M100 130 l5 10 11 1 -8 7 2 11 -10 -6 -10 6 2 -11 -8 -7 11 -1z" fill="#ffd36e" stroke="'+O+'" stroke-width="2"/>';
+    if (dressy) b += '<path d="M86 120 L100 150 L114 120 Z" fill="#fff" stroke="'+O+'" stroke-width="2.5"/><path d="M100 126 l-5 8 5 22 5 -22z" fill="#ff4d5a" stroke="'+O+'" stroke-width="2"/>';
+  } else if (st !== 'baby') b += '<ellipse cx="88" cy="160" rx="7" ry="5" fill="#7d6b55" opacity=".6"/>';
+  if (st === 'senior') b += '<circle cx="100" cy="140" r="3" fill="'+O+'"/><circle cx="100" cy="156" r="3" fill="'+O+'"/><circle cx="100" cy="172" r="3" fill="'+O+'"/>'+
+    (sad ? '' : '<path d="M150 150 L156 220 M150 150 q-2 -12 -12 -8" stroke="#8a5a34" stroke-width="6" fill="none" stroke-linecap="round"/>');
+
+  // head
+  b += '<g'+(sad ? ' transform="rotate(8 100 90)"' : '')+'>';
+  b += '<circle cx="100" cy="82" r="48" fill="'+c.skin+'" '+W+'/>';
+  if (st === 'baby') b += '<path d="M96 36 q4 -14 14 -10 q-8 2 -6 10" fill="'+hair+'" stroke="'+O+'" stroke-width="3"/>';
+  else if (st === 'senior') b += '<path d="M52 88 Q44 70 54 58 Q52 40 70 36 Q80 24 100 28 Q120 24 130 36 Q148 40 146 58 Q156 70 148 88 Q142 74 136 66 Q128 70 120 62 Q110 70 100 64 Q90 70 80 62 Q72 70 64 66 Q58 74 52 88Z" fill="'+hair+'" '+W+' stroke-linejoin="round"/><path d="M78 40 Q90 34 102 38" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>';
+  else {
+    b += '<path d="M52 86 Q48 30 100 30 Q152 30 148 86 Q140 60 124 56 Q116 68 98 60 Q82 70 70 58 Q58 66 52 86Z" fill="'+hair+'" '+W+' stroke-linejoin="round"/>';
+    if (st === 'teen' || st === 'middle') b += '<path d="M70 40 Q110 20 140 60 Q118 44 96 48Z" fill="'+hair+'" stroke="'+O+'" stroke-width="3"/><path d="M84 40 Q100 34 116 38" stroke="#fff" stroke-width="3" opacity=".5" fill="none"/>';
+    if (st === 'kid') b += '<path d="M96 30 q4 -14 14 -10 q-8 2 -6 10" fill="'+hair+'" stroke="'+O+'" stroke-width="3"/>';
+    if (sad) b += '<path d="M70 34 l-6 -8 M128 34 l8 -8 M100 28 l0 -10" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/>';
+  }
+  if (st === 'young' && c.edu) b += '<path d="M58 40 L100 22 L142 40 L100 58Z" fill="#2b2350" '+W+' stroke-linejoin="round"/><path d="M140 40 L144 64" stroke="#f5b700" stroke-width="3"/><circle cx="144" cy="66" r="5" fill="#f5b700"/>';
+  // face
+  if (!sad) {
+    for (const x of [82,118]) b += '<ellipse cx="'+x+'" cy="92" rx="8" ry="10" fill="#2b1d3a"/><circle cx="'+(x-3)+'" cy="88" r="3.2" fill="#fff"/><circle cx="'+(x+3)+'" cy="96" r="1.6" fill="#fff"/>';
+    b += '<ellipse cx="70" cy="106" rx="8" ry="5" fill="#ff8fa3" opacity=".6"/><ellipse cx="130" cy="106" rx="8" ry="5" fill="#ff8fa3" opacity=".6"/>';
+    b += '<path d="M90 106 Q100 120 110 106 Z" fill="#a33a4f" stroke="'+O+'" stroke-width="2.5" stroke-linejoin="round"/><path d="M95 112 Q100 116 105 112" fill="#ff8fa3"/>';
+  } else {
+    for (const x of [82,118]) b += '<ellipse cx="'+x+'" cy="95" rx="7" ry="6" fill="#2b1d3a"/><path d="M'+(x-9)+' 92 L'+(x+9)+' 92" stroke="'+c.skin+'" stroke-width="6"/><path d="M'+(x-9)+' 92 L'+(x+9)+' 92" stroke="'+O+'" stroke-width="2.5"/><path d="M'+(x-7)+' 103 Q'+x+' 106 '+(x+7)+' 103" stroke="#9a7fa0" stroke-width="2" fill="none"/>';
+    b += '<path d="M74 80 L88 84 M126 80 L112 84" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/>';
+    b += '<path d="M90 116 Q100 108 110 116" stroke="'+O+'" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M126 102 q-4 8 0 11 q4 -3 0 -11z" fill="#5aa9ff"/>';
+  }
+  if (st === 'senior' || c.s >= 70) b += '<g stroke="'+O+'" stroke-width="3" fill="rgba(255,255,255,.3)"><circle cx="82" cy="92" r="13"/><circle cx="118" cy="92" r="13"/><path d="M95 92 L105 92"/></g>';
+  b += '</g></g>';
+  const sparkle = !sad && c.j >= 60 ? '<text x="26" y="70" font-size="20">✨</text><text x="152" y="120" font-size="16">✨</text>' : '';
+  return '<svg viewBox="0 0 200 240" aria-label="'+esc(c.name)+'">'+g+sparkle+'<g class="bob">'+b+'</g></svg>';
 }
 
 // ============ SCREENS ============
