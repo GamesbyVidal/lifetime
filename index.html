@@ -703,7 +703,7 @@ function showYear(e){
     '<p class="muted">'+fmtTime(e.mins)+' of screen time vs. your '+fmtTime(e.goal)+' goal</p>'+
     '<div class="evt">'+e.emoji+'</div><div class="evtxt">'+esc(e.text)+'</div>'+
     '<div class="fx">'+fxHTML(e.fx, e.earned)+'</div>'+
-    (e.shrunk ? '<p class="muted">Gains are smaller when a stat is already high.</p>' : '');
+    (e.shrunk ? '<p class="muted">⭐ Already near the top! Keep it up to stay there.</p>' : '');
   for (const n of e.notes) h += '<p><b>'+n+'</b></p>';
   if (e.ms) h += '<div class="mscard"><div class="k">Big life moment</div><div class="e">'+e.ms.emoji+'</div><div class="t">'+esc(e.ms.title)+'</div><p>'+esc(e.ms.text)+'</p></div>';
   if (S.done) h += '<div class="mscard"><div class="k">The end of an era</div><div class="e">🎂</div><div class="t">'+esc(S.name)+' turned '+SETTINGS.lifeLength+'!</div><p>Their story is complete. See how it went on the Today screen.</p></div>';
