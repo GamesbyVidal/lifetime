@@ -352,12 +352,13 @@ function checkIn(mins){
   if (S.age > 60) fx.h = (fx.h || 0) - 1; // getting older
 
   const notes = [];
+  let streakBonus = 0;
   if (met) {
     S.streak++;
     S.best = Math.max(S.best, S.streak);
     const bonus = SETTINGS.streakBonuses[S.streak];
     if (bonus) {
-      for (const k of ['h','s','j']) fx[k] = (fx[k] || 0) + bonus;
+      streakBonus = bonus;
       notes.push('🔥 '+S.streak+' day streak! +'+bonus+' to everything.');
     }
   } else {
@@ -365,6 +366,15 @@ function checkIn(mins){
     S.streak = 0;
   }
   const shown = applyFx(fx);
+  // Gains shrink near 100; flag it so the year card can explain the smaller numbers.
+  const shrunk = Object.keys(fx).some(k => fx[k] > 0 && shown[k] < fx[k]);
+  // The streak bonus always adds its full amount (only capped at 100).
+  for (const k of ['h','s','j']) {
+    if (!streakBonus) break;
+    const before = S[k];
+    S[k] = clamp(S[k] + streakBonus);
+    shown[k] = (shown[k] || 0) + (S[k] - before);
+  }
 
   let earned = 0;
   if (S.pay > 0) { earned = Math.round(S.pay * (met ? 0.3 : 0.1)); S.money += earned; } // what they manage to save
@@ -372,7 +382,7 @@ function checkIn(mins){
   const ms = milestone(S.age, met);
   if (ms && ms.fx) applyFx(ms.fx);
 
-  const entry = {age:S.age, date:today(), mins, goal:g, tier, emoji:ev[0], text:ev[1], fx: shown, earned, notes, ms: ms ? {emoji:ms.emoji, title:ms.title, text:ms.text} : null};
+  const entry = {age:S.age, date:today(), mins, goal:g, tier, emoji:ev[0], text:ev[1], fx: shown, shrunk, earned, notes, ms: ms ? {emoji:ms.emoji, title:ms.title, text:ms.text} : null};
   S.log.push(entry);
   S.lastDate = today();
   if (S.age >= SETTINGS.lifeLength) S.done = true;
@@ -692,7 +702,8 @@ function showYear(e){
     '<div class="agebig">'+esc(S.name)+' is now<b>'+e.age+'</b></div>'+
     '<p class="muted">'+fmtTime(e.mins)+' of screen time vs. your '+fmtTime(e.goal)+' goal</p>'+
     '<div class="evt">'+e.emoji+'</div><div class="evtxt">'+esc(e.text)+'</div>'+
-    '<div class="fx">'+fxHTML(e.fx, e.earned)+'</div>';
+    '<div class="fx">'+fxHTML(e.fx, e.earned)+'</div>'+
+    (e.shrunk ? '<p class="muted">Gains are smaller when a stat is already high.</p>' : '');
   for (const n of e.notes) h += '<p><b>'+n+'</b></p>';
   if (e.ms) h += '<div class="mscard"><div class="k">Big life moment</div><div class="e">'+e.ms.emoji+'</div><div class="t">'+esc(e.ms.title)+'</div><p>'+esc(e.ms.text)+'</p></div>';
   if (S.done) h += '<div class="mscard"><div class="k">The end of an era</div><div class="e">🎂</div><div class="t">'+esc(S.name)+' turned '+SETTINGS.lifeLength+'!</div><p>Their story is complete. See how it went on the Today screen.</p></div>';
