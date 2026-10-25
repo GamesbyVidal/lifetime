@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lifetime</title>
+<meta name="description" content="One day for you is one year for them. Beat your screen time goal and your little person lives their best life.">
+<meta property="og:title" content="Lifetime">
+<meta property="og:description" content="One day for you is one year for them. Beat your screen time goal and your little person lives their best life.">
+<meta name="theme-color" content="#2b2350">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lifetime">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#2b2350; --bg2:#4b3b8f;
+  --card:#ffffff; --ink:#24203a; --soft:#6d6787; --line:#e7e3f3;
+  --accent:#ff7a59; --accent2:#7c5cff;
+  --good:#22b573; --great:#f5b700; --meh:#9a94b3; --bad:#ff6b6b; --awful:#c0264a;
+  --h:#ff6b8b; --s:#4da3ff; --j:#ffc23d;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+html{background:#3b2f70}
+body{
+  font-family:'Fredoka',system-ui,sans-serif;color:var(--ink);
+  background:linear-gradient(170deg,var(--bg1),var(--bg2));background-attachment:fixed;
+  min-height:100%;
+}
+button{font-family:inherit;cursor:pointer}
+.app{max-width:480px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-inset-bottom));min-height:100vh}
+.top{display:flex;align-items:center;justify-content:space-between;color:#fff;padding:4px 2px 12px}
+.logo{font-weight:700;font-size:24px;letter-spacing:.5px}
+.logo small{display:block;font-weight:400;font-size:12px;opacity:.75;letter-spacing:0}
+.streak{background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;font-weight:600}
+.card{background:var(--card);border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(20,10,60,.25)}
+.hero{text-align:center;padding-top:8px;background:linear-gradient(180deg,#e9f5ff,#fff 70%)}
+.hero svg{width:200px;height:220px;display:block;margin:0 auto}
+.bob{animation:bob 2.4s ease-in-out infinite;transform-origin:100px 230px}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.name{font-size:26px;font-weight:700;margin:2px 0 0}
+.sub{color:var(--soft);font-size:15px;margin-top:2px}
+.tag{display:inline-block;background:#f1edff;color:var(--accent2);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;margin:8px 3px 0}
+.stats{margin-top:14px;text-align:left}
+.stat{display:flex;align-items:center;gap:10px;margin:8px 0}
+.stat .lbl{width:92px;font-size:14px;font-weight:500}
+.bar{flex:1;height:12px;background:#f0eef7;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .8s ease}
+.stat .num{width:28px;text-align:right;font-size:13px;color:var(--soft)}
+h2{font-size:19px;margin:0 0 6px}
+p{margin:6px 0;line-height:1.4}
+.muted{color:var(--soft);font-size:14px}
+.row{display:flex;gap:10px}
+.field{flex:1}
+label{font-size:13px;color:var(--soft);font-weight:500;display:block;margin-bottom:4px}
+select,input[type=text]{
+  width:100%;font-family:inherit;font-size:20px;padding:12px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);
+}
+select:focus,input:focus{outline:none;border-color:var(--accent2)}
+.btn{display:block;width:100%;border:0;border-radius:16px;padding:15px;font-size:18px;font-weight:600;color:#fff;
+  background:linear-gradient(135deg,var(--accent),#ff4f7b);box-shadow:0 6px 0 #c8405f;margin-top:14px;transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #c8405f}
+.btn.alt{background:linear-gradient(135deg,var(--accent2),#5b3fe0);box-shadow:0 6px 0 #4127b0}
+.btn.ghost{background:#f1edff;color:var(--accent2);box-shadow:none}
+.btn.danger{background:#fff0f0;color:var(--awful);box-shadow:none}
+details{margin-top:10px;font-size:14px;color:var(--soft)}
+summary{cursor:pointer;font-weight:500;color:var(--accent2)}
+details ul{padding-left:18px;margin:6px 0}
+.goalnote{display:flex;justify-content:space-between;font-size:14px;color:var(--soft);margin-bottom:10px}
+.waiting{text-align:center}
+.waiting .big{font-size:42px}
+.countdown{font-size:28px;font-weight:700;color:var(--accent2)}
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;
+  background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:5}
+.nav div{display:flex;max-width:480px;width:100%}
+.nav button{flex:1;border:0;background:none;font-size:13px;color:var(--soft);padding:4px;font-weight:500}
+.nav button b{display:block;font-size:22px}
+.nav button.on{color:var(--accent2)}
+/* story */
+.year{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.year:last-child{border-bottom:0}
+.year .age{width:44px;flex:none;text-align:center;font-weight:700;color:var(--soft);font-size:13px}
+.year .age b{display:block;font-size:26px;line-height:1.1}
+.year .what{flex:1}
+.year .what .t{font-weight:500;line-height:1.35}
+.year .what .m{font-size:13px;color:var(--soft);margin-top:3px}
+.pill{display:inline-block;font-size:11px;font-weight:700;color:#fff;border-radius:99px;padding:2px 8px;margin-right:4px;text-transform:uppercase;letter-spacing:.4px}
+.ms{background:#fff8e1;border-radius:14px;padding:10px 12px;margin-top:8px}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(20,12,50,.7);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20;animation:fade .25s}
+.modal .card{width:100%;max-width:440px;max-height:90vh;overflow:auto;animation:pop .35s cubic-bezier(.2,1.4,.4,1);text-align:center}
+@keyframes fade{from{opacity:0}}
+@keyframes pop{from{transform:scale(.8);opacity:0}}
+.banner{font-size:15px;font-weight:700;color:#fff;border-radius:12px;padding:8px;margin:-4px 0 12px}
+.agebig{font-size:15px;color:var(--soft);font-weight:600}
+.agebig b{display:block;font-size:46px;color:var(--ink);line-height:1}
+.evt{font-size:52px;margin:6px 0 0}
+.evtxt{font-size:19px;font-weight:500;margin:6px 0 10px}
+.fx{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:6px 0}
+.fx span{font-size:14px;font-weight:600;border-radius:99px;padding:4px 10px;background:#f1f9f4;color:var(--good)}
+.fx span.neg{background:#fff1f1;color:var(--bad)}
+.mscard{background:linear-gradient(135deg,#fff4cc,#ffe3ec);border-radius:16px;padding:12px;margin-top:12px}
+.mscard .k{font-size:12px;font-weight:700;color:#b26b00;letter-spacing:1px;text-transform:uppercase}
+.mscard .e{font-size:40px}
+.mscard .t{font-size:18px;font-weight:600}
+/* setup */
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.sw{width:42px;height:42px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 1px var(--line)}
+.sw.on{border-color:var(--accent2)}
+.goalval{font-size:34px;font-weight:700;color:var(--accent2);text-align:center}
+input[type=range]{width:100%;accent-color:var(--accent2);height:30px}
+.intro{color:#fff;text-align:center;padding:10px 6px 4px}
+.intro h1{font-size:40px;margin:0}
+.intro p{font-size:18px;opacity:.9}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0}
+.switch input{width:22px;height:22px;accent-color:var(--accent2)}
+.confetti{position:fixed;top:-20px;font-size:22px;pointer-events:none;z-index:30;animation:drop linear forwards}
+@keyframes drop{to{transform:translateY(110vh) rotate(540deg)}}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<nav class="nav hide" id="nav"><div>
+  <button data-tab="home" class="on"><b>🏠</b>Today</button>
+  <button data-tab="story"><b>📖</b>Life story</button>
+  <button data-tab="settings"><b>⚙️</b>Settings</button>
+</div></nav>
+
+<script>
+// ============ SETTINGS ============
+// Change these numbers to tune the game.
+const SETTINGS = {
+  lifeLength: 80,          // the story ends (and a new generation begins) at this age
+  greatIfUnder: 0.5,       // under half your goal = an amazing year
+  mehIfOver: 1.25,         // up to 25% over your goal = a so-so year
+  awfulIfOver: 2,          // more than double your goal = a disaster year
+  streakBonuses: {3: 2, 7: 4, 14: 6, 30: 10}  // streak length: bonus points to every stat
+};
+
+// ============ LIFE EVENTS ============
+// Each event: [emoji, what happened, {h: health, s: smarts, j: happiness}]
+const EVENTS = {
+  baby: {
+    good: [
+      ['🚀', 'First word was "rocket." Parents are already saving for space camp.', {s:6,j:4}],
+      ['🐕', 'Took their first steps, straight toward the dog.', {h:6,j:4}],
+      ['😴', 'Slept through the night! Parents cried happy tears.', {h:5,j:5}],
+      ['🧱', 'Built a block tower taller than themselves.', {s:6,j:3}],
+      ['🎵', 'Dances every single time music plays. Every time.', {h:4,j:6}],
+      ['📚', 'Demands the same bedtime story 400 times. Now knows it by heart.', {s:7}],
+      ['🏊', 'Loved baby swim class and splashed the instructor.', {h:7,j:3}],
+    ],
+    bad: [
+      ['🖍️', 'Ate a crayon. The blue one.', {h:-5}],
+      ['✈️', 'Screamed through an entire six hour flight.', {j:-6}],
+      ['📱', 'Spent the year watching cartoons on a tablet instead of crawling around.', {h:-5,s:-4}],
+      ['🤧', 'Caught every cold at daycare. All of them.', {h:-7}],
+      ['🥄', 'Threw spaghetti at the wall. Refused to eat anything but crackers.', {h:-5,j:-2}],
+      ['😤', 'Entered a full year of tantrums.', {j:-7}],
+    ]
+  },
+  kid: {
+    good: [
+      ['🌋', 'Won the science fair with a volcano that actually erupted. On the judge.', {s:9,j:4}],
+      ['🏠', 'Built a treehouse with friends. It has a secret password.', {h:5,j:7}],
+      ['🛹', 'Learned to skateboard and landed their first kickflip.', {h:9,j:4}],
+      ['📖', 'Read 40 books for the library challenge and won a pizza party.', {s:10}],
+      ['⚽', 'Scored the winning goal in the championship game.', {h:8,j:6}],
+      ['🦖', 'Can name every dinosaur. Including the weird ones.', {s:7,j:3}],
+      ['🏕️', 'Went to summer camp and caught a fish bigger than their arm.', {h:6,j:7}],
+      ['🎹', 'Learned to play piano. Neighbors only complained twice.', {s:6,j:5}],
+      ['🧪', 'Invented a "potion" that turned the bathtub green. Mom was impressed. Kind of.', {s:8,j:3}],
+    ],
+    bad: [
+      ['🎮', 'Spent the entire summer indoors staring at a screen.', {h:-8,j:-3}],
+      ['📝', 'Was up late watching videos and failed the spelling test. Spelled it "speling."', {s:-8}],
+      ['🪟', 'Broke a window playing ball in the house.', {j:-6}],
+      ['🚫', 'Got detention for sneaking a tablet into class.', {s:-5,j:-4}],
+      ['🍬', 'Ate an entire bag of Halloween candy in one night. Regrets everything.', {h:-8}],
+      ['😢', 'Got left out of the group because they were always on their phone.', {j:-8}],
+      ['🪑', 'Grew roots on the couch. Their bike has cobwebs.', {h:-7}],
+    ]
+  },
+  teen: {
+    good: [
+      ['🎸', 'Started a band in the garage. They are... getting better.', {j:8,s:3}],
+      ['🏀', 'Made the varsity team as a freshman.', {h:10,j:4}],
+      ['💻', 'Taught themselves to code and made their own video game.', {s:10,j:4}],
+      ['🏔️', 'Hiked to the top of a real mountain with friends.', {h:9,j:5}],
+      ['💵', 'Got a summer job and saved up for their first car.', {s:4,j:6}],
+      ['🥇', 'Won the state debate tournament. Nobody can win an argument with them now.', {s:10}],
+      ['🎭', 'Got the lead role in the school musical.', {j:10}],
+      ['🥋', 'Earned a black belt in karate.', {h:10,j:3}],
+      ['🌎', 'Went on an exchange trip to Spain. Came back saying "vale" a lot.', {s:7,j:6}],
+    ],
+    bad: [
+      ['🌙', 'Stayed up until 3am scrolling and slept through finals.', {s:-10}],
+      ['🧪', 'Got a D in chemistry. Also set off the fire alarm.', {s:-8}],
+      ['🔒', 'Got grounded for a month for sneaking out.', {j:-8}],
+      ['💬', 'Lost a group chat drama war. Badly.', {j:-9}],
+      ['🍟', 'Lived on energy drinks and chips for a whole year.', {h:-9}],
+      ['🛋️', 'Quit the team to "focus on content creation." Got 11 followers.', {h:-7,j:-3}],
+      ['📉', 'Phone got taken away in class 14 times. Teachers know them by name.', {s:-7,j:-2}],
+    ]
+  },
+  young: {
+    good: [
+      ['🗾', 'Studied abroad in Japan and learned to make ramen from scratch.', {s:7,j:8}],
+      ['🏅', 'Made the dean\'s list.', {s:10}],
+      ['👟', 'Started a tiny business selling custom sneakers. It made actual money.', {s:6,j:6}],
+      ['🏢', 'Landed an internship at a really cool company.', {s:9,j:3}],
+      ['🧗', 'Joined the climbing club and is now freakishly strong.', {h:10,j:4}],
+      ['🎙️', 'Started a podcast that people actually listen to.', {s:4,j:8}],
+      ['🤝', 'Made lifelong friends on a road trip across the country.', {j:10}],
+    ],
+    bad: [
+      ['📱', 'Pulled an all nighter watching videos instead of writing the essay.', {s:-9}],
+      ['🍜', 'Ate instant noodles every day for a year.', {h:-8}],
+      ['⏰', 'Missed the internship deadline because they were doomscrolling.', {s:-6,j:-4}],
+      ['💳', 'Racked up credit card debt buying stuff from ads.', {j:-8}],
+      ['😪', 'Slept through every 8am class. Every single one.', {s:-8,h:-2}],
+      ['🪫', 'Felt burnt out and lonely from too much screen time.', {j:-9}],
+    ]
+  },
+  adult: {
+    good: [
+      ['🏃', 'Ran a half marathon and didn\'t even walk once.', {h:10,j:4}],
+      ['📈', 'Crushed a big project at work. Boss noticed.', {s:7,j:5}],
+      ['🏄', 'Learned to surf on vacation.', {h:8,j:7}],
+      ['🌌', 'Traveled to Iceland and saw the northern lights.', {j:10}],
+      ['🏠', 'Bought their first home. It has a hammock.', {j:9}],
+      ['⚽', 'Coaches the neighborhood kids\' soccer team. Undefeated.', {h:5,j:8}],
+      ['📚', 'Read 50 books this year instead of scrolling.', {s:9,j:3}],
+      ['🍳', 'Became an amazing cook. Friends invite themselves over.', {h:5,j:7}],
+      ['🚴', 'Biked across the whole state for charity.', {h:10,j:5}],
+      ['🎨', 'Picked up painting. One hangs in a coffee shop now.', {s:4,j:8}],
+    ],
+    bad: [
+      ['📵', 'Doomscrolled through an entire beach vacation.', {j:-9}],
+      ['⏳', 'Missed a huge deadline because they were on their phone.', {s:-6,j:-4}],
+      ['🦴', 'Back hurts from hunching over their phone all day.', {h:-9}],
+      ['🏖️', 'Accidentally bought a timeshare from a pop-up ad.', {j:-8}],
+      ['🍕', 'Ordered takeout every night. Gym membership unused.', {h:-9}],
+      ['😶', 'Forgot their best friend\'s birthday. Was busy scrolling.', {j:-8}],
+      ['💤', 'Stopped sleeping well because of screens in bed.', {h:-6,s:-3}],
+    ]
+  },
+  senior: {
+    good: [
+      ['🏺', 'Took up pottery and is weirdly great at it.', {j:9}],
+      ['🧒', 'The grandkids think they are the coolest person alive.', {j:10}],
+      ['🌶️', 'Won the town chili cook off. Third year running.', {j:8}],
+      ['🏊', 'Swims laps every morning. Still beats people half their age.', {h:9}],
+      ['♟️', 'Became the undefeated chess champion of the park.', {s:9,j:4}],
+      ['🚐', 'Drove an RV through 20 national parks.', {h:5,j:9}],
+      ['📝', 'Wrote a memoir. It\'s actually a page turner.', {s:8,j:6}],
+    ],
+    bad: [
+      ['📺', 'Fell asleep in front of the TV every night.', {h:-7}],
+      ['🤴', 'Got scammed by an email from a "prince."', {s:-6,j:-5}],
+      ['📱', 'Spent all day arguing with strangers online.', {j:-9}],
+      ['🛋️', 'Stopped going on walks. Knees are not happy.', {h:-9}],
+      ['☎️', 'Forgot to call the grandkids back. For months.', {j:-8}],
+    ]
+  }
+};
+
+// ============ GAME STATE ============
+const KEY = 'lifetime-v1';
+const SKINS = ['#ffe0c7','#f1c27d','#d9a066','#a86b3c','#6b4226'];
+const HAIRS = ['#2b1d14','#6a3e1f','#d8a24a','#c0392b','#3d3d8f'];
+let S = load();
+let tab = 'home';
+let draft = {name:'', skin:SKINS[1], hair:HAIRS[0], goal:120};
+
+function load(){ try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+function newLife(name, skin, hair, goal, gen, bonus){
+  const b = bonus || 0;
+  return {
+    name, skin, hair, goal, gen: gen || 1,
+    age: 0, h: 50 + b, s: 50 + b, j: 50 + b, money: 0,
+    streak: 0, best: 0, edu: null, eduTier: 0, job: null, pay: 0, talent: null, partner: null,
+    used: [], log: [], lastDate: null, testMode: S ? S.testMode : false, done: false
+  };
+}
+
+function stage(age){
+  if (age < 5) return 'baby';
+  if (age < 13) return 'kid';
+  if (age < 18) return 'teen';
+  if (age < 23) return 'young';
+  if (age < 65) return 'adult';
+  return 'senior';
+}
+const STAGE_NAMES = {baby:'Baby', kid:'Kid', teen:'Teenager', young:'Young adult', adult:'Adult', senior:'Golden years'};
+
+function today(){ const d = new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function canCheckIn(){ return S.testMode || S.lastDate !== today(); }
+function clamp(v){ return Math.max(0, Math.min(100, Math.round(v))); }
+function fmtTime(m){ const h = Math.floor(m/60), mm = m%60; return h ? (mm ? h+'h '+mm+'m' : h+'h') : mm+'m'; }
+function fmtMoney(k){ if (k >= 1000) return '$'+(k/1000).toFixed(k >= 10000 ? 0 : 1)+'M'; return '$'+Math.round(k)+'K'; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+// ============ ONE YEAR PASSES ============
+function checkIn(mins){
+  const g = S.goal;
+  let tier;
+  if (mins <= g * SETTINGS.greatIfUnder) tier = 'great';
+  else if (mins <= g) tier = 'good';
+  else if (mins <= g * SETTINGS.mehIfOver) tier = 'meh';
+  else if (mins <= g * SETTINGS.awfulIfOver) tier = 'bad';
+  else tier = 'awful';
+  const met = tier === 'great' || tier === 'good';
+
+  S.age++;
+  const st = stage(S.age);
+  const pool = EVENTS[st][met ? 'good' : 'bad'];
+  let fresh = pool.filter(e => !S.used.includes(e[1]));
+  if (!fresh.length) { S.used = S.used.filter(t => !pool.some(e => e[1] === t)); fresh = pool; }
+  const ev = pick(fresh);
+  S.used.push(ev[1]);
+
+  const mult = {great:1.5, good:1, meh:0.75, bad:1.5, awful:2}[tier];
+  const fx = {};
+  for (const k in ev[2]) fx[k] = Math.round(ev[2][k] * mult);
+  if (S.age > 60) fx.h = (fx.h || 0) - 1; // getting older
+
+  const notes = [];
+  if (met) {
+    S.streak++;
+    S.best = Math.max(S.best, S.streak);
+    const bonus = SETTINGS.streakBonuses[S.streak];
+    if (bonus) {
+      for (const k of ['h','s','j']) fx[k] = (fx[k] || 0) + bonus;
+      notes.push('🔥 '+S.streak+' day streak! +'+bonus+' to everything.');
+    }
+  } else {
+    if (S.streak >= 3) notes.push('💔 Your '+S.streak+' day streak ended.');
+    S.streak = 0;
+  }
+  const shown = applyFx(fx);
+
+  let earned = 0;
+  if (S.pay > 0) { earned = Math.round(S.pay * (met ? 0.3 : 0.1)); S.money += earned; } // what they manage to save
+
+  const ms = milestone(S.age);
+  if (ms && ms.fx) applyFx(ms.fx);
+
+  const entry = {age:S.age, date:today(), mins, goal:g, tier, emoji:ev[0], text:ev[1], fx: shown, earned, notes, ms: ms ? {emoji:ms.emoji, title:ms.title, text:ms.text} : null};
+  S.log.push(entry);
+  S.lastDate = today();
+  if (S.age >= SETTINGS.lifeLength) S.done = true;
+  save();
+  render();
+  showYear(entry);
+}
+
+// Gains shrink as a stat nears 100, so it takes steady good days to stay on top.
+function applyFx(fx){
+  const real = {};
+  for (const k in fx) {
+    let v = fx[k];
+    if (v > 0 && k !== 'money') v = Math.max(1, Math.round(v * Math.min(1, (100 - S[k]) / 50)));
+    const before = S[k];
+    S[k] = clamp(S[k] + v);
+    real[k] = S[k] - before;
+  }
+  return real;
+}
+
+// ============ BIG LIFE MOMENTS ============
+function milestone(age){
+  const avg = (S.h + S.s + S.j) / 3;
+  if (age === 5) return S.j >= 50
+    ? {emoji:'🎒', title:'First day of school', text:'Walked in like they owned the place. Made three friends by lunch.', fx:{j:4}}
+    : {emoji:'🎒', title:'First day of school', text:'Cried at the door for twenty minutes. Eventually made one friend.', fx:{}};
+
+  if (age === 10) {
+    const top = [['h',S.h],['s',S.s],['j',S.j]].sort((a,b) => b[1]-a[1])[0][0];
+    S.talent = {h:'athlete', s:'scientist', j:'performer'}[top];
+    return {
+      h:{emoji:'⚡', title:'Talent discovered: Sports', text:'Fastest kid in the whole school. Coaches are already asking about them.'},
+      s:{emoji:'🤖', title:'Talent discovered: Science', text:'Built a working robot out of an old vacuum cleaner.'},
+      j:{emoji:'🎤', title:'Talent discovered: Performing', text:'Stole the show in the school play. Standing ovation.'}
+    }[top];
+  }
+
+  if (age === 16) return (S.h + S.s)/2 >= 50
+    ? {emoji:'🚗', title:'Driving test', text:'Passed on the first try! Freedom!', fx:{j:8}}
+    : {emoji:'🚧', title:'Driving test', text:'Failed. Ran over a cone. Then a second cone. Then the mailbox.', fx:{j:-5}};
+
+  if (age === 18) {
+    if (S.s >= 75) { S.edu = 'Starfield University'; S.eduTier = 3; return {emoji:'🎓', title:'Got into their dream school!', text:'Accepted to Starfield University, one of the best in the world.', fx:{j:10}}; }
+    if (S.s >= 55) { S.edu = 'State University'; S.eduTier = 2; return {emoji:'🎓', title:'Off to college', text:'Accepted to State University. Go Mighty Moose!', fx:{j:6}}; }
+    if (S.s >= 35) { S.edu = 'Community College'; S.eduTier = 1; return {emoji:'📘', title:'Community college', text:'Didn\'t get into the big schools, but enrolled at the community college.', fx:{}}; }
+    S.job = 'Burger Barn cashier'; S.pay = 20;
+    return {emoji:'🍔', title:'No college', text:'Grades were too low to get in anywhere. Now working the fryer at Burger Barn.', fx:{j:-6}};
+  }
+
+  if (age === 22) {
+    const score = S.s*0.6 + S.h*0.2 + S.j*0.2 + S.eduTier*8;
+    let job, pay, text;
+    if (S.talent === 'athlete' && S.h >= 85) { job='Pro soccer player'; pay=900; text='Signed with a pro team! Their face is on a cereal box.'; }
+    else if (S.talent === 'scientist' && S.s >= 85 && S.eduTier >= 2) { job='Rocket scientist'; pay=250; text='Hired by a space company to build rockets. Literally rocket science.'; }
+    else if (S.talent === 'performer' && S.j >= 85) { job='Movie star'; pay=1000; text='Discovered at a coffee shop. Now starring in a superhero movie.'; }
+    else if (score >= 80) { [job,pay] = pick([['Doctor',220],['Software engineer',180],['Airline pilot',200]]); text='Landed a dream job as a '+job.toLowerCase()+'.'; }
+    else if (score >= 65) { [job,pay] = pick([['Architect',110],['Video game designer',120],['Nurse',95]]); text='Got a great job as a '+job.toLowerCase()+'.'; }
+    else if (score >= 50) { [job,pay] = pick([['Electrician',80],['Teacher',65],['Chef',60]]); text='Found a solid job as a '+job.toLowerCase()+'.'; }
+    else if (score >= 35) { [job,pay] = pick([['Delivery driver',45],['Call center agent',38]]); text='Took a job as a '+job.toLowerCase()+'. It pays the bills. Mostly.'; }
+    else { job='Seasonal mall Santa'; pay=20; text='The only job they could get: mall Santa. It\'s July.'; }
+    S.job = job; S.pay = pay;
+    return {emoji:'💼', title:'First real job: '+job, text, fx:{j: pay >= 100 ? 8 : pay >= 50 ? 3 : -4}};
+  }
+
+  if (age === 28) {
+    if (S.j >= 60) { S.partner = pick(['Sam','Alex','Jordan','Riley','Casey','Morgan']); return {emoji:'💞', title:'Found their person', text:'Met '+S.partner+' at a rock climbing gym. It was love at first belay.', fx:{j:12}}; }
+    return {emoji:'🐈', title:'Still single', text:'Adopted a cat named Gerald instead. Gerald does not like them.', fx:{j:-2}};
+  }
+
+  if (age === 35 && S.job) {
+    if (avg >= 65) { S.pay = Math.round(S.pay*1.6); S.job = 'Senior ' + S.job.toLowerCase(); return {emoji:'🚀', title:'Big promotion!', text:'Promoted to '+S.job+'. Corner office unlocked.', fx:{j:8}}; }
+    if (avg < 35) { S.pay = Math.round(S.pay*0.5); return {emoji:'📦', title:'Fired!', text:'Got caught scrolling during the big meeting. Now doing part time work.', fx:{j:-10}}; }
+  }
+
+  if (age === 45) return S.h >= 60
+    ? {emoji:'🏅', title:'Midlife glow up', text:'Ran a full marathon at 45. Kids are mildly impressed.', fx:{j:6}}
+    : {emoji:'🏍️', title:'Midlife crisis', text:'Bought a motorcycle. Can\'t ride it. It lives in the garage now.', fx:{j:-4}};
+
+  if (age === 65) {
+    if (S.money >= 2000) { S.job = 'Retired'; S.pay = 0; return {emoji:'🏝️', title:'Retired in style', text:'Retired to a beach house in Hawaii. Wears flip flops full time.', fx:{j:12}}; }
+    if (S.money >= 700) { S.job = 'Retired'; S.pay = 0; return {emoji:'🌻', title:'Happy retirement', text:'Retired comfortably with a big garden and a porch swing.', fx:{j:8}}; }
+    S.job = 'Mega-Mart greeter'; S.pay = 25;
+    return {emoji:'🛒', title:'Can\'t afford to retire', text:'Didn\'t save enough. Now a greeter at Mega-Mart. Waves a lot.', fx:{j:-6}};
+  }
+  return null;
+}
+
+function lifeScore(){
+  const avg = (S.h + S.s + S.j) / 3;
+  const metDays = S.log.filter(e => e.tier === 'good' || e.tier === 'great').length;
+  return Math.round(avg + Math.min(30, S.money/200) + metDays/2);
+}
+function lifeTitle(score){
+  if (score >= 120) return ['🏆','A legendary life'];
+  if (score >= 95) return ['🌟','An amazing life'];
+  if (score >= 70) return ['😊','A pretty good life'];
+  if (score >= 45) return ['😐','A so-so life'];
+  return ['🥔','A couch potato life'];
+}
+
+// ============ CHARACTER DRAWING ============
+function charSVG(c){
+  const st = stage(c.age);
+  const sc = {baby:.55, kid:.72, teen:.86, young:.95, adult:1, senior:.94}[st];
+  const hair = st === 'senior' ? '#d6d6d6' : c.hair;
+  const shirt = {baby:'#ffd36e', kid:'#5bc0eb', teen:'#9b5de5', young:'#f15bb5', adult:'#2a9d8f', senior:'#e76f51'}[st];
+  const pants = st === 'adult' && c.job && c.pay >= 100 ? '#2d3142' : '#3a6ea5';
+  const arm = 7 + c.h/14;               // stronger = thicker arms
+  const bodyW = c.h < 35 ? 66 : 56;     // unhealthy = rounder
+  const bx = 100 - bodyW/2;
+  const mouth = c.j >= 60 ? '<path d="M86 94 Q100 108 114 94" stroke="#3a2a2a" stroke-width="4" fill="none" stroke-linecap="round"/>'
+             : c.j >= 35 ? '<path d="M89 98 L111 98" stroke="#3a2a2a" stroke-width="4" stroke-linecap="round"/>'
+             : '<path d="M87 103 Q100 92 113 103" stroke="#3a2a2a" stroke-width="4" fill="none" stroke-linecap="round"/>';
+  let hairPath = st === 'baby'
+    ? '<path d="M98 47 q8 -10 14 -2 q-8 -2 -10 6" stroke="'+hair+'" stroke-width="5" fill="none" stroke-linecap="round"/>'
+    : '<path d="M64 82 Q62 40 100 40 Q138 40 136 82 Q130 60 100 58 Q72 60 64 82Z" fill="'+hair+'"/>';
+  const glasses = c.s >= 70 ? '<g stroke="#222" stroke-width="3" fill="rgba(255,255,255,.25)"><circle cx="87" cy="83" r="10"/><circle cx="113" cy="83" r="10"/><path d="M97 83 L103 83"/></g>' : '';
+  const cheeks = c.j >= 60 ? '<circle cx="78" cy="94" r="5" fill="#ff9aa2" opacity=".6"/><circle cx="122" cy="94" r="5" fill="#ff9aa2" opacity=".6"/>' : '';
+  let extra = '';
+  if (st === 'young' && c.edu) extra += '<path d="M62 50 L100 34 L138 50 L100 66Z" fill="#222"/><rect x="86" y="50" width="28" height="12" fill="#222"/><path d="M136 50 L138 70" stroke="#f5b700" stroke-width="3"/><circle cx="138" cy="72" r="4" fill="#f5b700"/>';
+  if (st === 'adult' && c.job && c.pay >= 60) extra += '<path d="M100 116 L93 124 L100 156 L107 124Z" fill="#c1121f"/>';
+  if (st === 'senior') extra += '<path d="M'+(140+arm/2)+' 168 L'+(146+arm/2)+' 228 M'+(140+arm/2)+' 168 q0 -10 -8 -8" stroke="#7a4b2a" stroke-width="5" fill="none" stroke-linecap="round"/>';
+  const sad = c.j < 30 ? '<g transform="translate(140 22)"><ellipse cx="0" cy="0" rx="16" ry="10" fill="#b8c2cc"/><ellipse cx="12" cy="2" rx="12" ry="8" fill="#b8c2cc"/><path d="M-4 14 l-2 6 M6 14 l-2 6" stroke="#4da3ff" stroke-width="3" stroke-linecap="round"/></g>' : '';
+  const sparkle = c.j >= 85 ? '<text x="30" y="60" font-size="22">✨</text><text x="150" y="110" font-size="18">✨</text>' : '';
+  return '<svg viewBox="0 0 200 240" aria-label="'+c.name+'">'+
+    '<ellipse cx="100" cy="232" rx="'+(40*sc)+'" ry="7" fill="rgba(0,0,0,.12)"/>'+ sad + sparkle +
+    '<g class="bob"><g transform="translate(100 230) scale('+sc+') translate(-100 -230)">'+
+      '<rect x="84" y="168" width="13" height="58" rx="6" fill="'+pants+'"/><rect x="103" y="168" width="13" height="58" rx="6" fill="'+pants+'"/>'+
+      '<ellipse cx="89" cy="227" rx="11" ry="6" fill="#333"/><ellipse cx="111" cy="227" rx="11" ry="6" fill="#333"/>'+
+      '<rect x="'+(bx-arm+4)+'" y="118" width="'+arm+'" height="52" rx="'+(arm/2)+'" fill="'+shirt+'" transform="rotate(8 '+(bx)+' 120)"/>'+
+      '<rect x="'+(bx+bodyW-4)+'" y="118" width="'+arm+'" height="52" rx="'+(arm/2)+'" fill="'+shirt+'" transform="rotate(-8 '+(bx+bodyW)+' 120)"/>'+
+      '<rect x="'+bx+'" y="112" width="'+bodyW+'" height="66" rx="22" fill="'+shirt+'"/>'+
+      '<circle cx="100" cy="80" r="35" fill="'+c.skin+'"/>'+ hairPath +
+      '<circle cx="87" cy="83" r="4.5" fill="#222"/><circle cx="113" cy="83" r="4.5" fill="#222"/>'+
+      glasses + cheeks + mouth + extra +
+    '</g></g></svg>';
+}
+
+// ============ SCREENS ============
+const $ = id => document.getElementById(id);
+function render(){
+  const app = $('app');
+  if (!S) { $('nav').classList.add('hide'); app.innerHTML = setupHTML(); bindSetup(); return; }
+  $('nav').classList.remove('hide');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  if (tab === 'home') app.innerHTML = homeHTML();
+  else if (tab === 'story') app.innerHTML = storyHTML();
+  else app.innerHTML = settingsHTML();
+  bind();
+}
+
+function header(){
+  return '<div class="top"><div class="logo">Lifetime<small>One day for you. One year for them.</small></div>'+
+    '<div class="streak">🔥 '+S.streak+'</div></div>';
+}
+
+function statRow(lbl, v, color){
+  return '<div class="stat"><span class="lbl">'+lbl+'</span><div class="bar"><i style="width:'+v+'%;background:'+color+'"></i></div><span class="num">'+v+'</span></div>';
+}
+
+function homeHTML(){
+  const st = stage(S.age);
+  let tags = '<span class="tag">'+STAGE_NAMES[st]+'</span>';
+  if (S.gen > 1) tags += '<span class="tag">Generation '+S.gen+'</span>';
+  if (S.edu && S.age < 23) tags += '<span class="tag">🎓 '+S.edu+'</span>';
+  if (S.job) tags += '<span class="tag">💼 '+S.job+'</span>';
+  if (S.partner) tags += '<span class="tag">💞 '+S.partner+'</span>';
+  if (S.money > 0) tags += '<span class="tag">💰 '+fmtMoney(S.money)+'</span>';
+
+  let action;
+  if (S.done) {
+    const sc = lifeScore(), t = lifeTitle(sc);
+    action = '<div class="card waiting"><div class="big">'+t[0]+'</div><h2>'+S.name+' lived '+t[1].toLowerCase()+'</h2>'+
+      '<p class="muted">Life score: <b>'+sc+'</b>. You hit your goal on '+S.log.filter(e=>e.tier==='good'||e.tier==='great').length+' of '+S.log.length+' days.</p>'+
+      '<p>'+S.name+' has passed the torch. Keep going as their kid, who gets a head start from the life you built.</p>'+
+      '<button class="btn alt" id="nextGen">Play as '+S.name+'\'s kid</button></div>';
+  } else if (canCheckIn()) {
+    action = '<div class="card"><h2>'+(S.age === 0 ? 'Ready for year one?' : 'How was your screen time today?')+'</h2>'+
+      '<div class="goalnote"><span>Your goal: '+fmtTime(S.goal)+' or less</span><span>Best streak: '+S.best+'</span></div>'+
+      '<div class="row"><div class="field"><label>Hours</label><select id="hrs">'+opts(0,16,1,'')+'</select></div>'+
+      '<div class="field"><label>Minutes</label><select id="mins">'+opts(0,55,5,'')+'</select></div></div>'+
+      '<button class="btn" id="go">Live year '+(S.age+1)+' ➜</button>'+
+      '<details><summary>Where do I find my screen time?</summary><ul>'+
+      '<li><b>iPhone:</b> Settings → Screen Time → See All App &amp; Website Activity. Use the number for Today.</li>'+
+      '<li><b>Android:</b> Settings → Digital Wellbeing &amp; parental controls. The number in the circle is today.</li>'+
+      '</ul>Best time to check in is right before bed.</details></div>';
+  } else {
+    action = '<div class="card waiting"><div class="big">🌙</div><h2>'+S.name+' is living out age '+S.age+'</h2>'+
+      '<p class="muted">Come back tomorrow to see what happens next.</p><div class="countdown" id="cd"></div></div>';
+  }
+
+  return header()+
+    '<div class="card hero">'+charSVG(S)+'<div class="name">'+esc(S.name)+'</div><div class="sub">Age '+S.age+'</div><div>'+tags+'</div>'+
+    '<div class="stats">'+statRow('💪 Health',S.h,'var(--h)')+statRow('🧠 Smarts',S.s,'var(--s)')+statRow('😊 Happiness',S.j,'var(--j)')+'</div></div>'+
+    action;
+}
+
+function opts(a,b,step,sel){ let o=''; for (let i=a;i<=b;i+=step) o+='<option value="'+i+'">'+i+'</option>'; return o; }
+function esc(t){ return String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+const TIER = {
+  great:{label:'🌟 Amazing year!', color:'var(--great)'},
+  good:{label:'✅ Good year', color:'var(--good)'},
+  meh:{label:'😐 So-so year', color:'var(--meh)'},
+  bad:{label:'⚠️ Rough year', color:'var(--bad)'},
+  awful:{label:'💥 Disaster year', color:'var(--awful)'}
+};
+
+function fxHTML(fx, earned){
+  const names = {h:'💪', s:'🧠', j:'😊'};
+  let out = '';
+  for (const k of ['h','s','j']) if (fx[k]) out += '<span class="'+(fx[k]<0?'neg':'')+'">'+(fx[k]>0?'+':'')+fx[k]+' '+names[k]+'</span>';
+  if (earned) out += '<span>+'+fmtMoney(earned)+' saved 💰</span>';
+  return out;
+}
+
+function storyHTML(){
+  if (!S.log.length) return header()+'<div class="card"><h2>Life story</h2><p class="muted">'+esc(S.name)+'\'s story starts after your first check-in.</p></div>';
+  let rows = '';
+  for (let i = S.log.length-1; i >= 0; i--) {
+    const e = S.log[i], t = TIER[e.tier];
+    rows += '<div class="year"><div class="age"><b>'+e.age+'</b>age</div><div class="what">'+
+      '<div class="t">'+e.emoji+' '+esc(e.text)+'</div>'+
+      '<div class="m"><span class="pill" style="background:'+t.color+'">'+e.tier+'</span>'+fmtTime(e.mins)+' on phone</div>'+
+      (e.ms ? '<div class="ms"><b>'+e.ms.emoji+' '+esc(e.ms.title)+'</b><br><span class="muted">'+esc(e.ms.text)+'</span></div>' : '')+
+      '</div></div>';
+  }
+  const met = S.log.filter(e=>e.tier==='good'||e.tier==='great').length;
+  return header()+'<div class="card"><h2>'+esc(S.name)+'\'s life story</h2><p class="muted">Goal met on '+met+' of '+S.log.length+' days.</p>'+rows+'</div>';
+}
+
+function settingsHTML(){
+  return header()+
+    '<div class="card"><h2>Daily goal</h2><p class="muted">Stay at or under this much phone time each day.</p>'+
+    '<div class="goalval" id="gv">'+fmtTime(S.goal)+'</div><input type="range" id="goal" min="15" max="480" step="15" value="'+S.goal+'"></div>'+
+    '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
+    '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>'+
+    '<div class="card"><h2>Start over</h2><p class="muted">Erases '+esc(S.name)+' and their whole life story.</p><button class="btn danger" id="reset">Start a brand new life</button></div>';
+}
+
+function setupHTML(){
+  const nextGen = draft.gen > 1;
+  return '<div class="intro"><h1>Lifetime</h1><p>One day for you is one year for them.</p></div>'+
+    '<div class="card"><p>Set a daily screen time goal. Each night, check in. Hit your goal and your little person lives a great life. Miss it and... well, things go less great.</p></div>'+
+    '<div class="card"><h2>'+(nextGen?'Name the next generation':'Name your little person')+'</h2><input type="text" id="nm" maxlength="20" placeholder="Their name" value="'+esc(draft.name)+'"></div>'+
+    '<div class="card"><h2>Skin</h2><div class="swatches">'+SKINS.map(c=>'<button class="sw'+(c===draft.skin?' on':'')+'" data-skin="'+c+'" style="background:'+c+'" aria-label="skin color"></button>').join('')+'</div>'+
+    '<h2 style="margin-top:14px">Hair</h2><div class="swatches">'+HAIRS.map(c=>'<button class="sw'+(c===draft.hair?' on':'')+'" data-hair="'+c+'" style="background:'+c+'" aria-label="hair color"></button>').join('')+'</div></div>'+
+    '<div class="card"><h2>Daily screen time goal</h2><div class="goalval" id="gv">'+fmtTime(draft.goal)+'</div>'+
+    '<input type="range" id="goal" min="15" max="480" step="15" value="'+draft.goal+'"><p class="muted">Tip: check your phone\'s average from last week and aim a bit lower.</p>'+
+    '<button class="btn alt" id="start">Bring them to life 👶</button></div>';
+}
+
+function bindSetup(){
+  document.querySelectorAll('[data-skin]').forEach(b => b.onclick = () => { draft.skin = b.dataset.skin; draft.name = $('nm').value; render(); });
+  document.querySelectorAll('[data-hair]').forEach(b => b.onclick = () => { draft.hair = b.dataset.hair; draft.name = $('nm').value; render(); });
+  $('goal').oninput = e => { draft.goal = +e.target.value; $('gv').textContent = fmtTime(draft.goal); };
+  $('start').onclick = () => {
+    const name = $('nm').value.trim();
+    if (!name) { $('nm').focus(); $('nm').style.borderColor = 'var(--bad)'; return; }
+    const keepTest = draft.testMode || false;
+    S = null;
+    S = newLife(name, draft.skin, draft.hair, draft.goal, draft.gen, draft.bonus);
+    S.testMode = keepTest;
+    save(); tab = 'home'; render();
+    modal('<div class="evt">👶</div><h2>'+esc(name)+' is born!</h2><p>Every day you hit your goal, they have a great year. Check in tonight to start year one.</p><button class="btn" data-close>Let\'s go</button>');
+  };
+}
+
+let cdTimer;
+function bind(){
+  clearInterval(cdTimer);
+  if ($('go')) $('go').onclick = () => checkIn((+$('hrs').value)*60 + (+$('mins').value));
+  if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(24,0,0,0); const s = Math.floor((m-n)/1000);
+      $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
+      if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
+  if ($('goal')) $('goal').oninput = e => { S.goal = +e.target.value; $('gv').textContent = fmtTime(S.goal); save(); };
+  if ($('nm')) $('nm').onchange = e => { const v = e.target.value.trim(); if (v) { S.name = v; save(); } };
+  if ($('tm')) $('tm').onchange = e => { S.testMode = e.target.checked; save(); };
+  if ($('reset')) $('reset').onclick = () => {
+    if (!confirm('Erase '+S.name+' and start a new life?')) return;
+    draft = {name:'', skin:S.skin, hair:S.hair, goal:S.goal, testMode:S.testMode};
+    S = null; save(); try { localStorage.removeItem(KEY); } catch(e){}
+    render();
+  };
+  if ($('nextGen')) $('nextGen').onclick = () => {
+    const bonus = Math.min(15, Math.round(lifeScore()/10));
+    draft = {name:'', skin:S.skin, hair:S.hair, goal:S.goal, gen:S.gen+1, bonus, testMode:S.testMode};
+    S = null; try { localStorage.removeItem(KEY); } catch(e){}
+    render();
+  };
+}
+
+function showYear(e){
+  const t = TIER[e.tier];
+  let h = '<div class="banner" style="background:'+t.color+'">'+t.label+'</div>'+
+    '<div class="agebig">'+esc(S.name)+' is now<b>'+e.age+'</b></div>'+
+    '<p class="muted">'+fmtTime(e.mins)+' of screen time vs. your '+fmtTime(e.goal)+' goal</p>'+
+    '<div class="evt">'+e.emoji+'</div><div class="evtxt">'+esc(e.text)+'</div>'+
+    '<div class="fx">'+fxHTML(e.fx, e.earned)+'</div>';
+  for (const n of e.notes) h += '<p><b>'+n+'</b></p>';
+  if (e.ms) h += '<div class="mscard"><div class="k">Big life moment</div><div class="e">'+e.ms.emoji+'</div><div class="t">'+esc(e.ms.title)+'</div><p>'+esc(e.ms.text)+'</p></div>';
+  if (S.done) h += '<div class="mscard"><div class="k">The end of an era</div><div class="e">🎂</div><div class="t">'+esc(S.name)+' turned '+SETTINGS.lifeLength+'!</div><p>Their story is complete. See how it went on the Today screen.</p></div>';
+  h += '<button class="btn" data-close>Continue</button>';
+  modal(h);
+  if (e.tier === 'great' || e.ms) confetti(e.tier === 'great' ? ['🎉','⭐','✨','🎊'] : [e.ms.emoji,'✨']);
+}
+
+function modal(inner){
+  const m = document.createElement('div');
+  m.className = 'modal';
+  m.innerHTML = '<div class="card">'+inner+'</div>';
+  m.onclick = ev => { if (ev.target === m || ev.target.hasAttribute('data-close')) m.remove(); };
+  document.body.appendChild(m);
+}
+
+function confetti(set){
+  for (let i = 0; i < 24; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = pick(set);
+    c.style.left = Math.random()*100 + 'vw';
+    c.style.animationDuration = (1.8 + Math.random()*1.6) + 's';
+    c.style.animationDelay = Math.random()*0.5 + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4200);
+  }
+}
+
+document.querySelectorAll('.nav button').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); window.scrollTo(0,0); });
+render();
+</script>
+</body>
+</html>
