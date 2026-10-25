@@ -188,6 +188,22 @@ const EVENTS = {
       ['🪑', 'Grew roots on the couch. Their bike has cobwebs.', {h:-7}],
     ]
   },
+  middle: {
+    good: [
+      ['🏆', 'Won the eighth grade science olympiad with a bridge made of popsicle sticks.', {s:8,j:4}],
+      ['🚲', 'Biked to every corner of town with friends all summer.', {h:8,j:6}],
+      ['🎤', 'Crushed the school talent show with a magic act.', {j:9}],
+      ['🏐', 'Made the middle school volleyball team.', {h:8,j:3}],
+      ['🧩', 'Solved a Rubik\'s cube in under a minute.', {s:7,j:3}],
+    ],
+    bad: [
+      ['🤳', 'Got their first phone and disappeared into it for a year.', {h:-6,j:-4}],
+      ['📉', 'Report card came home with a C in every class.', {s:-8}],
+      ['😳', 'An embarrassing video of them went around the whole school.', {j:-9}],
+      ['🛋️', 'Skipped soccer tryouts to binge a whole series.', {h:-7}],
+      ['🌙', 'Up until 2am in group chats every school night.', {s:-5,h:-4}],
+    ]
+  },
   teen: {
     good: [
       ['🎸', 'Started a band in the garage. They are... getting better.', {j:8,s:3}],
@@ -295,13 +311,14 @@ function newLife(name, skin, hair, goal, gen, bonus){
 
 function stage(age){
   if (age < 5) return 'baby';
-  if (age < 14) return 'kid';
+  if (age < 13) return 'kid';
+  if (age < 14) return 'middle';
   if (age < 18) return 'teen';
   if (age < 23) return 'young';
   if (age < 65) return 'adult';
   return 'senior';
 }
-const STAGE_NAMES = {baby:'Baby', kid:'Kid', teen:'High schooler', young:'Young adult', adult:'Adult', senior:'Golden years'};
+const STAGE_NAMES = {baby:'Baby', kid:'Kid', middle:'Teenager', teen:'Teenager', young:'Young adult', adult:'Adult', senior:'Golden years'};
 
 function today(){ const d = new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
 function canCheckIn(){ return S.testMode || S.lastDate !== today(); }
@@ -399,6 +416,10 @@ function milestone(age, met){
     }[top];
   }
 
+  if (age === 14) return met
+    ? {emoji:'🏫', title:'First day of high school', text:'Joined three clubs and found their crew by lunch.', fx:{j:6}}
+    : {emoji:'🏫', title:'First day of high school', text:'Walked into the wrong classroom. Twice. Was staring at their phone both times.', fx:{j:-4}};
+
   if (age === 16) return met && (S.h + S.s)/2 >= 50
     ? {emoji:'🚗', title:'Driving test', text:'Passed on the first try! Freedom!', fx:{j:8}}
     : {emoji:'🚧', title:'Driving test', text:'Failed. Ran over a cone. Then a second cone. Then the mailbox.', fx:{j:-5}};
@@ -476,9 +497,9 @@ function lifeTitle(score){
 // ============ CHARACTER DRAWING ============
 function charSVG(c){
   const st = stage(c.age);
-  const sc = {baby:.55, kid:.72, teen:.86, young:.95, adult:1, senior:.94}[st];
+  const sc = {baby:.55, kid:.72, middle:.8, teen:.86, young:.95, adult:1, senior:.94}[st];
   const hair = st === 'senior' ? '#d6d6d6' : c.hair;
-  const shirt = {baby:'#ffd36e', kid:'#5bc0eb', teen:'#9b5de5', young:'#f15bb5', adult:'#2a9d8f', senior:'#e76f51'}[st];
+  const shirt = {baby:'#ffd36e', kid:'#5bc0eb', middle:'#00bbf9', teen:'#9b5de5', young:'#f15bb5', adult:'#2a9d8f', senior:'#e76f51'}[st];
   const pants = st === 'adult' && c.job && c.pay >= 100 ? '#2d3142' : '#3a6ea5';
   const arm = 7 + c.h/14;               // stronger = thicker arms
   const bodyW = c.h < 35 ? 66 : 56;     // unhealthy = rounder
