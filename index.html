@@ -154,6 +154,10 @@ h2.sm{font-size:15px;color:var(--soft);margin:14px 0 8px}
 .stepper button{width:46px;height:46px;border-radius:50%;border:0;background:#fff;color:var(--accent2);font-size:26px;font-weight:700;box-shadow:0 2px 0 #d8d0ff}
 .stepper .goalval{width:150px;flex:none;white-space:nowrap;font-variant-numeric:tabular-nums}
 .stepper button{flex:none;touch-action:manipulation}
+textarea.code{width:100%;height:110px;border:2px solid #e4ddff;border-radius:12px;padding:10px;font:12px/1.3 ui-monospace,monospace;word-break:break-all;margin:8px 0;resize:none}
+.linkbtn{display:block;margin:12px auto 0;background:none;border:0;color:var(--accent2);font-size:14px;text-decoration:underline;cursor:pointer}
+.small{font-size:12px}
+.switch input[type=time]{width:auto;height:auto;flex:none;font-size:16px;font-family:inherit;color:var(--ink,#2b2350);background:#fff;padding:6px 8px;border:2px solid #e4ddff;border-radius:10px}
 .saved{font-size:15px;margin-top:6px;min-height:42px;line-height:1.4}
 .btn.promise{font-size:17px;line-height:1.3}
 .birth svg{width:170px;height:204px;display:block;margin:0 auto}
@@ -930,6 +934,12 @@ function settingsHTML(){
     '<div class="goalval" id="gv">'+fmtTime(S.goal)+'</div><input type="range" id="goal" min="15" max="720" step="15" value="'+S.goal+'"></div>'+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
     '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>'+
+    '<div class="card"><h2>⏰ Daily reminder</h2><p class="muted">Add a daily "Check in on '+esc(S.name)+'" reminder to your phone\'s calendar.</p>'+
+      '<div class="switch"><span>Remind me at</span><input type="time" id="rtime" value="21:00"></div>'+
+      '<div class="row"><button class="btn ghost" id="ics">📅 Phone calendar</button><button class="btn ghost" id="gcal">Google Calendar</button></div></div>'+
+    '<div class="card"><h2>💾 Backup</h2><p class="muted">'+esc(S.name)+' only lives in this browser. Clearing your history, or not opening the app for a few weeks on iPhone, can erase them. Copy this backup code somewhere safe, like your Notes app or an email to yourself.</p>'+
+      '<button class="btn alt" id="bkcopy">Copy backup code</button>'+(S.backedUp ? '<p class="muted small">Last backup: '+esc(S.backedUp)+'</p>' : '')+
+      '<button class="btn ghost" id="restore" style="margin-top:10px">Restore from a backup</button></div>'+
     '<div class="card"><h2>Start over</h2><p class="muted">Erases '+esc(S.name)+' and their whole life story.</p><button class="btn danger" id="reset">Start a brand new life</button></div>';
 }
 
@@ -951,7 +961,8 @@ function setupHTML(){
         '<div class="future up">'+previewSVG(30, {job:'Doctor', pay:200, log:[{tier:'good'}], j:90})+'<b>2 hours a day</b><span>Doctor, marathon runner, happy</span></div>'+
         '<div class="future down">'+previewSVG(30, {log:[{tier:'awful'}], j:20})+'<b>7 hours a day</b><span>Tired, broke, glued to the couch</span></div>'+
       '</div><h2>Which life will they live?</h2><p class="muted">Every day you hit your screen time goal, your little person has a great year. Every day you miss it... less great. '+(nextGen ? 'Time to raise the next generation.' : 'It\'s up to you.')+'</p>'+
-      '<button class="btn" id="next">'+(nextGen ? 'Meet the next generation' : 'Meet your little person')+' →</button></div>';
+      '<button class="btn" id="next">'+(nextGen ? 'Meet the next generation' : 'Meet your little person')+' →</button>'+
+      (nextGen ? '' : '<button class="linkbtn" id="restore">Have a backup code? Restore it</button>')+'</div>';
   }
   if (step === 1) return top+'<div class="card"><h2 class="big">Boy or girl?</h2><div class="row">'+[false,true].map(g=>'<button class="pick'+(draft.girl === g ? ' on' : '')+'" data-girl="'+g+'">'+
       charSVG({name:g?'Girl':'Boy', age:8, log:[], h:60, s:50, j:70, skin:draft.skin, hair:draft.hair, girl:g})+(g?'Girl':'Boy')+'</button>').join('')+'</div></div>';
@@ -1002,6 +1013,7 @@ function bindSetup(){
     }
     goStep(step + 1);
   };
+  if ($('restore')) $('restore').onclick = restoreModal;
   if ($('start')) $('start').onclick = () => {
     const name = draft.name.trim();
     const keepTest = draft.testMode || false;
@@ -1028,6 +1040,16 @@ function bind(){
   if ($('goal')) $('goal').oninput = e => { S.goal = +e.target.value; $('gv').textContent = fmtTime(S.goal); save(); };
   if ($('nm')) $('nm').onchange = e => { const v = e.target.value.trim(); if (v) { S.name = v; save(); } };
   if ($('tm')) $('tm').onchange = e => { S.testMode = e.target.checked; save(); };
+  if ($('bkcopy')) $('bkcopy').onclick = () => {
+    S.backedUp = new Date().toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'}); save();
+    const code = backupCode();
+    const done = () => { $('bkcopy').textContent = '✓ Copied! Paste it somewhere safe'; };
+    const fallback = () => modal('<h2>Your backup code</h2><p class="muted">Select all of it, copy it, and paste it somewhere safe.</p><textarea class="code" readonly>'+code+'</textarea><button class="btn" data-close>Done</button>');
+    try { navigator.clipboard.writeText(code).then(done, fallback); } catch(e) { fallback(); }
+  };
+  if ($('restore')) $('restore').onclick = restoreModal;
+  if ($('ics')) $('ics').onclick = () => addReminder('ics');
+  if ($('gcal')) $('gcal').onclick = () => addReminder('google');
   if ($('reset')) $('reset').onclick = () => {
     if (!confirm('Erase '+S.name+' and start a new life?')) return;
     draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, step:0, testMode:S.testMode};
@@ -1056,6 +1078,53 @@ function showYear(e){
   h += '<button class="btn" data-close>Continue</button>';
   modal(h);
   if (e.tier === 'great' || e.ms) confetti(e.tier === 'great' ? ['🎉','⭐','✨','🎊'] : [e.ms.emoji,'✨']);
+}
+
+// ============ BACKUP & REMINDER ============
+function backupCode(){ return 'LIFETIME-' + btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
+function readBackup(code){
+  try {
+    code = (code || '').replace(/\s+/g, '');
+    if (code.indexOf('LIFETIME-') !== 0) return null;
+    const d = JSON.parse(decodeURIComponent(escape(atob(code.slice(9)))));
+    return d && d.name && typeof d.age === 'number' && Array.isArray(d.log) ? d : null;
+  } catch(e) { return null; }
+}
+function restoreModal(){
+  modal('<h2>Restore a backup</h2><p class="muted">Paste your backup code below.'+(S ? ' This replaces '+esc(S.name)+'.' : '')+'</p>'+
+    '<textarea class="code" id="rcode" placeholder="LIFETIME-..."></textarea><p class="muted small" id="rerr"></p>'+
+    '<button class="btn" id="rgo">Restore</button><button class="btn ghost" data-close style="margin-top:8px">Cancel</button>');
+  $('rgo').onclick = () => {
+    const d = readBackup($('rcode').value);
+    if (!d) { $('rerr').textContent = 'That code didn\'t work. Make sure you copied all of it.'; return; }
+    S = d; save(); tab = 'home';
+    document.querySelectorAll('.modal').forEach(m => m.remove());
+    catchUp(); render();
+    modal('<div class="birth">'+charSVG(S)+'</div><h2>'+esc(S.name)+' is back!</h2><p>Age '+S.age+', right where you left off.</p><button class="btn" data-close>Yay</button>');
+    confetti(['💖','✨','🎉']);
+  };
+}
+function addReminder(kind){
+  const [hh, mm] = ($('rtime').value || '21:00').split(':').map(Number);
+  const start = new Date(); start.setHours(hh, mm, 0, 0);
+  const end = new Date(start.getTime() + 5*60000);
+  const p = n => String(n).padStart(2, '0');
+  const local = d => d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'T'+p(d.getHours())+p(d.getMinutes())+'00';
+  const title = 'Check in on '+S.name+' 🌱', url = location.href.split('#')[0].split('?')[0];
+  const details = 'How much screen time today? Open Lifetime and see what kind of year '+S.name+' has: '+url;
+  if (kind === 'google') {
+    window.open('https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(title)+
+      '&dates='+local(start)+'/'+local(end)+'&recur='+encodeURIComponent('RRULE:FREQ=DAILY')+'&details='+encodeURIComponent(details), '_blank');
+    return;
+  }
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Lifetime//EN','BEGIN:VEVENT',
+    'UID:lifetime-'+Date.now()+'@gamesbyvidal.github.io','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').split('.')[0]+'Z',
+    'DTSTART:'+local(start),'DTEND:'+local(end),'RRULE:FREQ=DAILY','SUMMARY:'+title,'DESCRIPTION:'+details,'URL:'+url,
+    'BEGIN:VALARM','TRIGGER:PT0M','ACTION:DISPLAY','DESCRIPTION:'+title,'END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+  a.download = 'lifetime-reminder.ics';
+  document.body.appendChild(a); a.click(); a.remove();
 }
 
 function modal(inner){
