@@ -125,6 +125,9 @@ details ul{padding-left:18px;margin:6px 0}
 .swatches{display:flex;gap:10px;flex-wrap:wrap}
 .sw{width:42px;height:42px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 1px var(--line)}
 .sw.on{border-color:var(--accent2)}
+.pick{flex:1;border:3px solid var(--line);background:#fff;border-radius:18px;padding:6px 6px 10px;font-family:inherit;font-size:17px;font-weight:600;color:var(--ink)}
+.pick svg{width:100%;max-width:120px;height:auto;display:block;margin:0 auto}
+.pick.on{border-color:var(--accent2);background:#f5f2ff}
 .goalval{font-size:34px;font-weight:700;color:var(--accent2);text-align:center}
 input[type=range]{width:100%;accent-color:var(--accent2);height:30px}
 .intro{color:#fff;text-align:center;padding:10px 6px 4px}
@@ -679,6 +682,8 @@ function charSVG(c){
   g += '<ellipse cx="100" cy="230" rx="'+(46*sc)+'" ry="7" fill="rgba(0,0,0,.12)"/>';
 
   b += '<g transform="translate(100 230) scale('+sc+') translate(-100 -230)">';
+  // long hair hangs behind the shoulders
+  if (c.girl && ['teen','young','adult'].includes(st)) b += '<path d="M50 84 Q46 38 100 34 Q154 38 150 84 L156 146 Q128 154 100 152 Q72 154 44 146Z" fill="'+hair+'" '+W+' stroke-linejoin="round"'+(sad ? ' transform="rotate(8 100 90)"' : '')+'/>';
   if (st === 'teen' || (st === 'young' && !c.edu)) b += '<ellipse cx="100" cy="122" rx="40" ry="16" fill="'+shirt+'" '+W+'/>'; // hood
   // legs and shoes
   const legH = st === 'baby' ? 26 : 40;
@@ -697,26 +702,37 @@ function charSVG(c){
     if (st === 'middle') b += '<path d="M78 124 L78 176 M122 124 L122 176" stroke="#ff7a59" stroke-width="5"/><path d="M88 150 h24" stroke="#fff" stroke-width="5" stroke-linecap="round"/>';
     if (st === 'teen' || (st === 'young' && !c.edu)) b += '<path d="M92 126 l-2 22 M108 126 l2 22" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M70 120 Q100 108 130 120" stroke="'+O+'" stroke-width="6" fill="none"/><circle cx="70" cy="120" r="9" fill="#ff5d8f" stroke="'+O+'" stroke-width="3"/><circle cx="130" cy="120" r="9" fill="#ff5d8f" stroke="'+O+'" stroke-width="3"/>';
     if (st === 'young' && c.edu) b += '<path d="M100 130 l5 10 11 1 -8 7 2 11 -10 -6 -10 6 2 -11 -8 -7 11 -1z" fill="#ffd36e" stroke="'+O+'" stroke-width="2"/>';
-    if (dressy) b += '<path d="M86 120 L100 150 L114 120 Z" fill="#fff" stroke="'+O+'" stroke-width="2.5"/><path d="M100 126 l-5 8 5 22 5 -22z" fill="#ff4d5a" stroke="'+O+'" stroke-width="2"/>';
+    if (dressy && c.girl) b += '<path d="M86 120 L100 150 L114 120 Z" fill="#fff" stroke="'+O+'" stroke-width="2.5"/><path d="M88 124 Q100 136 112 124" stroke="#f5b700" stroke-width="2.5" fill="none"/><circle cx="100" cy="131" r="3.5" fill="#f5b700" stroke="'+O+'" stroke-width="1.5"/>';
+    else if (dressy) b += '<path d="M86 120 L100 150 L114 120 Z" fill="#fff" stroke="'+O+'" stroke-width="2.5"/><path d="M100 126 l-5 8 5 22 5 -22z" fill="#ff4d5a" stroke="'+O+'" stroke-width="2"/>';
+    if (c.girl && (st === 'kid' || st === 'middle')) b += '<path d="M'+(bodyX+2)+' 166 L'+(bodyX-6)+' 196 Q100 206 '+(bodyX+bodyW+6)+' 196 L'+(bodyX+bodyW-2)+' 166Z" fill="'+shirt+'" '+W+' stroke-linejoin="round"/>';
   } else if (st !== 'baby') b += '<ellipse cx="88" cy="160" rx="7" ry="5" fill="#7d6b55" opacity=".6"/>';
   if (st === 'senior') b += '<circle cx="100" cy="140" r="3" fill="'+O+'"/><circle cx="100" cy="156" r="3" fill="'+O+'"/><circle cx="100" cy="172" r="3" fill="'+O+'"/>'+
     (sad ? '' : '<path d="M150 150 L156 220 M150 150 q-2 -12 -12 -8" stroke="#8a5a34" stroke-width="6" fill="none" stroke-linecap="round"/>');
 
   // head
   b += '<g'+(sad ? ' transform="rotate(8 100 90)"' : '')+'>';
+  if (c.girl) {
+    if (st === 'kid') b += '<g fill="'+hair+'" '+W+'><ellipse cx="46" cy="100" rx="13" ry="22"/><ellipse cx="154" cy="100" rx="13" ry="22"/></g><circle cx="52" cy="80" r="6" fill="#ff5d8f" stroke="'+O+'" stroke-width="2.5"/><circle cx="148" cy="80" r="6" fill="#ff5d8f" stroke="'+O+'" stroke-width="2.5"/>';
+    else if (st === 'middle') b += '<path d="M138 50 Q176 60 164 120 Q156 92 140 78Z" fill="'+hair+'" '+W+' stroke-linejoin="round"/>';
+    else if (st === 'senior') b += '<circle cx="100" cy="30" r="17" fill="'+hair+'" '+W+'/>';
+  }
   b += '<circle cx="100" cy="82" r="48" fill="'+c.skin+'" '+W+'/>';
-  if (st === 'baby') b += '<path d="M96 36 q4 -14 14 -10 q-8 2 -6 10" fill="'+hair+'" stroke="'+O+'" stroke-width="3"/>';
+  if (st === 'baby') b += '<path d="M96 36 q4 -14 14 -10 q-8 2 -6 10" fill="'+hair+'" stroke="'+O+'" stroke-width="3"/>'+
+    (c.girl ? '<path d="M112 40 l-12 -8 0 16z M112 40 l12 -8 0 16z" fill="#ff5d8f" stroke="'+O+'" stroke-width="2.5" stroke-linejoin="round"/><circle cx="112" cy="40" r="3.5" fill="#ff5d8f" stroke="'+O+'" stroke-width="2"/>' : '');
   else if (st === 'senior') b += '<path d="M52 88 Q44 70 54 58 Q52 40 70 36 Q80 24 100 28 Q120 24 130 36 Q148 40 146 58 Q156 70 148 88 Q142 74 136 66 Q128 70 120 62 Q110 70 100 64 Q90 70 80 62 Q72 70 64 66 Q58 74 52 88Z" fill="'+hair+'" '+W+' stroke-linejoin="round"/><path d="M78 40 Q90 34 102 38" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>';
   else {
-    b += '<path d="M52 86 Q48 30 100 30 Q152 30 148 86 Q140 60 124 56 Q116 68 98 60 Q82 70 70 58 Q58 66 52 86Z" fill="'+hair+'" '+W+' stroke-linejoin="round"/>';
-    if (st === 'teen' || st === 'middle') b += '<path d="M70 40 Q110 20 140 60 Q118 44 96 48Z" fill="'+hair+'" stroke="'+O+'" stroke-width="3"/><path d="M84 40 Q100 34 116 38" stroke="#fff" stroke-width="3" opacity=".5" fill="none"/>';
-    if (st === 'kid') b += '<path d="M96 30 q4 -14 14 -10 q-8 2 -6 10" fill="'+hair+'" stroke="'+O+'" stroke-width="3"/>';
+    if (c.girl) b += '<path d="M52 88 Q46 30 100 30 Q154 30 148 88 Q146 64 134 54 Q112 66 80 52 Q64 62 52 88Z" fill="'+hair+'" '+W+' stroke-linejoin="round"/><path d="M80 40 Q96 34 112 38" stroke="#fff" stroke-width="3" opacity=".45" fill="none" stroke-linecap="round"/>';
+    else b += '<path d="M52 86 Q48 30 100 30 Q152 30 148 86 Q140 60 124 56 Q116 68 98 60 Q82 70 70 58 Q58 66 52 86Z" fill="'+hair+'" '+W+' stroke-linejoin="round"/>';
+    if (c.girl) {}
+    else if (st === 'teen' || st === 'middle') b += '<path d="M70 40 Q110 20 140 60 Q118 44 96 48Z" fill="'+hair+'" stroke="'+O+'" stroke-width="3"/><path d="M84 40 Q100 34 116 38" stroke="#fff" stroke-width="3" opacity=".5" fill="none"/>';
+    if (st === 'kid' && !c.girl) b += '<path d="M96 30 q4 -14 14 -10 q-8 2 -6 10" fill="'+hair+'" stroke="'+O+'" stroke-width="3"/>';
     if (sad) b += '<path d="M70 34 l-6 -8 M128 34 l8 -8 M100 28 l0 -10" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/>';
   }
   if (st === 'young' && c.edu) b += '<path d="M58 40 L100 22 L142 40 L100 58Z" fill="#2b2350" '+W+' stroke-linejoin="round"/><path d="M140 40 L144 64" stroke="#f5b700" stroke-width="3"/><circle cx="144" cy="66" r="5" fill="#f5b700"/>';
   // face
   if (!sad) {
     for (const x of [82,118]) b += '<ellipse cx="'+x+'" cy="92" rx="8" ry="10" fill="#2b1d3a"/><circle cx="'+(x-3)+'" cy="88" r="3.2" fill="#fff"/><circle cx="'+(x+3)+'" cy="96" r="1.6" fill="#fff"/>';
+    if (c.girl) b += '<path d="M74 88 l-5 -3 M75 84 l-3 -5 M126 88 l5 -3 M125 84 l3 -5" stroke="'+O+'" stroke-width="2.5" stroke-linecap="round"/>';
     b += '<ellipse cx="70" cy="106" rx="8" ry="5" fill="#ff8fa3" opacity=".6"/><ellipse cx="130" cy="106" rx="8" ry="5" fill="#ff8fa3" opacity=".6"/>';
     b += '<path d="M90 106 Q100 120 110 106 Z" fill="#a33a4f" stroke="'+O+'" stroke-width="2.5" stroke-linejoin="round"/><path d="M95 112 Q100 116 105 112" fill="#ff8fa3"/>';
   } else {
@@ -897,6 +913,8 @@ function setupHTML(){
   return '<div class="intro"><h1>Lifetime</h1><p>One day for you is one year for them.</p></div>'+
     '<div class="card"><p>Set a daily screen time goal. Each night, check in. Hit your goal and your little person lives a great life. Miss it and... well, things go less great.</p></div>'+
     '<div class="card"><h2>'+(nextGen?'Name the next generation':'Name your little person')+'</h2><input type="text" id="nm" maxlength="20" placeholder="Their name" value="'+esc(draft.name)+'"></div>'+
+    '<div class="card"><h2>Boy or girl?</h2><div class="row">'+[false,true].map(g=>'<button class="pick'+(!!draft.girl===g?' on':'')+'" data-girl="'+g+'">'+
+      charSVG({name:g?'Girl':'Boy', age:8, log:[], h:60, s:50, j:70, skin:draft.skin, hair:draft.hair, girl:g})+(g?'Girl':'Boy')+'</button>').join('')+'</div></div>'+
     '<div class="card"><h2>Skin</h2><div class="swatches">'+SKINS.map(c=>'<button class="sw'+(c===draft.skin?' on':'')+'" data-skin="'+c+'" style="background:'+c+'" aria-label="skin color"></button>').join('')+'</div>'+
     '<h2 style="margin-top:14px">Hair</h2><div class="swatches">'+HAIRS.map(c=>'<button class="sw'+(c===draft.hair?' on':'')+'" data-hair="'+c+'" style="background:'+c+'" aria-label="hair color"></button>').join('')+'</div></div>'+
     '<div class="card"><h2>Daily screen time goal</h2><div class="goalval" id="gv">'+fmtTime(draft.goal)+'</div>'+
@@ -905,6 +923,7 @@ function setupHTML(){
 }
 
 function bindSetup(){
+  document.querySelectorAll('[data-girl]').forEach(b => b.onclick = () => { draft.girl = b.dataset.girl === 'true'; draft.name = $('nm').value; render(); });
   document.querySelectorAll('[data-skin]').forEach(b => b.onclick = () => { draft.skin = b.dataset.skin; draft.name = $('nm').value; render(); });
   document.querySelectorAll('[data-hair]').forEach(b => b.onclick = () => { draft.hair = b.dataset.hair; draft.name = $('nm').value; render(); });
   $('goal').oninput = e => { draft.goal = +e.target.value; $('gv').textContent = fmtTime(draft.goal); };
@@ -914,6 +933,7 @@ function bindSetup(){
     const keepTest = draft.testMode || false;
     S = null;
     S = newLife(name, draft.skin, draft.hair, draft.goal, draft.gen, draft.bonus);
+    S.girl = !!draft.girl;
     S.testMode = keepTest;
     save(); tab = 'home'; render();
     modal('<div class="evt">👶</div><h2>'+esc(name)+' is born!</h2><p>Every day you hit your goal, they have a great year. Check in tonight to start year one.</p><button class="btn" data-close>Let\'s go</button>');
@@ -933,13 +953,13 @@ function bind(){
   if ($('tm')) $('tm').onchange = e => { S.testMode = e.target.checked; save(); };
   if ($('reset')) $('reset').onclick = () => {
     if (!confirm('Erase '+S.name+' and start a new life?')) return;
-    draft = {name:'', skin:S.skin, hair:S.hair, goal:S.goal, testMode:S.testMode};
+    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, goal:S.goal, testMode:S.testMode};
     S = null; save(); try { localStorage.removeItem(KEY); } catch(e){}
     render();
   };
   if ($('nextGen')) $('nextGen').onclick = () => {
     const bonus = Math.min(15, Math.round(lifeScore()/10));
-    draft = {name:'', skin:S.skin, hair:S.hair, goal:S.goal, gen:S.gen+1, bonus, testMode:S.testMode};
+    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, goal:S.goal, gen:S.gen+1, bonus, testMode:S.testMode};
     S = null; try { localStorage.removeItem(KEY); } catch(e){}
     render();
   };
