@@ -133,6 +133,29 @@ input[type=range]{width:100%;accent-color:var(--accent2);height:30px}
 .intro{color:#fff;text-align:center;padding:10px 6px 4px}
 .intro h1{font-size:40px;margin:0}
 .intro p{font-size:18px;opacity:.9}
+.setuptop{display:flex;align-items:center;gap:10px;color:#fff;margin:4px 0 12px;min-height:34px}
+.backbtn{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:999px;padding:6px 12px;font-size:15px;font-weight:600}
+.dots{flex:1;display:flex;justify-content:center;gap:8px;margin-right:60px}
+.dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3)}
+.dots i.on{background:#fff}
+.center{text-align:center}
+h2.big{font-size:24px;margin:6px 0 14px}
+h2.sm{font-size:15px;color:var(--soft);margin:14px 0 8px}
+.center .swatches{justify-content:center}
+.bigprev svg{width:190px;height:228px;display:block;margin:0 auto}
+.futures{text-align:center}
+.future{flex:1;border-radius:18px;padding:6px 4px 10px;background:linear-gradient(180deg,#e9f5ff,#fff)}
+.future.down{background:linear-gradient(180deg,#e4e4ea,#f6f6f8)}
+.future svg{width:100%;height:auto;display:block}
+.future b{display:block;font-size:15px}
+.future span{display:block;font-size:12px;color:var(--soft);line-height:1.3;margin-top:2px}
+.goalbox{background:#f5f2ff;border-radius:18px;padding:12px;margin-top:14px;text-align:center}
+.stepper{display:flex;align-items:center;justify-content:center;gap:18px}
+.stepper button{width:46px;height:46px;border-radius:50%;border:0;background:#fff;color:var(--accent2);font-size:26px;font-weight:700;box-shadow:0 2px 0 #d8d0ff}
+.saved{font-size:15px;margin-top:6px}
+.btn.promise{font-size:17px;line-height:1.3}
+.birth svg{width:170px;height:204px;display:block;margin:0 auto}
+.firstword{display:inline-block;background:#fff;border:3px solid #3b2a4a;border-radius:16px;padding:6px 12px;font-weight:600;margin:4px 0 6px}
 .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0}
 .switch input{width:22px;height:22px;accent-color:var(--accent2)}
 .confetti{position:fixed;top:-20px;font-size:22px;pointer-events:none;z-index:30;animation:drop linear forwards}
@@ -403,7 +426,7 @@ const SKINS = ['#ffe0c7','#f1c27d','#d9a066','#a86b3c','#6b4226'];
 const HAIRS = ['#2b1d14','#6a3e1f','#d8a24a','#c0392b','#3d3d8f'];
 let S = load();
 let tab = 'home';
-let draft = {name:'', skin:SKINS[1], hair:HAIRS[0], goal:120};
+let draft = {name:'', skin:SKINS[1], hair:HAIRS[0], avg:240, goal:210, step:0};
 
 function load(){ try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
@@ -902,41 +925,93 @@ function storyHTML(){
 function settingsHTML(){
   return header()+
     '<div class="card"><h2>Daily goal</h2><p class="muted">Stay at or under this much phone time each day.</p>'+
-    '<div class="goalval" id="gv">'+fmtTime(S.goal)+'</div><input type="range" id="goal" min="15" max="480" step="15" value="'+S.goal+'"></div>'+
+    '<div class="goalval" id="gv">'+fmtTime(S.goal)+'</div><input type="range" id="goal" min="15" max="720" step="15" value="'+S.goal+'"></div>'+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
     '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>'+
     '<div class="card"><h2>Start over</h2><p class="muted">Erases '+esc(S.name)+' and their whole life story.</p><button class="btn danger" id="reset">Start a brand new life</button></div>';
 }
 
-function setupHTML(){
-  const nextGen = draft.gen > 1;
-  return '<div class="intro"><h1>Lifetime</h1><p>One day for you is one year for them.</p></div>'+
-    '<div class="card"><p>Set a daily screen time goal. Each night, check in. Hit your goal and your little person lives a great life. Miss it and... well, things go less great.</p></div>'+
-    '<div class="card"><h2>'+(nextGen?'Name the next generation':'Name your little person')+'</h2><input type="text" id="nm" maxlength="20" placeholder="Their name" value="'+esc(draft.name)+'"></div>'+
-    '<div class="card"><h2>Boy or girl?</h2><div class="row">'+[false,true].map(g=>'<button class="pick'+(!!draft.girl===g?' on':'')+'" data-girl="'+g+'">'+
-      charSVG({name:g?'Girl':'Boy', age:8, log:[], h:60, s:50, j:70, skin:draft.skin, hair:draft.hair, girl:g})+(g?'Girl':'Boy')+'</button>').join('')+'</div></div>'+
-    '<div class="card"><h2>Skin</h2><div class="swatches">'+SKINS.map(c=>'<button class="sw'+(c===draft.skin?' on':'')+'" data-skin="'+c+'" style="background:'+c+'" aria-label="skin color"></button>').join('')+'</div>'+
-    '<h2 style="margin-top:14px">Hair</h2><div class="swatches">'+HAIRS.map(c=>'<button class="sw'+(c===draft.hair?' on':'')+'" data-hair="'+c+'" style="background:'+c+'" aria-label="hair color"></button>').join('')+'</div></div>'+
-    '<div class="card"><h2>Daily screen time goal</h2><div class="goalval" id="gv">'+fmtTime(draft.goal)+'</div>'+
-    '<input type="range" id="goal" min="15" max="480" step="15" value="'+draft.goal+'"><p class="muted">Tip: check your phone\'s average from last week and aim a bit lower.</p>'+
-    '<button class="btn alt" id="start">Bring them to life 👶</button></div>';
+// ============ SETUP (one step at a time) ============
+// Steps: 0 two futures, 1 boy or girl, 2 name, 3 look, 4 goal, 5 promise
+const SETUP_STEPS = 6;
+function previewSVG(age, extra){
+  return charSVG(Object.assign({name: draft.name || 'them', age, log: [], h: 60, s: 50, j: 70, skin: draft.skin, hair: draft.hair, girl: !!draft.girl}, extra || {}));
 }
+function setupHTML(){
+  const step = draft.step || 0, name = esc(draft.name || 'them');
+  const dots = '<div class="dots">'+Array.from({length: SETUP_STEPS}, (_, i) => '<i class="'+(i <= step ? 'on' : '')+'"></i>').join('')+'</div>';
+  const back = step > 0 ? '<button class="backbtn" id="back">‹ Back</button>' : '';
+  const top = '<div class="setuptop">'+back+dots+'</div>';
+  if (step === 0) {
+    const nextGen = draft.gen > 1;
+    return '<div class="intro"><h1>Lifetime</h1><p>One day for you is one year for them.</p></div>'+
+      '<div class="card futures"><div class="row">'+
+        '<div class="future up">'+previewSVG(30, {job:'Doctor', pay:200, log:[{tier:'good'}], j:90})+'<b>2 hours a day</b><span>Doctor, marathon runner, happy</span></div>'+
+        '<div class="future down">'+previewSVG(30, {log:[{tier:'awful'}], j:20})+'<b>7 hours a day</b><span>Tired, broke, glued to the couch</span></div>'+
+      '</div><h2>Which life will they live?</h2><p class="muted">Every day you hit your screen time goal, your little person has a great year. Every day you miss it... less great. '+(nextGen ? 'Time to raise the next generation.' : 'It\'s up to you.')+'</p>'+
+      '<button class="btn" id="next">'+(nextGen ? 'Meet the next generation' : 'Meet your little person')+' →</button></div>';
+  }
+  if (step === 1) return top+'<div class="card"><h2 class="big">Boy or girl?</h2><div class="row">'+[false,true].map(g=>'<button class="pick'+(draft.girl === g ? ' on' : '')+'" data-girl="'+g+'">'+
+      charSVG({name:g?'Girl':'Boy', age:8, log:[], h:60, s:50, j:70, skin:draft.skin, hair:draft.hair, girl:g})+(g?'Girl':'Boy')+'</button>').join('')+'</div></div>';
+  if (step === 2) return top+'<div class="card center"><div class="bigprev">'+previewSVG(8)+'</div><h2 class="big">What\'s their name?</h2>'+
+      '<input type="text" id="nm" maxlength="20" placeholder="Their name" value="'+esc(draft.name)+'" autocomplete="off"><button class="btn alt" id="next">Next →</button></div>';
+  if (step === 3) return top+'<div class="card center"><div class="bigprev">'+previewSVG(8)+'</div><h2 class="big">How does '+name+' look?</h2>'+
+      '<h2 class="sm">Skin</h2><div class="swatches">'+SKINS.map(c=>'<button class="sw'+(c===draft.skin?' on':'')+'" data-skin="'+c+'" style="background:'+c+'" aria-label="skin color"></button>').join('')+'</div>'+
+      '<h2 class="sm">Hair</h2><div class="swatches">'+HAIRS.map(c=>'<button class="sw'+(c===draft.hair?' on':'')+'" data-hair="'+c+'" style="background:'+c+'" aria-label="hair color"></button>').join('')+'</div>'+
+      '<button class="btn alt" id="next">Next →</button></div>';
+  if (step === 4) return top+'<div class="card"><h2 class="big">How much screen time do you average a day?</h2>'+
+      '<div class="goalval" id="av">'+fmtTime(draft.avg)+'</div><input type="range" id="avg" min="30" max="720" step="15" value="'+draft.avg+'">'+
+      '<details><summary>Where do I find this?</summary><ul><li><b>iPhone:</b> Settings → Screen Time. It shows your Daily Average.</li><li><b>Android:</b> Settings → Digital Wellbeing &amp; parental controls.</li></ul></details>'+
+      '<div class="goalbox"><div class="muted">Your daily goal</div><div class="stepper"><button id="minus">–</button><div class="goalval" id="gv">'+fmtTime(draft.goal)+'</div><button id="plus">+</button></div>'+
+      '<div id="saved" class="saved">'+savedLine()+'</div></div>'+
+      '<button class="btn alt" id="next">Next →</button></div>';
+  return top+'<div class="card center"><div class="bigprev">'+previewSVG(0)+'</div><h2 class="big">Ready to bring '+name+' to life?</h2>'+
+      '<p class="muted">Check in every night with your screen time. Stay at '+fmtTime(draft.goal)+' or less and '+name+' gets a great year.</p>'+
+      '<button class="btn promise" id="start">I promise to give '+name+' a good life 🤞</button></div>';
+}
+function savedLine(){
+  const diff = draft.avg - draft.goal;
+  if (diff <= 0) return 'Try a goal a little below your average. That\'s where the magic happens.';
+  const hrs = Math.round(diff * 365 / 60);
+  return 'That\'s <b>'+hrs+' hours a year</b> back, about <b>'+Math.round(hrs/24)+' full days</b>.';
+}
+function goStep(n){ draft.step = Math.max(0, Math.min(SETUP_STEPS - 1, n)); render(); window.scrollTo(0, 0); }
 
 function bindSetup(){
-  document.querySelectorAll('[data-girl]').forEach(b => b.onclick = () => { draft.girl = b.dataset.girl === 'true'; draft.name = $('nm').value; render(); });
-  document.querySelectorAll('[data-skin]').forEach(b => b.onclick = () => { draft.skin = b.dataset.skin; draft.name = $('nm').value; render(); });
-  document.querySelectorAll('[data-hair]').forEach(b => b.onclick = () => { draft.hair = b.dataset.hair; draft.name = $('nm').value; render(); });
-  $('goal').oninput = e => { draft.goal = +e.target.value; $('gv').textContent = fmtTime(draft.goal); };
-  $('start').onclick = () => {
-    const name = $('nm').value.trim();
-    if (!name) { $('nm').focus(); $('nm').style.borderColor = 'var(--bad)'; return; }
+  const step = draft.step || 0;
+  if ($('back')) $('back').onclick = () => goStep(step - 1);
+  document.querySelectorAll('[data-girl]').forEach(b => b.onclick = () => { draft.girl = b.dataset.girl === 'true'; render(); setTimeout(() => goStep(2), 250); });
+  document.querySelectorAll('[data-skin]').forEach(b => b.onclick = () => { draft.skin = b.dataset.skin; render(); });
+  document.querySelectorAll('[data-hair]').forEach(b => b.onclick = () => { draft.hair = b.dataset.hair; render(); });
+  if ($('nm')) {
+    $('nm').oninput = e => { draft.name = e.target.value; };
+    $('nm').onkeydown = e => { if (e.key === 'Enter') $('next').click(); };
+  }
+  if ($('avg')) {
+    const update = () => { $('av').textContent = fmtTime(draft.avg); $('gv').textContent = fmtTime(draft.goal); $('saved').innerHTML = savedLine(); };
+    $('avg').oninput = e => { draft.avg = +e.target.value; draft.goal = Math.max(15, draft.avg - 30); update(); };
+    $('minus').onclick = () => { draft.goal = Math.max(15, draft.goal - 15); update(); };
+    $('plus').onclick = () => { draft.goal = Math.min(720, draft.goal + 15); update(); };
+  }
+  if ($('next')) $('next').onclick = () => {
+    if (step === 2) {
+      draft.name = $('nm').value.trim();
+      if (!draft.name) { $('nm').focus(); $('nm').style.borderColor = 'var(--bad)'; return; }
+    }
+    goStep(step + 1);
+  };
+  if ($('start')) $('start').onclick = () => {
+    const name = draft.name.trim();
     const keepTest = draft.testMode || false;
-    S = null;
     S = newLife(name, draft.skin, draft.hair, draft.goal, draft.gen, draft.bonus);
     S.girl = !!draft.girl;
+    S.avg = draft.avg;
     S.testMode = keepTest;
     save(); tab = 'home'; render();
-    modal('<div class="evt">👶</div><h2>'+esc(name)+' is born!</h2><p>Every day you hit your goal, they have a great year. Check in tonight to start year one.</p><button class="btn" data-close>Let\'s go</button>');
+    modal('<div class="birth">'+charSVG(S)+'</div><h2>'+esc(name)+' is born!</h2>'+
+      '<div class="firstword">"'+esc(pick(LINES.baby.up))+'"</div>'+
+      '<p>Every day you hit your goal, '+esc(name)+' has a great year. Check in tonight to start year one.</p><button class="btn" data-close>Let\'s go</button>');
+    confetti(['👶','🎉','✨','🍼','💖']);
   };
 }
 
@@ -953,13 +1028,13 @@ function bind(){
   if ($('tm')) $('tm').onchange = e => { S.testMode = e.target.checked; save(); };
   if ($('reset')) $('reset').onclick = () => {
     if (!confirm('Erase '+S.name+' and start a new life?')) return;
-    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, goal:S.goal, testMode:S.testMode};
+    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, step:0, testMode:S.testMode};
     S = null; save(); try { localStorage.removeItem(KEY); } catch(e){}
     render();
   };
   if ($('nextGen')) $('nextGen').onclick = () => {
     const bonus = Math.min(15, Math.round(lifeScore()/10));
-    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, goal:S.goal, gen:S.gen+1, bonus, testMode:S.testMode};
+    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, step:0, testMode:S.testMode};
     S = null; try { localStorage.removeItem(KEY); } catch(e){}
     render();
   };
