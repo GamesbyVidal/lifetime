@@ -187,6 +187,31 @@ textarea.code{width:100%;height:110px;border:2px solid #e4ddff;border-radius:12p
 .mbest .be{display:flex;gap:8px;font-size:14px;margin:6px 0;line-height:1.3}.meet .hook{font-size:15px;margin:14px 4px}
 .meet .cta{width:100%;border:0;border-radius:16px;padding:15px;font:600 18px Fredoka,system-ui;color:#fff;background:linear-gradient(90deg,#ff7a59,#ff5a8a);box-shadow:0 4px 0 #c84466}
 .meet .tiny{font-size:12px;opacity:.7;margin-top:8px}
+.hero2 .hrow{display:flex;gap:10px;align-items:center}
+.hero2 .buddy{width:126px;flex:none;margin:0}.hero2 .buddy svg{width:126px;height:151px;display:block}
+.hero2 .taphint{text-align:center;margin-top:-4px}
+.hero2 .bubble{left:58%;top:6px;transform:translate(0,-100%) scale(.6);transform-origin:20px 100%;max-width:210px}
+.hero2 .bubble.show{transform:translate(0,-100%) scale(1)}.hero2 .bubble:after{left:22px}
+.hero2 .who{flex:1;min-width:0}.hero2 .name{margin:0;line-height:1.05}.hero2 .sub{margin:2px 0 4px;font-size:14px}
+.hero2 .tags .tag{margin:2px 2px 0 0;font-size:12px;padding:2px 8px}
+.last{background:#f6f3ff;border-radius:12px;padding:7px 10px;font-size:13px;line-height:1.3;margin-top:8px}
+.last b{display:block;font-size:11px;text-transform:uppercase;color:var(--accent2);letter-spacing:.05em}
+.chips{display:flex;gap:6px;margin-top:10px}.chip{flex:1;border-radius:12px;padding:6px 8px;font-size:14px;font-weight:600;background:#f6f3ff}
+.chip i{display:block;height:5px;border-radius:5px;background:#e8e4f5;margin-top:4px;overflow:hidden}.chip u{display:block;height:100%;transition:width .6s}
+h2.ci{margin:0 0 2px;font-size:20px}
+.picker{display:flex;align-items:center;justify-content:center;gap:14px;margin:8px 0 4px}
+.picker button{width:54px;height:54px;flex:none;border-radius:50%;border:0;background:#f1edff;color:var(--accent2);font-size:30px;font-weight:700;touch-action:manipulation}
+.picker .v{width:160px;flex:none;text-align:center;font-size:40px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.verdict{border-radius:12px;padding:9px 10px;font-size:15px;text-align:center;margin:4px 0 12px;font-weight:600;min-height:42px}
+.week{display:flex;justify-content:space-between;gap:4px;margin:2px 0 8px}.week div{text-align:center;font-size:11px;color:var(--soft);flex:1}
+.week span{display:block;height:34px;max-width:40px;margin:0 auto 3px;border-radius:10px;background:#eee}
+.week .great,.week .good{background:var(--good)}.week .meh{background:#ffd34d}.week .bad,.week .awful{background:var(--bad)}.week .skipped{background:#d9d5e6}
+.week .next span{background:#fff;border:3px dashed #cfc6f5}
+.nudge{font-size:14px;text-align:center}.nudge b{color:var(--accent)}
+.tease{display:flex;gap:12px;align-items:center;background:linear-gradient(90deg,#fff6e6,#ffeef3);border-radius:16px;padding:12px;text-align:left;margin-bottom:14px}
+.card .tease{margin-bottom:0}.tease .e{font-size:32px}.tease b{display:block;color:var(--ink)}.tease span{font-size:13px;color:var(--soft)}
+.result{text-align:center}.result .ban{display:inline-block;color:#fff;border-radius:999px;padding:4px 14px;font-weight:700;font-size:14px}
+.result .ev{font-size:44px;margin:6px 0 0}.result p{margin:4px 0}.msline{font-size:14px;margin-top:4px}
 .saved{font-size:15px;margin-top:6px;min-height:42px;line-height:1.4}
 .btn.promise{font-size:17px;line-height:1.3}
 .birth svg{width:170px;height:204px;display:block;margin:0 auto}
@@ -498,14 +523,16 @@ function fmtMoney(k){ if (k >= 1000) return '$'+(k/1000).toFixed(k >= 10000 ? 0 
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
 // ============ ONE YEAR PASSES ============
-function checkIn(mins){
+function tierFor(mins){
   const g = S.goal;
-  let tier;
-  if (mins <= g * SETTINGS.greatIfUnder) tier = 'great';
-  else if (mins <= g) tier = 'good';
-  else if (mins <= g * SETTINGS.mehIfOver) tier = 'meh';
-  else if (mins <= g * SETTINGS.awfulIfOver) tier = 'bad';
-  else tier = 'awful';
+  if (mins <= g * SETTINGS.greatIfUnder) return 'great';
+  if (mins <= g) return 'good';
+  if (mins <= g * SETTINGS.mehIfOver) return 'meh';
+  if (mins <= g * SETTINGS.awfulIfOver) return 'bad';
+  return 'awful';
+}
+function checkIn(mins){
+  const tier = tierFor(mins);
   const entry = liveYear(mins, tier);
   S.lastDate = today();
   save();
@@ -886,43 +913,98 @@ function statRow(lbl, v, color){
   return '<div class="stat"><span class="lbl">'+lbl+'</span><div class="bar"><i style="width:'+v+'%;background:'+color+'"></i></div><span class="num">'+v+'</span></div>';
 }
 
+// Big moments coming up, used for the "Coming up" teaser on the Today screen.
+const UPCOMING = {5:['🎒','First day of school'], 10:['🌟','A hidden talent shows up'], 14:['🏫','First day of high school'], 16:['🚗','Driving test'],
+  18:['🎓','College decisions'], 22:['💼','First real job'], 28:['💞','Love life'], 35:['📈','Big career moment'], 45:['🪞','Midlife'], 65:['🏖️','Retirement']};
+function nextBig(after){
+  const ages = Object.keys(UPCOMING).map(Number).filter(a => a > after);
+  if (ages.length) return [ages[0]].concat(UPCOMING[ages[0]]);
+  return after < SETTINGS.lifeLength ? [SETTINGS.lifeLength, '🎂', 'The final chapter'] : null;
+}
+const VERDICT = {
+  great: ['🌟', 'Way under your goal. Amazing year!', '#fff6d6', '#9a6b00'],
+  good:  ['✅', 'Under your goal. {name} has a good year!', '#e4f7ee', '#148a55'],
+  meh:   ['😐', 'A little over your goal. So-so year.', '#f0eef6', '#5f5a77'],
+  bad:   ['⚠️', 'Over your goal. Rough year ahead.', '#fff0f0', '#c23c3c'],
+  awful: ['💥', 'Way over your goal. Disaster year.', '#ffe6ec', '#a01d3e']
+};
+function verdictHTML(mins){
+  const v = VERDICT[tierFor(mins)];
+  return '<div class="verdict" id="verdict" style="background:'+v[2]+';color:'+v[3]+'">'+v[0]+' '+v[1].replace('{name}', esc(S.name))+'</div>';
+}
+function weekHTML(){
+  const open = canCheckIn() && !S.done;
+  const days = S.log.slice(open ? -6 : -7);
+  let cells = days.map(e => '<div><span class="'+e.tier+'"></span>'+e.age+'</div>').join('');
+  if (open) cells += '<div class="next"><span></span>'+(S.age+1)+'</div>';
+  const keys = Object.keys(SETTINGS.streakBonuses).map(Number).sort((a, b) => a - b);
+  const next = keys.find(k => k > S.streak);
+  let nudge;
+  if (!S.streak) nudge = 'Hit your goal today to start a streak 🔥';
+  else nudge = '🔥 '+S.streak+' day streak'+(next ? ' · <b>'+(next - S.streak)+' more day'+(next - S.streak > 1 ? 's' : '')+' for a +'+SETTINGS.streakBonuses[next]+' bonus</b>' : ' · <b>Legendary!</b>');
+  return '<div class="card"><div class="week">'+cells+'</div><div class="nudge">'+nudge+'</div></div>';
+}
+function teaserHTML(after){
+  const nb = nextBig(after);
+  if (!nb) return '';
+  if (!canCheckIn()) {
+    const turning = S.age + 1, big = nb[0] === turning;
+    return '<div class="tease"><div class="e">🎂</div><div><b>Tomorrow '+esc(S.name)+' turns '+turning+'</b><span>'+(big ? nb[2]+'! '+nb[1] : 'Coming up at '+nb[0]+': '+nb[2]+' '+nb[1])+'</span></div></div>';
+  }
+  const soon = nb[0] === S.age + 1;
+  return '<div class="tease"><div class="e">'+nb[1]+'</div><div><b>'+(soon ? 'This year: ' : 'Coming up at '+nb[0]+': ')+nb[2]+'</b><span>'+(soon ? 'Hit your goal today so it goes well!' : 'Hit your goal that day so it goes well!')+'</span></div></div>';
+}
+
 function homeHTML(){
   const st = stage(S.age);
-  let tags = '<span class="tag">'+STAGE_NAMES[st]+'</span>';
-  if (S.gen > 1) tags += '<span class="tag">Generation '+S.gen+'</span>';
+  let tags = '';
+  if (S.gen > 1) tags += '<span class="tag">Gen '+S.gen+'</span>';
   if (S.edu && S.age < 23) tags += '<span class="tag">🎓 '+S.edu+'</span>';
   if (S.job) tags += '<span class="tag">💼 '+S.job+'</span>';
   if (S.partner) tags += '<span class="tag">💞 '+S.partner+'</span>';
   if (S.money > 0) tags += '<span class="tag">💰 '+fmtMoney(S.money)+'</span>';
+  const open = canCheckIn() && !S.done;
+  const last = S.log.length ? S.log[S.log.length - 1] : null;
+  const share = S.log.length ? '<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '';
 
-  let action;
+  const chip = (e, v, c) => '<div class="chip">'+e+' '+v+'<i><u style="width:'+v+'%;background:'+c+'"></u></i></div>';
+  const hero = '<div class="card hero2"><div class="hrow"><div class="buddy" id="buddy"><div class="bubble" id="bubble"></div>'+charSVG(S)+
+      (S.tapped ? '' : '<div class="taphint" id="taphint">👆 Tap me!</div>')+'</div>'+
+    '<div class="who"><div class="name">'+esc(S.name)+'</div><div class="sub">Age '+S.age+' · '+STAGE_NAMES[st]+'</div>'+(tags ? '<div class="tags">'+tags+'</div>' : '')+
+    (open && last ? '<div class="last"><b>Last year</b>'+last.emoji+' '+esc(last.text)+'</div>' : '')+'</div></div>'+
+    '<div class="chips">'+chip('💪', S.h, 'var(--h)')+chip('🧠', S.s, 'var(--s)')+chip('😊', S.j, 'var(--j)')+'</div></div>';
+
   if (S.done) {
     const sc = lifeScore(), t = lifeTitle(sc);
-    action = '<div class="card waiting"><div class="big">'+t[0]+'</div><h2>'+S.name+' lived '+t[1].toLowerCase()+'</h2>'+
-      '<p class="muted">Life score: <b>'+sc+'</b>. You hit your goal on '+S.log.filter(e=>e.tier==='good'||e.tier==='great').length+' of '+S.log.length+' days.</p>'+
-      '<p>'+S.name+' has passed the torch. Keep going as their kid, who gets a head start from the life you built.</p>'+
-      '<button class="btn alt" id="nextGen">Play as '+S.name+'\'s kid</button></div>';
-  } else if (canCheckIn()) {
-    action = '<div class="card"><h2>'+(S.age === 0 ? 'Ready for year one?' : 'How was your screen time today?')+'</h2>'+
+    return header()+hero+'<div class="card waiting"><div class="big">'+t[0]+'</div><h2>'+esc(S.name)+' lived '+t[1].toLowerCase()+'</h2>'+
+      '<p class="muted">Life score: <b>'+sc+'</b>. You hit your goal on '+S.log.filter(isMet).length+' of '+S.log.length+' days.</p>'+
+      '<p>'+esc(S.name)+' has passed the torch. Keep going as their kid, who gets a head start from the life you built.</p>'+
+      '<button class="btn alt" id="nextGen">Play as '+esc(S.name)+'\'s kid</button>'+share+'</div>';
+  }
+  if (open) {
+    const start = Math.min(960, Math.max(0, homeMins == null ? S.goal : homeMins));
+    return header()+hero+
+      '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one? How much screen time today?' : 'How much screen time today?')+'</h2>'+
+      '<div class="picker"><button id="tminus" aria-label="Less">–</button><div class="v" id="tval">'+fmtTime(start)+'</div><button id="tplus" aria-label="More">+</button></div>'+
+      '<input type="range" id="tslide" min="0" max="960" step="5" value="'+start+'">'+
       '<div class="goalnote"><span>Your goal: '+fmtTime(S.goal)+' or less</span><span>Best streak: '+S.best+'</span></div>'+
-      '<div class="row"><div class="field"><label>Hours</label><select id="hrs">'+opts(0,16,1,'')+'</select></div>'+
-      '<div class="field"><label>Minutes</label><select id="mins">'+opts(0,55,5,'')+'</select></div></div>'+
+      verdictHTML(start)+
       '<button class="btn" id="go">Live year '+(S.age+1)+' ➜</button>'+
       '<details><summary>Where do I find my screen time?</summary><ul>'+
       '<li><b>iPhone:</b> Settings → Screen Time → See All App &amp; Website Activity. Use the number for Today.</li>'+
       '<li><b>Android:</b> Settings → Digital Wellbeing &amp; parental controls. The number in the circle is today.</li>'+
-      '</ul>Best time to check in is right before bed.</details></div>';
-  } else {
-    action = '<div class="card waiting"><div class="big">🌙</div><h2>'+S.name+' is living out age '+S.age+'</h2>'+
-      '<p class="muted">Come back tomorrow to see what happens next.</p><div class="countdown" id="cd"></div></div>';
+      '</ul>Best time to check in is right before bed.</details></div>'+
+      (S.log.length ? weekHTML() : '')+teaserHTML(S.age)+share;
   }
-
-  return header()+
-    '<div class="card hero"><div class="buddy" id="buddy"><div class="bubble" id="bubble"></div>'+charSVG(S)+'</div>'+(S.tapped ? '' : '<div class="taphint" id="taphint">👆 Tap me!</div>')+'<div class="name">'+esc(S.name)+'</div><div class="sub">Age '+S.age+'</div><div>'+tags+'</div>'+
-    '<div class="stats">'+statRow('💪 Health',S.h,'var(--h)')+statRow('🧠 Smarts',S.s,'var(--s)')+statRow('😊 Happiness',S.j,'var(--j)')+'</div>'+
-    (S.log.length ? '<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '')+'</div>'+
-    action;
+  const t = last ? TIER[last.tier] : null;
+  const result = last ? '<div class="card result"><span class="ban" style="background:'+t.color+'">'+t.label+'</span><div class="ev">'+last.emoji+'</div>'+
+      '<p><b>'+esc(last.text)+'</b></p>'+(last.mins != null ? '<p class="muted">'+fmtTime(last.mins)+' vs. your '+fmtTime(last.goal)+' goal</p>' : '')+
+      '<div class="fx">'+fxHTML(last.fx, last.earned)+'</div>'+
+      (last.ms ? '<div class="msline">'+last.ms.emoji+' <b>'+esc(last.ms.title)+'</b></div>' : '')+share+'</div>' : '';
+  return header()+hero+result+weekHTML()+
+    '<div class="card waiting">'+teaserHTML(S.age)+'<div class="muted" style="margin-top:12px">Next check-in opens in</div><div class="countdown" id="cd"></div></div>';
 }
+let homeMins = null; // what the player has dialed in so far today
 
 function opts(a,b,step,sel){ let o=''; for (let i=a;i<=b;i+=step) o+='<option value="'+i+'">'+i+'</option>'; return o; }
 function esc(t){ return String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -1071,7 +1153,13 @@ function bind(){
   clearInterval(cdTimer);
   if ($('buddy')) $('buddy').onclick = tapCharacter;
   if ($('share')) $('share').onclick = shareLife;
-  if ($('go')) $('go').onclick = () => checkIn((+$('hrs').value)*60 + (+$('mins').value));
+  if ($('tslide')) {
+    const set = m => { m = Math.max(0, Math.min(960, m)); homeMins = m; $('tslide').value = m; $('tval').textContent = fmtTime(m); $('verdict').outerHTML = verdictHTML(m); };
+    $('tslide').oninput = e => set(+e.target.value);
+    $('tminus').onclick = () => set(Math.ceil(+$('tslide').value / 15) * 15 - 15);
+    $('tplus').onclick = () => set(Math.floor(+$('tslide').value / 15) * 15 + 15);
+  }
+  if ($('go')) $('go').onclick = () => { const m = +$('tslide').value; homeMins = null; checkIn(m); };
   if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(4,0,0,0); if (m <= n) m.setDate(m.getDate()+1); const s = Math.floor((m-n)/1000);
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
       if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
