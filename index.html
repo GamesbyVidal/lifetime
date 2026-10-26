@@ -14,6 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -158,6 +159,19 @@ textarea.code{width:100%;height:110px;border:2px solid #e4ddff;border-radius:12p
 .linkbtn{display:block;margin:12px auto 0;background:none;border:0;color:var(--accent2);font-size:14px;text-decoration:underline;cursor:pointer}
 .small{font-size:12px}
 .switch input[type=time]{width:auto;height:auto;flex:none;font-size:16px;font-family:inherit;color:var(--ink,#2b2350);background:#fff;padding:6px 8px;border:2px solid #e4ddff;border-radius:10px}
+.lcmodal{background:rgba(20,12,50,.92)}.lcmodal .card{background:transparent;box-shadow:none;padding:0}.lcmodal .card>.muted,.lcmodal .card>.small{color:#e6e0ff}
+.lifecard{background:linear-gradient(170deg,#7c5cff,#2b2350);color:#fff;border-radius:24px;padding:20px;text-align:center;margin-bottom:12px}
+.lifecard .k{font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.lifecard .age{font-size:72px;font-weight:700;line-height:1;color:#ffd36b}
+.lifecard .nm{font-size:22px;font-weight:600;line-height:1.2}
+.lifecard .pc svg{width:170px;height:200px}
+.lifecard .best{background:rgba(255,255,255,.12);border-radius:16px;padding:10px 12px;text-align:left}
+.lifecard .bh{font-size:12px;text-transform:uppercase;opacity:.7;margin-bottom:4px}
+.lifecard .be{display:flex;gap:8px;font-size:14px;margin:6px 0;line-height:1.25}
+.lifecard .foot{font-size:12px;opacity:.85;margin-top:12px}
+.lcrow{flex-wrap:wrap;margin:8px 0 4px}.lcrow .btn{flex:1;font-size:15px;padding:10px;min-width:120px}
+.install{display:flex;gap:14px;align-items:center}.install img{width:64px;height:64px;border-radius:15px;box-shadow:0 4px 10px rgba(40,20,90,.3);flex:none}
+.kbd{display:inline-block;background:#f1edff;border-radius:6px;padding:0 6px;font-weight:700}
 .saved{font-size:15px;margin-top:6px;min-height:42px;line-height:1.4}
 .btn.promise{font-size:17px;line-height:1.3}
 .birth svg{width:170px;height:204px;display:block;margin:0 auto}
@@ -925,7 +939,9 @@ function storyHTML(){
       '</div></div>';
   }
   const met = S.log.filter(e=>e.tier==='good'||e.tier==='great').length;
-  return header()+'<div class="card"><h2>'+esc(S.name)+'\'s life story</h2><p class="muted">Goal met on '+met+' of '+S.log.length+' days.</p>'+rows+'</div>';
+  const cards = LIFE_CARD_AGES.filter(a => S.age >= a).map(a => '<button class="btn ghost lcbtn" data-age="'+a+'">✨ Age '+a+' card</button>').join('');
+  return header()+'<div class="card"><h2>'+esc(S.name)+'\'s life story</h2><p class="muted">Goal met on '+met+' of '+S.log.length+' days.</p>'+
+    (cards ? '<div class="row lcrow">'+cards+'</div>' : '')+rows+'</div>';
 }
 
 function settingsHTML(){
@@ -934,6 +950,9 @@ function settingsHTML(){
     '<div class="goalval" id="gv">'+fmtTime(S.goal)+'</div><input type="range" id="goal" min="15" max="720" step="15" value="'+S.goal+'"></div>'+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
     '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>'+
+    (isInstalled() ? '' : '<div class="card"><h2>📲 Put Lifetime on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
+      '<p class="muted">Get '+esc(S.name)+' as an app icon that opens full screen. It also keeps their save safer on iPhone.</p></div></div>'+
+      '<p class="small"><b>iPhone:</b> tap the Share button <span class="kbd">⬆︎</span> in Safari, then <b>Add to Home Screen</b>.<br><b>Android:</b> tap the <span class="kbd">⋮</span> menu in Chrome, then <b>Add to Home screen</b> or <b>Install app</b>.</p></div>')+
     '<div class="card"><h2>⏰ Daily reminder</h2><p class="muted">Add a daily "Check in on '+esc(S.name)+'" reminder to your phone\'s calendar.</p>'+
       '<div class="switch"><span>Remind me at</span><input type="time" id="rtime" value="21:00"></div>'+
       '<div class="row"><button class="btn ghost" id="ics">📅 Phone calendar</button><button class="btn ghost" id="gcal">Google Calendar</button></div></div>'+
@@ -1021,7 +1040,7 @@ function bindSetup(){
     S.girl = !!draft.girl;
     S.avg = draft.avg;
     S.testMode = keepTest;
-    save(); tab = 'home'; render();
+    save(); tab = 'home'; render(); updateIcon();
     modal('<div class="birth">'+charSVG(S)+'</div><h2>'+esc(name)+' is born!</h2>'+
       '<div class="firstword">"'+esc(pick(LINES.baby.up))+'"</div>'+
       '<p>Every day you hit your goal, '+esc(name)+' has a great year. Check in tonight to start year one.</p><button class="btn" data-close>Let\'s go</button>');
@@ -1048,6 +1067,7 @@ function bind(){
     try { navigator.clipboard.writeText(code).then(done, fallback); } catch(e) { fallback(); }
   };
   if ($('restore')) $('restore').onclick = restoreModal;
+  document.querySelectorAll('.lcbtn').forEach(b => b.onclick = () => showLifeCard(+b.dataset.age));
   if ($('ics')) $('ics').onclick = () => addReminder('ics');
   if ($('gcal')) $('gcal').onclick = () => addReminder('google');
   if ($('reset')) $('reset').onclick = () => {
@@ -1075,9 +1095,73 @@ function showYear(e){
   for (const n of e.notes) h += '<p><b>'+n+'</b></p>';
   if (e.ms) h += '<div class="mscard"><div class="k">Big life moment</div><div class="e">'+e.ms.emoji+'</div><div class="t">'+esc(e.ms.title)+'</div><p>'+esc(e.ms.text)+'</p></div>';
   if (S.done) h += '<div class="mscard"><div class="k">The end of an era</div><div class="e">🎂</div><div class="t">'+esc(S.name)+' turned '+SETTINGS.lifeLength+'!</div><p>Their story is complete. See how it went on the Today screen.</p></div>';
-  h += '<button class="btn" data-close>Continue</button>';
+  const card = LIFE_CARD_AGES.includes(e.age);
+  h += card ? '<button class="btn" id="lcard">See '+esc(S.name)+'\'s life card ✨</button>' : '<button class="btn" data-close>Continue</button>';
   modal(h);
+  if (card) $('lcard').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); showLifeCard(e.age); };
   if (e.tier === 'great' || e.ms) confetti(e.tier === 'great' ? ['🎉','⭐','✨','🎊'] : [e.ms.emoji,'✨']);
+}
+
+// ============ HOME SCREEN ICON ============
+// The icon is drawn from the player's own character (their skin, hair, boy or girl).
+// Phones copy the icon when "Add to Home Screen" is tapped, so we keep it current.
+function iconSVG(c){
+  const kid = {name:c.name, age:8, log:[{tier:'great'}], h:80, s:70, j:90, skin:c.skin, hair:c.hair, girl:!!c.girl};
+  const face = charSVG(kid).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 130" width="512" height="512">'+
+    '<defs><linearGradient id="ibg" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#2b2350"/></linearGradient></defs>'+
+    '<rect width="130" height="130" fill="url(#ibg)"/><g transform="translate(-35 -15)">'+face+'</g></svg>';
+}
+let iconURL = '';
+function updateIcon(){
+  if (!S) return;
+  try {
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas'); cv.width = cv.height = 512;
+      cv.getContext('2d').drawImage(img, 0, 0, 512, 512);
+      iconURL = cv.toDataURL('image/png');
+      document.querySelectorAll('link[rel=apple-touch-icon],link[rel=icon]').forEach(l => l.href = iconURL);
+      const base = location.href.split('#')[0].split('?')[0];
+      const man = {name:'Lifetime', short_name:'Lifetime', start_url:base, scope:base.replace(/[^/]*$/, ''), display:'standalone',
+        background_color:'#2b2350', theme_color:'#2b2350', icons:[{src:iconURL, sizes:'512x512', type:'image/png', purpose:'any'}]};
+      const ml = document.querySelector('link[rel=manifest]');
+      if (ml) ml.href = URL.createObjectURL(new Blob([JSON.stringify(man)], {type:'application/manifest+json'}));
+      if ($('iconprev')) $('iconprev').src = iconURL;
+    };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(iconSVG(S));
+  } catch(e) {}
+}
+function isInstalled(){ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
+
+// ============ LIFE CARDS (shareable, at 18, 40 and the end) ============
+const LIFE_CARD_AGES = [18, 40, SETTINGS.lifeLength];
+function bestMoments(upTo){
+  const met = e => e.tier === 'good' || e.tier === 'great';
+  const score = e => Object.values(e.fx || {}).reduce((a, v) => a + Math.max(0, v), 0);
+  const log = S.log.filter(e => e.age <= upTo && met(e));
+  const picks = log.filter(e => e.ms).map(e => ({emoji:e.ms.emoji, text:e.ms.title+(/[.!?]$/.test(e.ms.title) ? ' ' : '. ')+e.ms.text, age:e.age, rank:1000 + score(e)}))
+    .concat(log.map(e => ({emoji:e.emoji, text:e.text, age:e.age, rank:score(e)})));
+  return picks.sort((a, b) => b.rank - a.rank).slice(0, 3).sort((a, b) => a.age - b.age);
+}
+function lifeCardHTML(age){
+  const log = S.log.filter(e => e.age <= age);
+  const metN = log.filter(e => e.tier === 'good' || e.tier === 'great').length;
+  const end = age >= SETTINGS.lifeLength;
+  const head = end ? esc(S.name)+' lived '+lifeTitle(lifeScore())[1].toLowerCase()+'!' : age === 18 ? esc(S.name)+' is all grown up!' : esc(S.name)+' hit the big 4-0!';
+  const best = bestMoments(age);
+  const who = Object.assign({}, S, {age, log:[{tier: metN >= log.length/2 ? 'great' : 'awful'}]});
+  return '<div class="lifecard"><div class="k">Lifetime · '+(end ? 'Life story' : 'Milestone')+'</div><div class="age">'+age+'</div><div class="nm">'+head+'</div>'+
+    '<div class="pc">'+charSVG(who)+'</div>'+
+    (best.length ? '<div class="best"><div class="bh">Best moments</div>'+best.map(b => '<div class="be"><span>'+b.emoji+'</span><div>'+esc(b.text)+'</div></div>').join('')+'</div>' : '')+
+    '<div class="foot"><b>Goal met '+metN+' of '+log.length+' days</b><br>gamesbyvidal.github.io/lifetime</div></div>';
+}
+function showLifeCard(age){
+  modal(lifeCardHTML(age)+'<p class="muted small">📸 Screenshot this card to share it</p>'+
+    (navigator.share ? '<button class="btn alt" id="lcshare">Share Lifetime</button>' : '')+
+    '<button class="btn ghost" data-close style="margin-top:8px">Done</button>', 'lcmodal');
+  if ($('lcshare')) $('lcshare').onclick = () => { try { navigator.share({title:'Lifetime', text:S.name+' just turned '+age+' in Lifetime! My screen time decides how their life goes.', url:location.href.split('#')[0].split('?')[0]}).catch(()=>{}); } catch(e){} };
+  confetti(['🎉','⭐','✨','💖']);
 }
 
 // ============ BACKUP & REMINDER ============
@@ -1099,7 +1183,7 @@ function restoreModal(){
     if (!d) { $('rerr').textContent = 'That code didn\'t work. Make sure you copied all of it.'; return; }
     S = d; save(); tab = 'home';
     document.querySelectorAll('.modal').forEach(m => m.remove());
-    catchUp(); render();
+    catchUp(); render(); updateIcon();
     modal('<div class="birth">'+charSVG(S)+'</div><h2>'+esc(S.name)+' is back!</h2><p>Age '+S.age+', right where you left off.</p><button class="btn" data-close>Yay</button>');
     confetti(['💖','✨','🎉']);
   };
@@ -1127,9 +1211,9 @@ function addReminder(kind){
   document.body.appendChild(a); a.click(); a.remove();
 }
 
-function modal(inner){
+function modal(inner, cls){
   const m = document.createElement('div');
-  m.className = 'modal';
+  m.className = 'modal' + (cls ? ' ' + cls : '');
   m.innerHTML = '<div class="card">'+inner+'</div>';
   m.onclick = ev => { if (ev.target === m || ev.target.hasAttribute('data-close')) m.remove(); };
   document.body.appendChild(m);
@@ -1151,6 +1235,7 @@ function confetti(set){
 document.querySelectorAll('.nav button').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); window.scrollTo(0,0); });
 catchUp();
 render();
+updateIcon();
 // If the app sat open overnight, catch up when it comes back on screen.
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { catchUp(); render(); } });
 </script>
