@@ -153,7 +153,8 @@ const SETTINGS = {
   greatIfUnder: 0.5,       // under half your goal = an amazing year
   mehIfOver: 1.25,         // up to 25% over your goal = a so-so year
   awfulIfOver: 2,          // more than double your goal = a disaster year
-  streakBonuses: {3: 2, 7: 4, 14: 6, 30: 10}  // streak length: bonus points to every stat
+  streakBonuses: {3: 2, 7: 4, 14: 6, 30: 10},  // streak length: bonus points to every stat
+  maxSkippedYears: 3       // days without a check-in each cost a rough year, up to this many per break
 };
 
 // ============ LIFE EVENTS ============
@@ -425,7 +426,10 @@ function stage(age){
 }
 const STAGE_NAMES = {baby:'Baby', kid:'Kid', middle:'Teenager', teen:'Teenager', young:'Young adult', adult:'Adult', senior:'Golden years'};
 
-function today(){ const d = new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+// A day runs from 4am to 4am, so a check-in just after midnight still counts for the night before.
+function today(){ const d = new Date(Date.now() - 4*3600e3); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function dayNum(key){ const [y,m,d] = key.split('-').map(Number); return Math.round(Date.UTC(y, m-1, d) / 864e5); }
+function dayKey(n){ const d = new Date(n * 864e5); return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1)+'-'+d.getUTCDate(); }
 function canCheckIn(){ return S.testMode || S.lastDate !== today(); }
 function clamp(v){ return Math.max(0, Math.min(100, Math.round(v))); }
 function fmtTime(m){ const h = Math.floor(m/60), mm = m%60; return h ? (mm ? h+'h '+mm+'m' : h+'h') : mm+'m'; }
@@ -441,6 +445,16 @@ function checkIn(mins){
   else if (mins <= g * SETTINGS.mehIfOver) tier = 'meh';
   else if (mins <= g * SETTINGS.awfulIfOver) tier = 'bad';
   else tier = 'awful';
+  const entry = liveYear(mins, tier);
+  S.lastDate = today();
+  save();
+  render();
+  showYear(entry);
+}
+
+// One year of the character's life. tier 'skipped' means a day you didn't check in.
+function liveYear(mins, tier){
+  const g = S.goal;
   const met = tier === 'great' || tier === 'good';
 
   S.age++;
@@ -453,12 +467,13 @@ function checkIn(mins){
   const ev = pick(fresh);
   S.used.push(ev[1]);
 
-  const mult = {great:1.5, good:1, meh:0.75, bad:1.5, awful:2}[tier];
+  const mult = {great:1.5, good:1, meh:0.75, bad:1.5, skipped:1.5, awful:2}[tier];
   const fx = {};
   for (const k in ev[2]) fx[k] = Math.round(ev[2][k] * mult);
   if (S.age > 60) fx.h = (fx.h || 0) - 1; // getting older
 
   const notes = [];
+  if (tier === 'skipped') notes.push(pick(SKIP_LINES).replace('{name}', S.name));
   let streakBonus = 0;
   if (met) {
     S.streak++;
@@ -494,11 +509,38 @@ function checkIn(mins){
 
   const entry = {age:S.age, date:today(), mins, goal:g, tier, emoji:ev[0], text:ev[1], fx: shown, shrunk, earned, notes, ms: ms ? {emoji:ms.emoji, title:ms.title, text:ms.text} : null};
   S.log.push(entry);
-  S.lastDate = today();
   if (S.age >= SETTINGS.lifeLength) S.done = true;
+  return entry;
+}
+
+// ============ SKIPPED DAYS ============
+const SKIP_LINES = [
+  '👻 You weren\'t around. {name} spent the year glued to the couch.',
+  '👻 No check-in. {name} wandered through the year on autopilot.',
+  '👻 You disappeared, so {name} picked up their phone instead.',
+  '👻 {name} waited for you all year. You never came.'
+];
+// Each full day without a check-in is a rough year lived without you (at most a few per break).
+function catchUp(){
+  if (!S || S.done || S.testMode || !S.lastDate) return;
+  const missed = dayNum(today()) - dayNum(S.lastDate) - 1;
+  if (missed < 1) return;
+  const years = Math.min(missed, SETTINGS.maxSkippedYears);
+  const entries = [];
+  for (let i = 0; i < years && !S.done; i++) entries.push(liveYear(null, 'skipped'));
+  S.lastDate = dayKey(dayNum(today()) - 1);   // today's check-in is still open
   save();
   render();
-  showYear(entry);
+  let h = '<div class="banner" style="background:var(--meh)">👻 You were away</div>'+
+    '<h2>You missed '+missed+' day'+(missed > 1 ? 's' : '')+'</h2>'+
+    '<p>'+esc(S.name)+' lived '+entries.length+' year'+(entries.length > 1 ? 's' : '')+' without you'+(missed > years ? ' (never more than '+years+' per break)' : '')+'.</p>';
+  for (const e of entries) {
+    h += '<div class="year" style="text-align:left"><div class="age"><b>'+e.age+'</b>age</div><div class="what"><div class="t">'+e.emoji+' '+esc(e.text)+'</div>'+
+      '<div class="fx" style="justify-content:flex-start">'+fxHTML(e.fx, e.earned)+'</div>'+
+      (e.ms ? '<div class="ms"><b>'+e.ms.emoji+' '+esc(e.ms.title)+'</b><br><span class="muted">'+esc(e.ms.text)+'</span></div>' : '')+'</div></div>';
+  }
+  h += '<p class="muted">Check in every day so you don\'t miss their life.</p><button class="btn" data-close>'+(S.done ? 'See how their life went' : 'Check in for today')+'</button>';
+  modal(h);
 }
 
 // Gains shrink as a stat nears 100, so it takes steady good days to stay on top.
@@ -810,6 +852,7 @@ function esc(t){ return String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt
 
 const TIER = {
   great:{label:'🌟 Amazing year!', color:'var(--great)'},
+  skipped:{label:'👻 Skipped year', color:'#6d6787'},
   good:{label:'✅ Good year', color:'var(--good)'},
   meh:{label:'😐 So-so year', color:'var(--meh)'},
   bad:{label:'⚠️ Rough year', color:'var(--bad)'},
@@ -832,7 +875,7 @@ function storyHTML(){
     const e = S.log[i], t = TIER[e.tier];
     rows += '<div class="year"><div class="age"><b>'+e.age+'</b>age</div><div class="what">'+
       '<div class="t">'+e.emoji+' '+esc(e.text)+'</div>'+
-      '<div class="m"><span class="pill" style="background:'+t.color+'">'+e.tier+'</span>'+fmtTime(e.mins)+' on phone</div>'+
+      '<div class="m"><span class="pill" style="background:'+t.color+'">'+e.tier+'</span>'+(e.mins == null ? 'No check-in' : fmtTime(e.mins)+' on phone')+'</div>'+
       (e.ms ? '<div class="ms"><b>'+e.ms.emoji+' '+esc(e.ms.title)+'</b><br><span class="muted">'+esc(e.ms.text)+'</span></div>' : '')+
       '</div></div>';
   }
@@ -882,7 +925,7 @@ function bind(){
   clearInterval(cdTimer);
   if ($('buddy')) $('buddy').onclick = tapCharacter;
   if ($('go')) $('go').onclick = () => checkIn((+$('hrs').value)*60 + (+$('mins').value));
-  if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(24,0,0,0); const s = Math.floor((m-n)/1000);
+  if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(4,0,0,0); if (m <= n) m.setDate(m.getDate()+1); const s = Math.floor((m-n)/1000);
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
       if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
   if ($('goal')) $('goal').oninput = e => { S.goal = +e.target.value; $('gv').textContent = fmtTime(S.goal); save(); };
@@ -940,7 +983,10 @@ function confetti(set){
 }
 
 document.querySelectorAll('.nav button').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); window.scrollTo(0,0); });
+catchUp();
 render();
+// If the app sat open overnight, catch up when it comes back on screen.
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { catchUp(); render(); } });
 </script>
 </body>
 </html>
