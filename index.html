@@ -6,6 +6,12 @@
 <title>Lifetime</title>
 <meta name="description" content="One day for you is one year for them. Beat your screen time goal and your little person lives their best life.">
 <meta property="og:title" content="Lifetime">
+<meta property="og:image" content="https://gamesbyvidal.github.io/lifetime/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://gamesbyvidal.github.io/lifetime/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <meta property="og:description" content="One day for you is one year for them. Beat your screen time goal and your little person lives their best life.">
 <meta name="theme-color" content="#2b2350">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -172,6 +178,15 @@ textarea.code{width:100%;height:110px;border:2px solid #e4ddff;border-radius:12p
 .lcrow{flex-wrap:wrap;margin:8px 0 4px}.lcrow .btn{flex:1;font-size:15px;padding:10px;min-width:120px}
 .install{display:flex;gap:14px;align-items:center}.install img{width:64px;height:64px;border-radius:15px;box-shadow:0 4px 10px rgba(40,20,90,.3);flex:none}
 .kbd{display:inline-block;background:#f1edff;border-radius:6px;padding:0 6px;font-weight:700}
+.sharebtn{margin-top:12px;font-size:16px;padding:12px}
+.meet{color:#fff;text-align:center;padding:8px 2px 30px}.meet .k{font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+.meet h1{font-size:34px;margin:4px 0 0;color:#fff}.meet .sub{color:#d9d2ff;font-size:14px}.meet .pc svg{width:190px;height:220px}
+.mstats{background:#fff;color:var(--ink);border-radius:16px;padding:8px 12px;text-align:left}.mst{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:14px}
+.mst span{width:90px}.mst i{flex:1;height:10px;background:#eee;border-radius:9px;overflow:hidden}.mst u{display:block;height:100%;background:var(--accent2)}
+.mbest{background:rgba(255,255,255,.12);border-radius:16px;padding:10px 12px;text-align:left;margin-top:10px}.mbest .bh{font-size:12px;text-transform:uppercase;opacity:.7}
+.mbest .be{display:flex;gap:8px;font-size:14px;margin:6px 0;line-height:1.3}.meet .hook{font-size:15px;margin:14px 4px}
+.meet .cta{width:100%;border:0;border-radius:16px;padding:15px;font:600 18px Fredoka,system-ui;color:#fff;background:linear-gradient(90deg,#ff7a59,#ff5a8a);box-shadow:0 4px 0 #c84466}
+.meet .tiny{font-size:12px;opacity:.7;margin-top:8px}
 .saved{font-size:15px;margin-top:6px;min-height:42px;line-height:1.4}
 .btn.promise{font-size:17px;line-height:1.3}
 .birth svg{width:170px;height:204px;display:block;margin:0 auto}
@@ -851,6 +866,8 @@ function tapCharacter(){
 const $ = id => document.getElementById(id);
 function render(){
   const app = $('app');
+  const meet = readMeet();
+  if (meet) { $('nav').classList.add('hide'); app.innerHTML = meetHTML(meet); $('raise').onclick = () => { history.replaceState(null, '', location.pathname); tab = 'home'; render(); window.scrollTo(0,0); }; return; }
   if (!S) { $('nav').classList.add('hide'); app.innerHTML = setupHTML(); bindSetup(); return; }
   $('nav').classList.remove('hide');
   document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
@@ -902,7 +919,8 @@ function homeHTML(){
 
   return header()+
     '<div class="card hero"><div class="buddy" id="buddy"><div class="bubble" id="bubble"></div>'+charSVG(S)+'</div>'+(S.tapped ? '' : '<div class="taphint" id="taphint">👆 Tap me!</div>')+'<div class="name">'+esc(S.name)+'</div><div class="sub">Age '+S.age+'</div><div>'+tags+'</div>'+
-    '<div class="stats">'+statRow('💪 Health',S.h,'var(--h)')+statRow('🧠 Smarts',S.s,'var(--s)')+statRow('😊 Happiness',S.j,'var(--j)')+'</div></div>'+
+    '<div class="stats">'+statRow('💪 Health',S.h,'var(--h)')+statRow('🧠 Smarts',S.s,'var(--s)')+statRow('😊 Happiness',S.j,'var(--j)')+'</div>'+
+    (S.log.length ? '<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '')+'</div>'+
     action;
 }
 
@@ -1052,6 +1070,7 @@ let cdTimer;
 function bind(){
   clearInterval(cdTimer);
   if ($('buddy')) $('buddy').onclick = tapCharacter;
+  if ($('share')) $('share').onclick = shareLife;
   if ($('go')) $('go').onclick = () => checkIn((+$('hrs').value)*60 + (+$('mins').value));
   if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(4,0,0,0); if (m <= n) m.setDate(m.getDate()+1); const s = Math.floor((m-n)/1000);
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
@@ -1140,7 +1159,7 @@ function bestMoments(upTo){
   const met = e => e.tier === 'good' || e.tier === 'great';
   const score = e => Object.values(e.fx || {}).reduce((a, v) => a + Math.max(0, v), 0);
   const log = S.log.filter(e => e.age <= upTo && met(e));
-  const picks = log.filter(e => e.ms).map(e => ({emoji:e.ms.emoji, text:e.ms.title+(/[.!?]$/.test(e.ms.title) ? ' ' : '. ')+e.ms.text, age:e.age, rank:1000 + score(e)}))
+  const picks = log.filter(e => e.ms).map(e => ({emoji:e.ms.emoji, text:e.ms.title+(/[.!?]$/.test(e.ms.title) ? ' ' : '. ')+e.ms.text, age:e.age, rank:9}))
     .concat(log.map(e => ({emoji:e.emoji, text:e.text, age:e.age, rank:score(e)})));
   return picks.sort((a, b) => b.rank - a.rank).slice(0, 3).sort((a, b) => a.age - b.age);
 }
@@ -1162,6 +1181,66 @@ function showLifeCard(age){
     '<button class="btn ghost" data-close style="margin-top:8px">Done</button>', 'lcmodal');
   if ($('lcshare')) $('lcshare').onclick = () => { try { navigator.share({title:'Lifetime', text:S.name+' just turned '+age+' in Lifetime! My screen time decides how their life goes.', url:location.href.split('#')[0].split('?')[0]}).catch(()=>{}); } catch(e){} };
   confetti(['🎉','⭐','✨','💖']);
+}
+
+// ============ SHARING ============
+// "Share my week" builds a Wordle-style message. Its link opens a "Meet my person" page
+// that carries a small snapshot of the character in the link itself (no server needed).
+const SQUARE = {great:'🟩', good:'🟩', meh:'🟨', bad:'🟥', awful:'🟥', skipped:'⬜'};
+const isMet = e => e.tier === 'good' || e.tier === 'great';
+function appURL(){ return location.href.split('#')[0].split('?')[0]; }
+function b64url(str){ return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+function unb64url(str){ str = str.replace(/-/g, '+').replace(/_/g, '/'); while (str.length % 4) str += '='; return decodeURIComponent(escape(atob(str))); }
+function meetLink(){
+  const met = S.log.filter(isMet).length;
+  const m = {n:S.name, a:S.age, g:S.girl ? 1 : 0, k:Math.max(0, SKINS.indexOf(S.skin)), r:Math.max(0, HAIRS.indexOf(S.hair)),
+    h:S.h, s:S.s, j:S.j, jb:S.job || '', st:S.streak, m:met, t:S.log.length, p:S.pay || 0,
+    b:bestMoments(S.age).map(momentRef)};
+  return appURL() + '#meet=' + b64url(JSON.stringify(m));
+}
+// Keep links short: a regular event is stored as "stage.index", a big moment as its emoji and title.
+function momentRef(x){
+  for (const st in EVENTS) { const i = EVENTS[st].good.findIndex(e => e[1] === x.text); if (i >= 0) return st+'.'+i; }
+  const m = x.text.match(/^.*?[.!?](?= |$)/);
+  return [x.emoji, m ? m[0] : x.text.slice(0, 60)];
+}
+function momentFromRef(r){
+  if (Array.isArray(r)) return r;
+  const [st, i] = String(r).split('.'), e = EVENTS[st] && EVENTS[st].good[+i];
+  return e ? [e[0], e[1]] : null;
+}
+function readMeet(){
+  const h = location.hash;
+  if (h.indexOf('#meet=') !== 0) return null;
+  try {
+    const m = JSON.parse(unb64url(h.slice(6)));
+    return m && m.n && typeof m.a === 'number' ? m : null;
+  } catch(e) { return null; }
+}
+function weekText(){
+  const last = S.log.slice(-7), met = last.filter(isMet).length;
+  return S.name+' is '+S.age+' in Lifetime 🌱\n'+last.map(e => SQUARE[e.tier] || '⬜').join('')+'\n'+
+    met+' of '+last.length+' days on goal'+(S.streak >= 2 ? ' · 🔥 '+S.streak : '')+'\nMeet '+S.name+': '+meetLink();
+}
+function shareLife(){
+  const text = weekText();
+  const btn = $('share');
+  const copied = () => { if (btn) btn.textContent = '✓ Copied! Paste it in a chat'; };
+  const fallback = () => modal('<h2>Share '+esc(S.name)+'</h2><p class="muted">Copy this and paste it in a chat.</p><textarea class="code" readonly>'+esc(text)+'</textarea><button class="btn" data-close>Done</button>');
+  if (navigator.share) { navigator.share({text}).catch(() => {}); return; }
+  try { navigator.clipboard.writeText(text).then(copied, fallback); } catch(e) { fallback(); }
+}
+function meetHTML(m){
+  const c = {name:m.n, age:m.a, girl:!!m.g, skin:SKINS[m.k] || SKINS[1], hair:HAIRS[m.r] || HAIRS[0], h:m.h, s:m.s, j:m.j, job:m.jb, pay:m.p,
+    log:[{tier: m.m >= m.t/2 ? 'great' : 'awful'}]};
+  const bar = (label, v) => '<div class="mst"><span>'+label+'</span><i><u style="width:'+Math.max(0, Math.min(100, v))+'%"></u></i></div>';
+  const sub = ['Age '+m.a].concat(m.jb ? [esc(m.jb)] : []).concat(m.st >= 2 ? ['🔥 '+m.st+' day streak'] : []).join(' · ');
+  const best = (m.b || []).slice(0, 3).map(momentFromRef).filter(Boolean);
+  return '<div class="meet"><div class="k">Lifetime</div><h1>Meet '+esc(m.n)+'</h1><div class="sub">'+sub+'</div><div class="pc">'+charSVG(c)+'</div>'+
+    '<div class="mstats">'+bar('💪 Health', m.h)+bar('🧠 Smarts', m.s)+bar('😊 Joy', m.j)+'</div>'+
+    (best.length ? '<div class="mbest"><div class="bh">Best moments</div>'+best.map(x => '<div class="be"><span>'+esc(x[0])+'</span><div>'+esc(x[1])+'</div></div>').join('')+'</div>' : '')+
+    '<p class="hook">'+esc(m.n)+'\'s owner hit their screen time goal on <b>'+m.m+' of '+m.t+' days</b>. Every day they did, '+esc(m.n)+' had a great year.</p>'+
+    '<button class="cta" id="raise">'+(S ? 'Back to '+esc(S.name)+' →' : 'Raise your own little person →')+'</button>'+(S ? '' : '<div class="tiny">Free. No sign up.</div>')+'</div>';
 }
 
 // ============ BACKUP & REMINDER ============
@@ -1236,6 +1315,7 @@ document.querySelectorAll('.nav button').forEach(b => b.onclick = () => { tab = 
 catchUp();
 render();
 updateIcon();
+window.addEventListener('hashchange', render);
 // If the app sat open overnight, catch up when it comes back on screen.
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { catchUp(); render(); } });
 </script>
