@@ -39,8 +39,20 @@ button{font-family:inherit;cursor:pointer}
 .logo small{display:block;font-weight:400;font-size:12px;opacity:.75;letter-spacing:0}
 .streak{background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;font-weight:600}
 .card{background:var(--card);border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(20,10,60,.25)}
-.hero{text-align:center;padding-top:8px;background:linear-gradient(180deg,#e9f5ff,#fff 70%)}
+.hero{text-align:center;background:linear-gradient(180deg,#e9f5ff,#fff 70%)}
 .hero svg{width:220px;height:264px;display:block;margin:0 auto}
+.buddy{position:relative;width:220px;margin:0 auto;cursor:pointer;user-select:none;-webkit-user-select:none}
+.buddy.hop{animation:hop .55s ease}
+.buddy.droop{animation:droop .7s ease}
+@keyframes hop{30%{transform:translateY(-22px) scale(1.04)}55%{transform:translateY(0) scale(1.06,.94)}75%{transform:translateY(-6px)}}
+@keyframes droop{25%{transform:translateX(-6px) rotate(-3deg)}50%{transform:translateX(6px) rotate(3deg)}75%{transform:translateX(-3px)}}
+.bubble{position:absolute;left:50%;top:-6px;transform:translate(-50%,-100%) scale(.6);opacity:0;pointer-events:none;
+  background:#fff;color:var(--ink);border:3px solid #3b2a4a;border-radius:18px;padding:8px 12px;font-size:15px;font-weight:500;
+  width:max-content;max-width:240px;line-height:1.3;transition:opacity .2s,transform .25s cubic-bezier(.2,1.4,.4,1);z-index:2}
+.bubble:after{content:'';position:absolute;left:50%;bottom:-11px;margin-left:-8px;border:8px solid transparent;border-top-color:#3b2a4a;border-bottom:0}
+.bubble.show{opacity:1;transform:translate(-50%,-100%) scale(1)}
+.hero{position:relative;padding-top:56px}
+.taphint{font-size:12px;color:var(--accent2);font-weight:600}
 .bob{animation:bob 2.4s ease-in-out infinite;transform-origin:100px 230px}
 @keyframes bob{50%{transform:translateY(-4px)}}
 .name{font-size:26px;font-weight:700;margin:2px 0 0}
@@ -578,6 +590,64 @@ function charSVG(c){
   return '<svg viewBox="0 0 200 240" aria-label="'+esc(c.name)+'">'+g+sparkle+'<g class="bob">'+b+'</g></svg>';
 }
 
+// ============ THINGS THEY SAY WHEN TAPPED ============
+// up = your last check-in hit the goal, down = it missed. {n} becomes the streak length.
+const LINES = {
+  baby: {
+    up: ['Goo goo! 👶', 'Ba-ba! *giggles*', 'Again! Again!', 'Up! Pick me up!', '*happy baby noises*', 'Doggy! Where doggy?'],
+    down: ['Waaah! 😭', '*grumpy baby face*', 'Nap... need nap...', 'Tablet... gimme...', '*throws spoon*', 'Hmph.']
+  },
+  kid: {
+    up: ['Race you to the treehouse!', 'Look, I can do a cartwheel!', 'Did you know T. rex had tiny arms?', 'Can my friends come over?', 'I got a gold star today! ⭐', 'Let\'s build a fort!'],
+    down: ['Can we go outside tomorrow? Please?', 'I\'m bored...', 'My eyes feel all fuzzy.', 'Nobody wanted to play with me today.', 'Just five more minutes of videos...', 'I forgot to do my homework.']
+  },
+  middle: {
+    up: ['Eighth grade is kind of awesome.', 'I made the volleyball team!', 'Wanna see my Rubik\'s cube trick?', 'Biked all the way across town today!', 'I actually like science now. Weird.', 'Middle school? Easy mode.'],
+    down: ['Everyone saw that video... ugh.', 'My phone is my only friend.', 'I\'m not tired. *yawns*', 'Do I have to go to school?', 'I skipped tryouts. Whatever.', 'Leave me alone, I\'m texting.']
+  },
+  teen: {
+    up: ['Coach says I might start this season!', 'Our band has a gig on Friday! 🎸', 'Aced the chem test. No big deal.', 'Thinking about colleges already.', 'Thanks for having my back. Seriously.', 'Summer job money! Ka-ching.'],
+    down: ['Stayed up till 3am again...', 'I\'m fine. Totally fine. 🙃', 'Can you not right now?', 'I think I failed that test.', 'Everyone\'s ignoring my messages.', 'Do I really need sleep?']
+  },
+  young: {
+    up: ['Dean\'s list, baby! 🎓', 'I\'m learning so much here.', 'Road trip this weekend!', 'Got the internship!', 'I think I know what I want to do with my life.', 'Ramen from scratch tonight. Want some?'],
+    down: ['Pulled another all nighter... on memes.', 'Instant noodles again. Yay.', 'I missed my 8am. Again.', 'Is it normal to feel this tired at 20?', 'My credit card hates me.', 'Maybe I\'ll start the essay tomorrow.']
+  },
+  adult: {
+    up: ['Corner office, baby. Thanks for having my back.', 'Just got back from a run. I feel amazing.', 'Weekend plans: surfing! 🏄', 'Work is going great!', 'I read three books this month!', 'Dinner party at my place this Saturday.'],
+    down: ['My neck hurts from looking down all day...', 'Where did the whole weekend go?', 'Just one more scroll...', 'I really should call my friends.', 'My boss is not happy with me.', 'I can\'t remember the last time I went outside.']
+  },
+  senior: {
+    up: ['Let me tell you about the summer of \'42...', 'The grandkids are visiting today! 🥰', 'Won the chess tournament again. Too easy.', 'Swam 40 laps this morning!', 'Want some homemade cookies?', 'Life\'s been good to me. Thanks to you.'],
+    down: ['Back in my day, we went outside...', 'Who keeps sending me these emails?', 'My knees are not happy.', 'Is it nap time? It\'s always nap time.', 'Forgot to call the grandkids again...', 'Kids these days and their phones. Oh wait.']
+  }
+};
+const STREAK_LINES = ['{n} days in a row! I\'ve never felt this good.', 'Our streak is at {n}! Don\'t stop now!', '{n} day streak! We make a great team.'];
+const TICKLE_LINES = ['Okay okay, I\'m awake!', 'That tickles! 😆', 'Hey! Personal space!', 'Stop poking me! ...Okay, one more.'];
+
+let taps = [], bubbleTimer;
+function tapCharacter(){
+  const wrap = $('buddy');
+  if (!wrap) return;
+  const now = Date.now();
+  taps = taps.filter(t => now - t < 3000); taps.push(now);
+  const st = stage(S.age);
+  const last = S.log.length ? S.log[S.log.length-1] : null;
+  const up = !(last && !(last.tier === 'good' || last.tier === 'great')) && S.j >= 30;
+  let line;
+  if (taps.length >= 5) line = pick(TICKLE_LINES);
+  else if (up && S.streak >= 3 && Math.random() < 0.3) line = pick(STREAK_LINES).replace('{n}', S.streak);
+  else line = pick(LINES[st][up ? 'up' : 'down']);
+  wrap.classList.remove('hop', 'droop'); void wrap.offsetWidth;
+  wrap.classList.add(up ? 'hop' : 'droop');
+  const bub = $('bubble');
+  bub.textContent = line;
+  bub.classList.add('show');
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => bub.classList.remove('show'), 3200);
+  if (!S.tapped) { S.tapped = true; save(); const h = $('taphint'); if (h) h.remove(); }
+}
+
 // ============ SCREENS ============
 const $ = id => document.getElementById(id);
 function render(){
@@ -632,7 +702,7 @@ function homeHTML(){
   }
 
   return header()+
-    '<div class="card hero">'+charSVG(S)+'<div class="name">'+esc(S.name)+'</div><div class="sub">Age '+S.age+'</div><div>'+tags+'</div>'+
+    '<div class="card hero"><div class="buddy" id="buddy"><div class="bubble" id="bubble"></div>'+charSVG(S)+'</div>'+(S.tapped ? '' : '<div class="taphint" id="taphint">👆 Tap me!</div>')+'<div class="name">'+esc(S.name)+'</div><div class="sub">Age '+S.age+'</div><div>'+tags+'</div>'+
     '<div class="stats">'+statRow('💪 Health',S.h,'var(--h)')+statRow('🧠 Smarts',S.s,'var(--s)')+statRow('😊 Happiness',S.j,'var(--j)')+'</div></div>'+
     action;
 }
@@ -711,6 +781,7 @@ function bindSetup(){
 let cdTimer;
 function bind(){
   clearInterval(cdTimer);
+  if ($('buddy')) $('buddy').onclick = tapCharacter;
   if ($('go')) $('go').onclick = () => checkIn((+$('hrs').value)*60 + (+$('mins').value));
   if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(24,0,0,0); const s = Math.floor((m-n)/1000);
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
