@@ -228,6 +228,10 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .stop{flex:1;min-width:0;text-align:center;position:relative;font-size:11px;line-height:1.2}.stop .dot{width:38px;height:38px;margin:0 auto 4px;border-radius:50%;background:#f1edff;border:3px solid #3b2a4a;display:grid;place-items:center;font-size:18px;overflow:hidden}
 .stop .dot svg{width:100%;height:100%}.stop b{display:block;font-size:14px}.stop span{color:var(--soft)}.stop.now .dot{background:#9be08f}.stop.next .dot{background:#ffe26b;transform:scale(1.12);box-shadow:0 0 0 5px rgba(255,226,107,.45)}
 .tmr{margin-top:12px;padding:10px 12px;background:#fff6dc;border-radius:14px;font-size:14px}
+.shwrap{position:relative;margin:10px auto 12px;max-width:300px;aspect-ratio:4/5;border-radius:18px;overflow:hidden;background:#f1edff}.shload{position:absolute;inset:0;display:grid;place-items:center;color:var(--soft);font-size:14px}
+.shimg{position:relative;display:block;width:100%;height:100%;opacity:0;transition:opacity .3s}.shimg.on{opacity:1}.btn.sharebtn{background:linear-gradient(90deg,#ff7a59,#ff5a8a);color:#fff;margin-top:12px}.btn.sharebtn:disabled{opacity:.5}
+.meet .mscene{margin:14px 0;border-radius:20px;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 24px rgba(20,10,60,.3)}.meet .mscene svg{display:block;width:100%;height:auto}.meet .where{color:#3b2a4a;text-align:left}
+.meet .chal{background:#fff6dc;color:#3b2a4a;border-radius:16px;padding:12px;font-size:14px;margin:14px 0;text-align:left;line-height:1.35}
 h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 2px}h2.earnh small{font-size:13px;color:var(--soft);font-weight:500;white-space:nowrap}
 .own{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0edf8;font-size:15px}.own:last-of-type{border-bottom:0}.own i{color:var(--soft);font-size:12px;font-style:normal}
 .own .a{margin-left:auto;font-size:12px;color:var(--soft)}.oicon{width:34px;height:34px;flex:none}.oicon.car{width:46px;height:28px}
@@ -1331,30 +1335,40 @@ const SCENE_LAYOUT = {
   family:    {blip:[17, 3], car:[284, 146, 74]},
   dream:     {blip:[22, 3], car:[252, 148, 96]}
 };
-function homeScene(){
+// Everything about the scene that can be drawn without the live game (also used for share pictures and friend links).
+function sceneOpts(){
   const o = owned();
   const key = S.age < 18 ? 'parents' : (o.home ? HOME_KEY[o.home] : 'apartment');
   // Later generations grow up in the home their parent ended up in, with the parent's old car in the driveway.
   const inh = S.inherit || {}, art = key === 'parents' && inh.home ? inh.home : key;
-  const L = SCENE_LAYOUT[art], home = HOME_ART[art];
-  const carKey = key === 'parents' ? inh.car : (o.car && CAR_KEY[o.car]);
-  const car = (carKey && L.car) ? '<svg x="'+L.car[0]+'" y="'+L.car[1]+'" width="'+L.car[2]+'" height="'+(L.car[2]*.6)+'" viewBox="0 0 200 120">'+CAR_ART[carKey].svg+'</svg>' : '';
-  const label = key === 'parents' ? 'Mom and Dad\'s house' : key === 'apartment' ? 'First apartment' : home.title;
-  const wx = weatherNow();
-  let extra = '';
-  if (key === 'parents') {
-    const fresh = newYardThing();
-    // Inherited homes have their own driveways and trees, so a couple of things move or stay out.
-    const dogX = art === 'parents' ? 0 : 76;
-    extra = yardThings().filter(g => !(g.k === 'treehouse' && art === 'dream'))
-      .map(g => g.k === 'dog' && dogX ? '<g transform="translate('+dogX+' 0)">'+YARD.P.dog[1]+'</g>' : YARD.P[g.k][1]).join('');
-    if (fresh) extra += YARD.SPARK(YARD.P[fresh.k][2], YARD.P[fresh.k][3]);
-  }
-  if (wx === 'sun' && S.streak >= 3) extra += YARD.KITE;
-  if (wx !== 'sun') extra += YARD[wx === 'rain' ? 'rainy' : 'cloudy'];
-  return '<div class="lifescene"><svg viewBox="0 0 360 220" class="scene">'+home.svg+car+extra+'</svg>'+
+  const fresh = key === 'parents' ? newYardThing() : null;
+  return {key, art, car: key === 'parents' ? inh.car : (o.car && CAR_KEY[o.car]), yard: key === 'parents' ? yardThings().map(g => g.k) : [],
+    fresh: fresh && fresh.k, wx: weatherNow(), streak: S.streak};
+}
+function sceneInner(p){
+  const L = SCENE_LAYOUT[p.art], home = HOME_ART[p.art];
+  const car = (p.car && L.car && CAR_ART[p.car]) ? '<svg x="'+L.car[0]+'" y="'+L.car[1]+'" width="'+L.car[2]+'" height="'+(L.car[2]*.6)+'" viewBox="0 0 200 120">'+CAR_ART[p.car].svg+'</svg>' : '';
+  // Inherited homes have their own driveways and trees, so a couple of things move or stay out.
+  const dogX = p.art === 'parents' ? 0 : 76;
+  let extra = (p.yard || []).filter(k => YARD.P[k] && !(k === 'treehouse' && p.art === 'dream'))
+    .map(k => k === 'dog' && dogX ? '<g transform="translate('+dogX+' 0)">'+YARD.P.dog[1]+'</g>' : YARD.P[k][1]).join('');
+  if (p.fresh && YARD.P[p.fresh]) extra += YARD.SPARK(YARD.P[p.fresh][2], YARD.P[p.fresh][3]);
+  if (p.wx === 'sun' && p.streak >= 3) extra += YARD.KITE;
+  if (p.wx === 'rain' || p.wx === 'cloud') extra += YARD[p.wx === 'rain' ? 'rainy' : 'cloudy'];
+  return home.svg+car+extra;
+}
+function sceneLabel(p){ return p.key === 'parents' ? 'Mom and Dad\'s house' : p.key === 'apartment' ? 'First apartment' : HOME_ART[p.art].title; }
+// One standalone SVG with the Blip drawn into the scene.
+function sceneSVG(p, c){
+  const L = SCENE_LAYOUT[p.art], w = 108, h = w * 1.2;
+  const blip = charSVG(c).replace(/<circle cx="100" cy="122" r="86"[^>]*\/>/, '').replace('<svg ', '<svg x="'+(L.blip[0] * 3.6)+'" y="'+(220 - L.blip[1] * 2.2 - h)+'" width="'+w+'" height="'+h+'" ');
+  return '<svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">'+sceneInner(p)+blip+'</svg>';
+}
+function homeScene(){
+  const p = sceneOpts(), L = SCENE_LAYOUT[p.art], inner = sceneInner(p);
+  return '<div class="lifescene"><svg viewBox="0 0 360 220" class="scene">'+inner+'</svg>'+
     '<div class="sblip" id="sblip" style="left:'+L.blip[0]+'%;bottom:'+L.blip[1]+'%"><div class="bubble" id="sbub"></div>'+charSVG(S)+'</div>'+
-    (/id="ydog"/.test(extra) ? '<div class="bubble dogbub" id="dogbub"'+(art === 'parents' ? '' : ' style="left:57%"')+'></div>' : '')+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(label)+'</div></div>';
+    (/id="ydog"/.test(inner) ? '<div class="bubble dogbub" id="dogbub"'+(p.art === 'parents' ? '' : ' style="left:57%"')+'></div>' : '')+'<div class="where">'+(p.key === 'parents' ? '🏡' : '📍')+' '+esc(sceneLabel(p))+'</div></div>';
 }
 
 // One line under the scene: what's new in the yard, or what the weather means.
@@ -1573,7 +1587,7 @@ function bind(){
   if ($('buddy')) $('buddy').onclick = tapCharacter;
   if ($('sblip')) $('sblip').onclick = () => tapCharacter('sblip', 'sbub');
   if ($('ydog')) $('ydog').onclick = tapDog;
-  if ($('share')) $('share').onclick = shareLife;
+  if ($('share')) $('share').onclick = () => shareModal(null);
   if ($('tslide')) {
     const set = m => { m = Math.max(0, Math.min(960, m)); homeMins = m; $('tslide').value = m; $('tval').textContent = fmtTime(m); $('verdict').outerHTML = verdictHTML(m); };
     $('tslide').oninput = e => set(+e.target.value);
@@ -1626,8 +1640,11 @@ function showYear(e){
   if (e.ms) h += '<div class="mscard"><div class="k">Big life moment</div><div class="e">'+e.ms.emoji+'</div><div class="t">'+esc(e.ms.title)+'</div><p>'+esc(e.ms.text)+'</p></div>';
   if (S.done) h += '<div class="mscard"><div class="k">The end of an era</div><div class="e">🎂</div><div class="t">'+esc(S.name)+' turned '+SETTINGS.lifeLength+'!</div><p>Their story is complete. See how it went on the Today screen.</p></div>';
   const card = LIFE_CARD_AGES.includes(e.age);
+  const moment = e.ms ? {emoji:e.ms.emoji, title:e.ms.title, text:e.ms.text} : e.buys ? {emoji:'🔑', title:plain(buyLine(e.buys[0]))} : null;
+  if (moment) h += '<button class="btn sharebtn" id="mshare">📤 Share this moment</button>';
   h += card ? '<button class="btn" id="lcard">See '+esc(S.name)+'\'s life card ✨</button>' : '<button class="btn" data-close>Continue</button>';
   modal(h);
+  if (moment) $('mshare').onclick = () => shareModal(moment);
   if (card) $('lcard').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); showLifeCard(e.age); };
   if (e.buys) confetti(['🎉','💰','✨','🔑']);
   else if (e.tier === 'great' || e.ms) confetti(e.tier === 'great' ? ['🎉','⭐','✨','🎊'] : [e.ms.emoji,'✨']);
@@ -1689,9 +1706,9 @@ function lifeCardHTML(age){
 }
 function showLifeCard(age){
   modal(lifeCardHTML(age)+'<p class="muted small">📸 Screenshot this card to share it</p>'+
-    (navigator.share ? '<button class="btn alt" id="lcshare">Share Lifetime</button>' : '')+
+    '<button class="btn sharebtn" id="lcshare">📤 Share '+esc(S.name)+'\'s life card</button>'+
     '<button class="btn ghost" data-close style="margin-top:8px">Done</button>', 'lcmodal');
-  if ($('lcshare')) $('lcshare').onclick = () => { try { navigator.share({title:'Lifetime', text:'My Blip '+S.name+' just turned '+age+' in Lifetime! My screen time decides how their life goes.', url:location.href.split('#')[0].split('?')[0]}).catch(()=>{}); } catch(e){} };
+  if ($('lcshare')) $('lcshare').onclick = () => shareModal({emoji:'✨', title:S.name+' turned '+age+'!', text:(bestMoments(age)[0] || {}).text});
   confetti(['🎉','⭐','✨','💖']);
 }
 
@@ -1708,6 +1725,8 @@ function meetLink(){
   const m = {n:S.name, a:S.age, g:S.girl ? 1 : 0, k:Math.max(0, SKINS.indexOf(S.skin)), r:Math.max(0, HAIRS.indexOf(S.hair)),
     h:S.h, s:S.s, j:S.j, jb:S.job || '', st:S.streak, m:met, t:S.log.length, p:S.pay || 0,
     b:bestMoments(S.age).map(momentRef)};
+  const sc = sceneOpts();
+  m.o = sc.key; m.w = sc.art; if (sc.car) m.c = sc.car; if (sc.yard.length) m.y = sc.yard.join('.');
   return appURL() + '#meet=' + b64url(JSON.stringify(m));
 }
 // Keep links short: a regular event is stored as "stage.index", a big moment as its emoji and title.
@@ -1742,17 +1761,114 @@ function shareLife(){
   if (navigator.share) { navigator.share({text}).catch(() => {}); return; }
   try { navigator.clipboard.writeText(text).then(copied, fallback); } catch(e) { fallback(); }
 }
+// ============ SHARE PICTURE ============
+// A 1080x1350 picture of the Blip at home with a headline, drawn from one SVG onto a canvas.
+const SQ_COLOR = {great:'#5cc26b', good:'#5cc26b', meh:'#ffc83d', bad:'#ff6b6b', awful:'#ff6b6b', skipped:'#e6e1f5'};
+function wrapText(t, max){
+  const words = String(t).split(' '), lines = [];
+  let line = '';
+  for (const w of words) { if ((line + ' ' + w).trim().length > max && line) { lines.push(line); line = w; } else line = (line + ' ' + w).trim(); }
+  if (line) lines.push(line);
+  return lines;
+}
+function plain(html){ const d = document.createElement('div'); d.innerHTML = html; return d.textContent; }
+// What the picture says: a given moment, or else the latest year.
+function shareMoment(m){
+  if (m) return m;
+  const e = S.log[S.log.length-1];
+  if (!e) return {emoji:'🌱', title:'Just getting started'};
+  if (e.ms) return {emoji:e.ms.emoji, title:e.ms.title, text:e.ms.text};
+  return {emoji:e.emoji, title:e.text};
+}
+// The picture's graphics are one SVG; the words are drawn on top with the app's font.
+function shareArt(m){
+  const title = wrapText(m.emoji+' '+m.title, 30).slice(0, 2);
+  const first = m.text ? (m.text.match(/^.*?[.!?](?= |$)/) || [m.text])[0] : '';
+  const sub = first && first !== m.title ? wrapText(first, 46).slice(0, 2) : [];
+  // Center the words in the space between the scene and the squares.
+  const hgt = 70 + title.length * 62 + sub.length * 46;
+  let y = 760 + Math.max(40, (1110 - 760 - hgt) / 2) + 50;
+  const texts = [[S.name+' · age '+S.age, y, 58, 700, 1]];
+  y += 76;
+  for (const l of title) { texts.push([l, y, 50, 700, 1]); y += 62; }
+  for (const l of sub) { texts.push([l, y, 34, 500, .92]); y += 46; }
+  texts.push(['Lifetime', 104, 62, 700, 1]);
+  if (S.streak >= 2) texts.push(['🔥 '+S.streak+' day streak', 1236, 32, 500, 1]);
+  texts.push(['One day for you. One year for them.', 1290, 30, 500, .95]);
+  texts.push([appURL().replace(/^https?:\/\//, '').replace(/\/(index\.html)?$/, ''), 1330, 30, 700, 1]);
+  const days = S.log.slice(-7);
+  const x0 = 540 - (days.length * 70 - 14) / 2;
+  const sq = days.map((e, i) => '<rect x="'+(x0 + i*70)+'" y="1130" width="56" height="56" rx="12" fill="'+(SQ_COLOR[e.tier] || '#e6e1f5')+'" stroke="#3b2a4a" stroke-width="4"/>').join('');
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">'+
+    '<defs><linearGradient id="shbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#ff5a8a"/></linearGradient>'+
+    '<clipPath id="shclip"><rect x="60" y="150" width="960" height="587" rx="36"/></clipPath></defs>'+
+    '<rect width="1080" height="1350" fill="url(#shbg)"/>'+
+    '<g clip-path="url(#shclip)">'+sceneSVG(sceneOpts(), S).replace('<svg ', '<svg x="60" y="150" width="960" height="587" ')+'</g>'+
+    '<rect x="60" y="150" width="960" height="587" rx="36" fill="none" stroke="#fff" stroke-width="10"/>'+sq+'</svg>';
+  return {svg, texts};
+}
+function sharePicture(m){
+  const art = shareArt(m);
+  const fonts = document.fonts ? Promise.all([document.fonts.load('700 50px Fredoka'), document.fonts.load('500 30px Fredoka')]).catch(() => {}) : Promise.resolve();
+  return fonts.then(() => new Promise((ok, bad) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
+        const x = c.getContext('2d');
+        x.drawImage(img, 0, 0, 1080, 1350);
+        x.textAlign = 'center'; x.fillStyle = '#fff';
+        for (const [t, y, size, w, a] of art.texts) { x.globalAlpha = a; x.font = w+' '+size+'px Fredoka, system-ui, sans-serif'; x.fillText(t, 540, y); }
+        c.toBlob(b => b ? ok(b) : bad(), 'image/png');
+      } catch(e) { bad(e); }
+    };
+    img.onerror = bad;
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(art.svg);
+  }));
+}
+// Opens a preview of the picture with one share button. The picture is made first,
+// so the share happens right on the tap (phones require that).
+function shareModal(moment){
+  const m = shareMoment(moment);
+  const text = (moment ? S.name+': '+m.emoji+' '+m.title+'\n' : weekText().split('\nMeet ')[0]+'\n')+'Meet '+S.name+': '+meetLink();
+  modal('<h2>Share '+esc(S.name)+'</h2><div class="shwrap"><div class="shload">Drawing the picture...</div><img id="shimg" class="shimg" alt=""></div>'+
+    '<button class="btn sharebtn" id="shgo" disabled>📤 Share</button><p class="muted small" id="shnote"></p>'+
+    '<button class="btn ghost" id="shcopy" style="margin-top:8px">Copy link instead</button><button class="btn ghost" data-close style="margin-top:8px">Close</button>');
+  const go = $('shgo'), note = $('shnote');
+  $('shcopy').onclick = () => { try { navigator.clipboard.writeText(text).then(() => { $('shcopy').textContent = '✓ Copied! Paste it in a chat'; }); } catch(e) {} };
+  sharePicture(m).then(blob => {
+    const url = URL.createObjectURL(blob);
+    $('shimg').src = url; $('shimg').classList.add('on');
+    const file = new File([blob], 'lifetime-'+S.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')+'.png', {type:'image/png'});
+    go.disabled = false;
+    if (navigator.canShare && navigator.canShare({files:[file]})) {
+      go.onclick = () => navigator.share({files:[file], text}).catch(() => {});
+    } else if (navigator.share) {
+      note.textContent = 'Tip: press and hold the picture to save it, then add it to your post.';
+      go.onclick = () => navigator.share({text}).catch(() => {});
+    } else {
+      go.textContent = '⬇️ Save picture';
+      go.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = file.name; a.click(); };
+    }
+  }).catch(() => {
+    $('shimg').parentNode.innerHTML = '<p class="muted">Couldn\'t draw the picture on this phone.</p>';
+    go.disabled = false; go.onclick = shareLife;
+  });
+}
+
 function meetHTML(m){
   const c = {name:m.n, age:m.a, girl:!!m.g, skin:SKINS[m.k] || SKINS[1], hair:HAIRS[m.r] || HAIRS[0], h:m.h, s:m.s, j:m.j, job:m.jb, pay:m.p,
     log:[{tier: m.m >= m.t/2 ? 'great' : 'awful'}]};
-  const bar = (label, v) => '<div class="mst"><span>'+label+'</span><i><u style="width:'+Math.max(0, Math.min(100, v))+'%"></u></i></div>';
+  const key = HOME_ART[m.o] || m.o === 'parents' ? m.o : (m.a < 18 ? 'parents' : 'apartment');
+  const p = {key, art: HOME_ART[m.w] ? m.w : key, car: m.c, yard: m.y ? String(m.y).split('.') : [], wx:'sun', streak: m.st};
+  const have = key === 'parents' ? 'is growing up at Mom and Dad\'s house' : key === 'apartment' ? 'lives in a first apartment' : 'owns a '+HOME_ART[key].title.toLowerCase();
   const sub = ['Age '+m.a].concat(m.jb ? [esc(m.jb)] : []).concat(m.st >= 2 ? ['🔥 '+m.st+' day streak'] : []).join(' · ');
   const best = (m.b || []).slice(0, 3).map(momentFromRef).filter(Boolean);
-  return '<div class="meet"><div class="k">A Blip in Lifetime</div><h1>Meet '+esc(m.n)+'</h1><div class="sub">'+sub+'</div><div class="pc">'+charSVG(c)+'</div>'+
-    '<div class="mstats">'+bar('💪 Health', m.h)+bar('🧠 Smarts', m.s)+bar('😊 Joy', m.j)+'</div>'+
+  return '<div class="meet"><div class="k">A Blip in Lifetime</div><h1>Meet '+esc(m.n)+'</h1><div class="sub">'+sub+'</div><div class="mscene"><div class="lifescene">'+sceneSVG(p, c)+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(sceneLabel(p))+'</div></div></div>'+
     (best.length ? '<div class="mbest"><div class="bh">Best moments</div>'+best.map(x => '<div class="be"><span>'+esc(x[0])+'</span><div>'+esc(x[1])+'</div></div>').join('')+'</div>' : '')+
-    '<p class="hook">'+esc(m.n)+'\'s owner hit their screen time goal on <b>'+m.m+' of '+m.t+' days</b>. Every day they did, '+esc(m.n)+' had a great year.</p>'+
-    '<button class="cta" id="raise">'+(S ? 'Back to '+esc(S.name)+' →' : 'Raise your own Blip →')+'</button>'+(S ? '' : '<div class="tiny">Free. No sign up.</div>')+'</div>';
+    '<div class="chal"><b>Can your Blip beat '+esc(m.n)+'?</b><br>'+esc(m.n)+' is '+m.a+' and '+have+'. Their owner hit their screen time goal on <b>'+m.m+' of '+m.t+' days</b>. '+
+    'Every day you hit yours, your Blip has a great year.</div>'+
+    '<button class="cta" id="raise">'+(S ? 'Back to '+esc(S.name)+' →' : 'Raise your own Blip →')+'</button>'+(S ? '' : '<div class="tiny">Free. No sign up. Takes 30 seconds.</div>')+'</div>';
 }
 
 // ============ BACKUP & REMINDER ============
