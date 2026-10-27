@@ -212,6 +212,14 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .card .tease{margin-bottom:0}.tease .e{font-size:32px}.tease b{display:block;color:var(--ink)}.tease span{font-size:13px;color:var(--soft)}
 .result{text-align:center}.result .ban{display:inline-block;color:#fff;border-radius:999px;padding:4px 14px;font-weight:700;font-size:14px}
 .result .ev{font-size:44px;margin:6px 0 0}.result p{margin:4px 0}.msline{font-size:14px;margin-top:4px}
+.scenecard{padding:0;overflow:hidden}.lifescene{position:relative}.lifescene .scene{display:block;width:100%;height:auto}
+.sblip{position:absolute;width:30%}.sblip svg{width:100%;height:auto;display:block}.sblip svg>circle:first-of-type{display:none}
+.where{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.88);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
+h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 2px}h2.earnh small{font-size:13px;color:var(--soft);font-weight:500;white-space:nowrap}
+.own{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0edf8;font-size:15px}.own:last-of-type{border-bottom:0}.own i{color:var(--soft);font-size:12px;font-style:normal}
+.own .a{margin-left:auto;font-size:12px;color:var(--soft)}.oicon{width:34px;height:34px;flex:none}.oicon.car{width:46px;height:28px}
+.nexttxt{font-size:14px;margin-top:10px}.nicon{width:24px;height:20px;vertical-align:middle}.nbar{display:block;height:9px;border-radius:9px;background:#eee;margin-top:6px;overflow:hidden}.nbar u{display:block;height:100%;background:var(--good)}
+.mscard.buy .buyart{width:96px;height:96px;display:block;margin:4px auto}.mscard.buy .buyart.car{width:150px;height:90px}
 .saved{font-size:15px;margin-top:6px;min-height:42px;line-height:1.4}
 .btn.promise{font-size:17px;line-height:1.3}
 .birth svg{width:170px;height:204px;display:block;margin:0 auto}
@@ -227,7 +235,7 @@ h2.ci{margin:0 0 2px;font-size:20px}
 <div class="app" id="app"></div>
 <nav class="nav hide" id="nav"><div>
   <button data-tab="home" class="on"><b>🏠</b>Today</button>
-  <button data-tab="story"><b>📖</b>Life story</button>
+  <button data-tab="story"><b>🏡</b>Blip's life</button>
   <button data-tab="settings"><b>⚙️</b>Settings</button>
 </div></nav>
 
@@ -591,11 +599,13 @@ function liveYear(mins, tier){
   if (met) { if (S.pay > 0) earned = Math.round(S.pay * 0.3); }
   else earned = -Math.min(S.money, Math.round(Math.max(S.pay * 0.2, S.money * 0.03)));
   S.money += earned;
+  const buys = buyThings();
 
   const ms = milestone(S.age, met);
   if (ms && ms.fx) applyFx(ms.fx);
 
   const entry = {age:S.age, date:today(), mins, goal:g, tier, emoji:ev[0], text:ev[1], fx: shown, shrunk, earned, notes, ms: ms ? {emoji:ms.emoji, title:ms.title, text:ms.text} : null};
+  if (buys.length) entry.buys = buys;
   S.log.push(entry);
   if (S.age >= SETTINGS.lifeLength) S.done = true;
   return entry;
@@ -719,7 +729,7 @@ function milestone(age, met){
     : {emoji:'🏍️', title:'Midlife crisis', text:'Bought a motorcycle. Can\'t ride it. It lives in the garage now.', fx:{j:-4}};
 
   if (age === 65) {
-    let tier = S.money >= 2000 ? 2 : S.money >= 700 ? 1 : 0;
+    let tier = netWorth() >= 2000 ? 2 : netWorth() >= 700 ? 1 : 0;
     const scammed = !met && tier > 0;
     if (scammed) { tier--; S.money = Math.round(S.money * 0.6); }
     const why = scammed ? 'Lost a big chunk of savings to an online scam right before retiring. ' : '';
@@ -734,7 +744,7 @@ function milestone(age, met){
 function lifeScore(){
   const avg = (S.h + S.s + S.j) / 3;
   const metDays = S.log.filter(e => e.tier === 'good' || e.tier === 'great').length;
-  return Math.round(avg + Math.min(30, S.money/200) + metDays/2);
+  return Math.round(avg + Math.min(30, netWorth()/200) + metDays/2);
 }
 function lifeTitle(score){
   if (score >= 120) return ['🏆','A legendary life'];
@@ -899,7 +909,7 @@ function render(){
   $('nav').classList.remove('hide');
   document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   if (tab === 'home') app.innerHTML = homeHTML();
-  else if (tab === 'story') app.innerHTML = storyHTML();
+  else if (tab === 'story') app.innerHTML = lifeHTML();
   else app.innerHTML = settingsHTML();
   bind();
 }
@@ -1027,8 +1037,226 @@ function fxHTML(fx, earned){
   return out;
 }
 
-function storyHTML(){
-  if (!S.log.length) return header()+'<div class="card"><h2>Life story</h2><p class="muted">'+esc(S.name)+'\'s story starts after your first check-in.</p></div>';
+// ============ ART: homes, cars and icons in the Blip style ============
+const ICONS = (function(){
+// Blip-style icons: thick dark outline, rounded joins, flat pastel fills, shiny eyes and blush.
+const O='#3b2a4a';
+const W='stroke="'+O+'" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"';
+const eye=(x,y,r)=>'<ellipse cx="'+x+'" cy="'+y+'" rx="'+r+'" ry="'+(r*1.2)+'" fill="#2b1d3a"/><circle cx="'+(x-r*.35)+'" cy="'+(y-r*.45)+'" r="'+(r*.4)+'" fill="#fff"/><circle cx="'+(x+r*.35)+'" cy="'+(y+r*.4)+'" r="'+(r*.2)+'" fill="#fff"/>';
+const blush=(x,y)=>'<ellipse cx="'+x+'" cy="'+y+'" rx="6" ry="3.5" fill="#ff8fa3" opacity=".7"/>';
+const shadow=(y,rx)=>'<ellipse cx="50" cy="'+(y||92)+'" rx="'+(rx||30)+'" ry="5" fill="rgba(0,0,0,.12)"/>';
+const svg=(inner,vb)=>'<svg viewBox="'+(vb||'0 0 100 100')+'" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';
+const ICONS={
+ tophat: shadow(88,32)+'<g '+W+'><rect x="30" y="18" width="40" height="52" rx="6" fill="#2b2350"/><rect x="30" y="52" width="40" height="11" fill="#ff5a8a"/><ellipse cx="50" cy="74" rx="36" ry="9" fill="#2b2350"/></g><path d="M37 26 v18" stroke="#5a4b8f" stroke-width="5" stroke-linecap="round"/>',
+ crown: shadow(86,32)+'<path d="M18 74 L22 30 L38 48 L50 22 L62 48 L78 30 L82 74 Z" fill="#ffc83d" '+W+'/><circle cx="50" cy="60" r="6" fill="#ff5a8a" '+W.replace('5','3.5')+'/><circle cx="32" cy="64" r="4" fill="#4da3ff" '+W.replace('5','3')+'/><circle cx="68" cy="64" r="4" fill="#4da3ff" '+W.replace('5','3')+'/><circle cx="22" cy="28" r="4" fill="#ffc83d" '+W.replace('5','3')+'/><circle cx="50" cy="20" r="4" fill="#ffc83d" '+W.replace('5','3')+'/><circle cx="78" cy="28" r="4" fill="#ffc83d" '+W.replace('5','3')+'/>',
+ cap: shadow(84,34)+'<g '+W+'><path d="M20 66 Q20 26 52 26 Q80 26 80 62 Z" fill="#4da3ff"/><path d="M60 62 Q86 58 94 70 Q78 76 58 72 Z" fill="#2f7fd6"/></g><circle cx="50" cy="26" r="4" fill="#2f7fd6" '+W.replace('5','3')+'/><path d="M50 30 Q46 46 48 64" stroke="'+O+'" stroke-width="3" fill="none"/>',
+ cowboy: shadow(86,40)+'<g '+W+'><path d="M8 62 Q20 76 50 76 Q80 76 92 62 Q86 70 50 70 Q14 70 8 62 Z" fill="#b97a45"/><path d="M28 64 Q24 30 38 26 Q50 34 62 26 Q76 30 72 64 Z" fill="#c98c55"/></g><path d="M30 56 Q50 62 70 56" stroke="#7a4a26" stroke-width="5" fill="none"/>',
+ bow: shadow(84,30)+'<g '+W+'><path d="M50 50 Q30 22 16 34 Q8 50 16 64 Q30 76 50 50 Z" fill="#ff5d8f"/><path d="M50 50 Q70 22 84 34 Q92 50 84 64 Q70 76 50 50 Z" fill="#ff5d8f"/><circle cx="50" cy="50" r="9" fill="#ff8fb0"/></g><path d="M22 42 Q20 50 24 58 M78 42 Q80 50 76 58" stroke="#fff" stroke-width="3" fill="none" opacity=".7" stroke-linecap="round"/>',
+ halo: shadow(86,28)+'<ellipse cx="50" cy="46" rx="34" ry="13" fill="none" stroke="'+O+'" stroke-width="13"/><ellipse cx="50" cy="46" rx="34" ry="13" fill="none" stroke="#ffe26b" stroke-width="7"/><path d="M78 20 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#ffe26b" '+W.replace('5','2.5')+'/>',
+ sunhat: shadow(84,40)+'<g '+W+'><ellipse cx="50" cy="62" rx="44" ry="14" fill="#ffe3a3"/><path d="M28 60 Q28 30 50 30 Q72 30 72 60 Z" fill="#ffd27a"/></g><path d="M29 54 Q50 62 71 54" stroke="#ff7a59" stroke-width="7" fill="none"/><circle cx="68" cy="50" r="6" fill="#fff" '+W.replace('5','3')+'/><circle cx="68" cy="50" r="2.5" fill="#ffc83d"/>',
+ hardhat: shadow(84,38)+'<g '+W+'><path d="M20 64 Q20 26 50 26 Q80 26 80 64 Z" fill="#ffc83d"/><rect x="12" y="62" width="76" height="12" rx="6" fill="#ffb21f"/></g><path d="M50 28 v34" stroke="'+O+'" stroke-width="4"/><path d="M34 40 Q36 34 42 32" stroke="#fff" stroke-width="4" fill="none" opacity=".8" stroke-linecap="round"/>',
+ gradcap: shadow(84,34)+'<g '+W+'><path d="M30 50 v18 Q50 80 70 68 v-18" fill="#3b3068"/><path d="M6 42 L50 22 L94 42 L50 62 Z" fill="#2b2350"/></g><path d="M82 46 L84 70" stroke="#ffc83d" stroke-width="4" stroke-linecap="round"/><circle cx="84" cy="74" r="6" fill="#ffc83d" '+W.replace('5','3')+'/>',
+ dog: shadow(92,30)+'<g '+W+'><ellipse cx="50" cy="74" rx="24" ry="16" fill="#f3c993"/><circle cx="50" cy="48" r="28" fill="#f3c993"/><path d="M26 34 Q12 40 18 66 Q28 66 32 50 Z" fill="#9b6a43"/><path d="M74 34 Q88 40 82 66 Q72 66 68 50 Z" fill="#9b6a43"/></g><ellipse cx="62" cy="40" rx="9" ry="8" fill="#9b6a43" opacity=".55"/>'+eye(40,48,5)+eye(60,48,5)+'<ellipse cx="50" cy="60" rx="6" ry="4.5" fill="'+O+'"/><path d="M50 64 Q50 70 44 70 M50 64 Q50 70 56 70" stroke="'+O+'" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M47 70 q3 8 6 0" fill="#ff7a8a" '+W.replace('5','2.5')+'/>'+blush(33,60)+blush(67,60),
+ cat: shadow(92,28)+'<g '+W+'><ellipse cx="50" cy="74" rx="22" ry="15" fill="#ffb562"/><path d="M24 30 L30 10 L44 24 Z M76 30 L70 10 L56 24 Z" fill="#ffb562"/><circle cx="50" cy="48" r="27" fill="#ffb562"/></g><path d="M44 24 Q50 32 56 24" stroke="#e08a2e" stroke-width="5" fill="none"/>'+eye(40,48,5)+eye(60,48,5)+'<path d="M47 58 l3 3 3 -3 z" fill="#ff7a8a" '+W.replace('5','2')+'/><path d="M50 61 q-4 6 -8 2 M50 61 q4 6 8 2" stroke="'+O+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+blush(33,58)+blush(67,58),
+ plant: shadow(94,24)+'<g '+W+'><path d="M50 62 Q30 52 22 30 Q42 28 50 50 Z" fill="#5cc26b"/><path d="M50 60 Q70 46 82 26 Q62 22 50 48 Z" fill="#4cae5c"/><path d="M50 62 Q46 36 52 14 Q64 34 50 62 Z" fill="#6fd47c"/><path d="M30 62 h40 l-6 28 h-28 Z" fill="#e8705a"/><rect x="26" y="58" width="48" height="10" rx="4" fill="#f08a72"/></g>'+eye(42,78,3)+eye(58,78,3)+blush(36,84)+blush(64,84),
+ pumpkin: shadow(92,34)+'<g '+W+'><path d="M50 22 q2 -10 10 -12" fill="none"/><ellipse cx="34" cy="58" rx="20" ry="28" fill="#ff9a3d"/><ellipse cx="66" cy="58" rx="20" ry="28" fill="#ff9a3d"/><ellipse cx="50" cy="58" rx="18" ry="30" fill="#ffad55"/></g><path d="M50 24 q4 -8 12 -8" stroke="#4cae5c" stroke-width="6" fill="none" stroke-linecap="round"/>'+eye(40,54,5)+eye(60,54,5)+'<path d="M42 68 Q50 76 58 68" stroke="'+O+'" stroke-width="4" fill="none" stroke-linecap="round"/>'+blush(30,66)+blush(70,66),
+ car: shadow(90,40)+'<g '+W+'><path d="M10 70 V56 Q10 48 20 46 L30 30 Q34 24 44 24 H64 Q74 24 80 34 L86 46 Q92 48 92 58 V70 Z" fill="#ff6b6b"/><path d="M34 32 Q36 28 42 28 H50 V46 H28 Z" fill="#bfe3ff"/><path d="M56 28 H64 Q70 28 74 34 L80 46 H56 Z" fill="#bfe3ff"/><circle cx="28" cy="72" r="10" fill="#4a3f63"/><circle cx="74" cy="72" r="10" fill="#4a3f63"/></g><circle cx="28" cy="72" r="3.5" fill="#ddd"/><circle cx="74" cy="72" r="3.5" fill="#ddd"/><circle cx="88" cy="56" r="3" fill="#ffe26b"/>',
+ apartment: shadow(94,34)+'<g '+W+'><rect x="24" y="12" width="52" height="80" rx="6" fill="#a9c7ff"/><rect x="42" y="72" width="16" height="20" rx="3" fill="#8a5a3c"/></g>'+[[32,22],[54,22],[32,38],[54,38],[32,54],[54,54]].map(a=>'<rect x="'+a[0]+'" y="'+a[1]+'" width="14" height="11" rx="3" fill="#fff6c9" stroke="'+O+'" stroke-width="3"/>').join(''),
+ plane: shadow(92,36)+'<g '+W+'><path d="M10 52 Q10 42 24 42 H74 Q92 42 92 52 Q92 60 74 60 H24 Q10 60 10 52 Z" fill="#f4f4fb"/><path d="M44 44 L58 18 H66 L60 44 Z" fill="#7c5cff"/><path d="M44 58 L58 82 H66 L60 58 Z" fill="#7c5cff"/><path d="M14 46 L8 32 H16 L26 44 Z" fill="#7c5cff"/></g><circle cx="76" cy="50" r="3" fill="#4da3ff"/><circle cx="66" cy="50" r="3" fill="#4da3ff"/><circle cx="56" cy="50" r="3" fill="#4da3ff"/>',
+ house: shadow(92,38)+'<g '+W+'><rect x="20" y="46" width="60" height="42" rx="5" fill="#ffe3c4"/><path d="M12 50 L50 18 L88 50 Z" fill="#e8705a"/><rect x="42" y="62" width="16" height="26" rx="3" fill="#8a5a3c"/></g><circle cx="31" cy="62" r="6" fill="#bfe3ff" stroke="'+O+'" stroke-width="3"/><circle cx="69" cy="62" r="6" fill="#bfe3ff" stroke="'+O+'" stroke-width="3"/>',
+ bighouse: shadow(94,44)+'<g '+W+'><rect x="10" y="44" width="80" height="46" rx="5" fill="#d9f0ff"/><path d="M4 48 L36 18 L64 18 L96 48 Z" fill="#7c5cff"/><rect x="42" y="64" width="16" height="26" rx="3" fill="#8a5a3c"/></g><circle cx="24" cy="62" r="6" fill="#fff6c9" stroke="'+O+'" stroke-width="3"/><circle cx="76" cy="62" r="6" fill="#fff6c9" stroke="'+O+'" stroke-width="3"/><circle cx="50" cy="32" r="5" fill="#fff6c9" stroke="'+O+'" stroke-width="3"/>'
+ ,mansion: shadow(94,46)+'<g '+W+'><rect x="30" y="40" width="40" height="50" rx="4" fill="#fff6e6"/><path d="M24 44 L50 20 L76 44 Z" fill="#ff7a59"/><rect x="6" y="56" width="26" height="34" rx="4" fill="#fff6e6"/><rect x="68" y="56" width="26" height="34" rx="4" fill="#fff6e6"/><path d="M2 58 L19 46 L36 58 Z M64 58 L81 46 L98 58 Z" fill="#ff7a59"/><path d="M44 90 V72 Q50 64 56 72 V90 Z" fill="#8a5a3c"/></g><circle cx="50" cy="52" r="5" fill="#bfe3ff" stroke="'+O+'" stroke-width="3"/>'
+};
+return ICONS;
+
+})();
+const HOME_ART = (function(){
+// Blip-style home scenes for the "Lily's life" tab. Each is 360x220.
+const O='#3b2a4a';
+const W=(w)=>'stroke="'+O+'" stroke-width="'+(w||3.5)+'" stroke-linejoin="round" stroke-linecap="round"';
+const sky=(top,bot,id)=>'<defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+top+'"/><stop offset="1" stop-color="'+bot+'"/></linearGradient></defs><rect width="360" height="220" fill="url(#'+id+')"/>';
+const sun=(x,y,c)=>'<circle cx="'+x+'" cy="'+y+'" r="30" fill="'+(c||'#fff3b0')+'" opacity=".7"/><circle cx="'+x+'" cy="'+y+'" r="18" fill="#ffd96b" '+W()+'/>';
+const cloud=(x,y,s)=>'<g transform="translate('+x+' '+y+') scale('+(s||1)+')"><path d="M0 16 a12 12 0 0 1 20 -8 a14 14 0 0 1 26 4 a10 10 0 0 1 2 20 h-46 a9 9 0 0 1 -2 -16z" fill="#fff" '+W()+'/></g>';
+const ground=(c)=>'<path d="M0 176 Q90 162 180 172 T360 168 V220 H0 Z" fill="'+(c||'#9be08f')+'" '+W()+'/>';
+const tree=(x,y,s)=>'<g transform="translate('+x+' '+y+') scale('+(s||1)+')"><rect x="-5" y="0" width="10" height="44" rx="4" fill="#9b6a43" '+W()+'/><circle cx="0" cy="-14" r="26" fill="#5cc26b" '+W()+'/><circle cx="-15" cy="2" r="14" fill="#4cae5c" '+W()+'/><circle cx="-8" cy="-20" r="4" fill="#ff6b6b" '+W(2)+'/><circle cx="10" cy="-6" r="4" fill="#ff6b6b" '+W(2)+'/></g>';
+const win=(x,y,r)=>'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#bfe3ff" '+W()+'/><path d="M'+x+' '+(y-r)+' v'+(2*r)+' M'+(x-r)+' '+y+' h'+(2*r)+'" stroke="'+O+'" stroke-width="2.5"/><circle cx="'+(x-r*.4)+'" cy="'+(y-r*.45)+'" r="'+(r*.25)+'" fill="#fff" opacity=".8"/>';
+const sqwin=(x,y,w,h,lit)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="4" fill="'+(lit?'#fff3b0':'#bfe3ff')+'" '+W(3)+'/><path d="M'+(x+w/2)+' '+y+' v'+h+'" stroke="'+O+'" stroke-width="2"/>';
+const door=(x,y,w,h,c)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="6" fill="'+(c||'#8a5a3c')+'" '+W()+'/><circle cx="'+(x+w-7)+'" cy="'+(y+h/2+4)+'" r="3" fill="#ffd96b"/>';
+const flowers=(x,y,w)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="10" rx="4" fill="#5cc26b" '+W(3)+'/>'+[0.25,0.5,0.75].map(f=>'<circle cx="'+(x+w*f)+'" cy="'+(y-1)+'" r="4" fill="#ff8fa3" '+W(2)+'/>').join('');
+const car=(x,y,s)=>'<g transform="translate('+x+' '+y+') scale('+(s||1)+')"><path d="M0 40 V28 Q0 20 10 18 L20 4 Q24 -2 34 -2 H54 Q64 -2 70 8 L76 18 Q82 20 82 30 V40 Z" fill="#ff6b6b" '+W()+'/><path d="M24 6 Q26 2 32 2 H40 V18 H18 Z" fill="#bfe3ff" '+W(3)+'/><path d="M46 2 H54 Q60 2 64 8 L70 18 H46 Z" fill="#bfe3ff" '+W(3)+'/><circle cx="18" cy="42" r="10" fill="#4a3f63" '+W()+'/><circle cx="64" cy="42" r="10" fill="#4a3f63" '+W()+'/><circle cx="18" cy="42" r="3.5" fill="#ddd"/><circle cx="64" cy="42" r="3.5" fill="#ddd"/><circle cx="78" cy="28" r="3" fill="#ffe26b"/></g>';
+const fence=(x1,x2,y)=>{let s='<path d="M'+x1+' '+(y+10)+' H'+x2+' M'+x1+' '+(y+22)+' H'+x2+'" stroke="'+O+'" stroke-width="3"/>';for(let x=x1;x<=x2;x+=14)s+='<path d="M'+x+' '+(y+30)+' V'+(y+4)+' l5 -6 5 6 V'+(y+30)+' Z" fill="#fff" '+W(2.5)+'/>';return s;};
+const HOMES={
+ parents: { title:"Mom and Dad's house", sub:'Under 18', svg: sky('#c9e8ff','#f1f9ff','s1')+sun(312,38)+cloud(40,30)+ground()+
+   '<g>'+'<rect x="150" y="92" width="170" height="86" rx="10" fill="#ffd6e0" '+W()+'/><path d="M138 98 Q138 92 144 88 L229 38 Q235 34 241 38 L326 88 Q332 92 332 98 Q332 104 324 104 H146 Q138 104 138 98 Z" fill="#7c9cff" '+W()+'/>'+
+   door(220,126,30,52,'#ff8a5c')+win(188,134,16)+win(284,134,16)+flowers(172,152,32)+flowers(268,152,32)+
+   '<rect x="128" y="140" width="6" height="36" fill="#9b6a43" '+W(2.5)+'/><rect x="104" y="126" width="52" height="22" rx="8" fill="#ff6b6b" '+W()+'/><text x="130" y="142" font-size="8" text-anchor="middle" font-family="Fredoka" font-weight="700" fill="#fff">MOM&amp;DAD</text></g>'+
+   tree(36,132) },
+ apartment: { title:'First apartment', sub:'Age 18 · free', svg: sky('#ffd9c2','#fff1e6','s2')+sun(318,44,'#ffe0c2')+
+   '<g fill="#d7cdf5" '+W(3)+'><rect x="10" y="98" width="40" height="80" rx="4"/><rect x="300" y="84" width="50" height="94" rx="4"/><rect x="54" y="118" width="30" height="60" rx="4"/></g>'+
+   ground('#b9c3d6')+
+   '<rect x="130" y="34" width="150" height="146" rx="8" fill="#ffb38a" '+W()+'/><rect x="124" y="26" width="162" height="14" rx="6" fill="#e8705a" '+W()+'/>'+
+   [56,92].map(y=>[146,186,226].map(x=>sqwin(x,y,26,22,(x+y)%3===0)).join('')).join('')+
+   sqwin(146,128,26,22)+sqwin(226,128,26,22,true)+
+   '<rect x="222" y="148" width="34" height="8" rx="3" fill="#a9c7ff" '+W(2.5)+'/><path d="M224 148 v-10 h30 v10" fill="none" stroke="'+O+'" stroke-width="2.5"/><circle cx="232" cy="140" r="5" fill="#5cc26b" '+W(2)+'/>'+
+   door(183,138,32,42,'#7c5cff')+'<rect x="176" y="132" width="46" height="8" rx="3" fill="#e8705a" '+W(2.5)+'/>' },
+ starter: { title:'Starter home', sub:'$100K', svg: sky('#c9e8ff','#f1f9ff','s3')+sun(312,38)+cloud(40,30)+ground()+
+   '<rect x="282" y="52" width="16" height="30" rx="3" fill="#c98c55" '+W()+'/><rect x="164" y="92" width="156" height="86" rx="10" fill="#ffe3c4" '+W()+'/>'+
+   '<path d="M150 98 Q150 92 156 88 L236 42 Q242 38 248 42 L328 88 Q334 92 334 98 Q334 104 326 104 H158 Q150 104 150 98 Z" fill="#e8705a" '+W()+'/>'+
+   door(226,126,30,52)+win(196,134,16)+win(290,134,16)+flowers(180,152,32)+flowers(274,152,32)+tree(30,132) },
+ family: { title:'Family house', sub:'$250K', svg: sky('#c9e8ff','#f1f9ff','s4')+sun(326,34)+cloud(30,24,.9)+ground()+
+   '<rect x="130" y="64" width="150" height="114" rx="10" fill="#d9f0ff" '+W()+'/>'+
+   '<path d="M118 70 Q118 64 124 60 L199 22 Q205 18 211 22 L286 60 Q292 64 292 70 Q292 76 284 76 H126 Q118 76 118 70 Z" fill="#7c5cff" '+W()+'/>'+
+   '<rect x="280" y="112" width="70" height="66" rx="8" fill="#d9f0ff" '+W()+'/><path d="M274 116 L315 94 L356 116 Z" fill="#7c5cff" '+W()+'/><rect x="290" y="132" width="50" height="46" rx="4" fill="#f4f4fb" '+W(3)+'/><path d="M290 144 h50 M290 156 h50 M290 168 h50" stroke="'+O+'" stroke-width="2"/>'+
+   win(205,48,10)+sqwin(146,88,30,24,true)+sqwin(234,88,30,24)+door(190,130,30,48,'#ff8a5c')+sqwin(146,136,30,24)+sqwin(234,136,30,24,true)+
+   flowers(144,162,34)+flowers(232,162,34)+tree(28,128,1.05)+fence(52,122,150) },
+ dream: { title:'Dream home', sub:'$600K', svg: sky('#ffb8a8','#ffe9c7','s5')+sun(60,56,'#ffd0a8')+cloud(250,20,.8)+ground('#8fd88a')+
+   '<rect x="120" y="70" width="120" height="108" rx="10" fill="#fff6e6" '+W()+'/><path d="M110 76 Q110 70 116 66 L174 30 Q180 26 186 30 L244 66 Q250 70 250 76 Q250 82 242 82 H118 Q110 82 110 76 Z" fill="#ff7a59" '+W()+'/>'+
+   '<rect x="40" y="104" width="86" height="74" rx="8" fill="#fff6e6" '+W()+'/><rect x="234" y="104" width="86" height="74" rx="8" fill="#fff6e6" '+W()+'/>'+
+   '<path d="M34 108 L83 84 L132 108 Z" fill="#ff7a59" '+W()+'/><path d="M228 108 L277 84 L326 108 Z" fill="#ff7a59" '+W()+'/>'+
+   win(180,58,11)+sqwin(56,122,22,22,true)+sqwin(88,122,22,22)+sqwin(250,122,22,22)+sqwin(282,122,22,22,true)+
+   '<g fill="#fff" '+W(3)+'><rect x="140" y="96" width="10" height="82" rx="3"/><rect x="210" y="96" width="10" height="82" rx="3"/></g>'+
+   '<path d="M164 178 V130 Q180 112 196 130 V178 Z" fill="#8a5a3c" '+W()+'/><circle cx="188" cy="152" r="3" fill="#ffd96b"/>'+
+   '<ellipse cx="76" cy="198" rx="44" ry="11" fill="#7fd3ff" '+W()+'/><path d="M52 196 q8 -4 16 0 M78 200 q8 -4 16 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+   '<g '+W(3)+'><path d="M20 178 Q16 140 24 112" fill="none" stroke-width="7" stroke="'+O+'"/><path d="M20 178 Q16 140 24 112" fill="none" stroke="#c98c55" stroke-width="3.5"/>'+
+   '<path d="M24 112 Q4 104 -2 118 Q12 110 24 112 Q14 92 30 88 Q28 104 24 112 Q42 96 54 106 Q36 106 24 112 Z" fill="#4cae5c"/></g>'+
+   '<path d="M8 40 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#fff" '+W(2)+'/><path d="M340 70 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#fff" '+W(2)+'/>' }
+};
+return HOMES;
+
+})();
+const CAR_ART = (function(){
+// Blip-style cars, side view, 200x120 viewBox, wheels sitting on y=104.
+const O='#3b2a4a';
+const W=(w)=>'stroke="'+O+'" stroke-width="'+(w||4)+'" stroke-linejoin="round" stroke-linecap="round"';
+const wheel=(x,r)=>'<circle cx="'+x+'" cy="'+(104-r)+'" r="'+r+'" fill="#4a3f63" '+W()+'/><circle cx="'+x+'" cy="'+(104-r)+'" r="'+(r*.4)+'" fill="#e6e3ef" '+W(2.5)+'/>';
+const shadow='<ellipse cx="100" cy="106" rx="84" ry="6" fill="rgba(0,0,0,.12)"/>';
+const shine=(d)=>'<path d="'+d+'" stroke="#fff" stroke-width="4" fill="none" opacity=".6" stroke-linecap="round"/>';
+const CARS={
+ hatch:{name:'Used hatchback',price:'$15K',svg:shadow+
+  '<path d="M26 92 V70 Q26 58 40 56 L58 34 Q64 28 76 28 H118 Q132 28 140 40 L150 56 Q170 58 172 72 V92 Z" fill="#ff6b6b" '+W()+'/>'+
+  '<path d="M64 38 Q68 34 74 34 H94 V56 H48 Z" fill="#bfe3ff" '+W(3)+'/><path d="M102 34 H118 Q128 34 134 42 L142 56 H102 Z" fill="#bfe3ff" '+W(3)+'/>'+
+  '<path d="M98 60 V88" stroke="'+O+'" stroke-width="3"/><rect x="104" y="64" width="12" height="4" rx="2" fill="'+O+'"/>'+
+  '<rect x="164" y="64" width="10" height="8" rx="3" fill="#ffe26b" '+W(2.5)+'/><rect x="22" y="66" width="8" height="8" rx="3" fill="#ff9a9a" '+W(2.5)+'/>'+
+  '<path d="M44 84 q4 -4 8 0 M130 84 q4 -4 8 0" stroke="#d95454" stroke-width="3" fill="none"/>'+
+  '<path d="M36 74 Q60 70 74 76" stroke="#e05555" stroke-width="3" fill="none"/>'+  // little dent
+  shine('M70 40 L60 52')+wheel(56,15)+wheel(144,15)},
+ suv:{name:'Family SUV',price:'$40K',svg:shadow+
+  '<rect x="52" y="12" width="96" height="8" rx="4" fill="#6d6787" '+W(3)+'/><path d="M62 20 v-6 M138 20 v-6" stroke="'+O+'" stroke-width="3"/>'+
+  '<path d="M18 92 V60 Q18 48 32 46 L44 26 Q48 20 58 20 H146 Q160 20 166 32 L176 50 Q184 54 184 66 V92 Z" fill="#2fb8a6" '+W()+'/>'+
+  '<path d="M52 28 Q54 26 60 26 H84 V48 H38 Z" fill="#bfe3ff" '+W(3)+'/><rect x="90" y="26" width="36" height="22" rx="4" fill="#bfe3ff" '+W(3)+'/><path d="M132 26 H146 Q154 26 158 32 L166 48 H132 Z" fill="#bfe3ff" '+W(3)+'/>'+
+  '<path d="M87 52 V88 M129 52 V88" stroke="'+O+'" stroke-width="3"/><rect x="92" y="56" width="12" height="4" rx="2" fill="'+O+'"/><rect x="134" y="56" width="12" height="4" rx="2" fill="'+O+'"/>'+
+  '<path d="M18 74 H184" stroke="#1f8f80" stroke-width="5"/>'+
+  '<rect x="176" y="58" width="10" height="9" rx="3" fill="#ffe26b" '+W(2.5)+'/><rect x="14" y="58" width="8" height="10" rx="3" fill="#ff9a9a" '+W(2.5)+'/>'+
+  '<clipPath id="suvwin"><rect x="90" y="26" width="36" height="22" rx="4"/></clipPath><g clip-path="url(#suvwin)"><svg x="93" y="25" width="30" height="30" viewBox="0 0 100 100">'+ICONS.dog+'</svg></g><rect x="90" y="26" width="36" height="22" rx="4" fill="none" '+W(3)+'/>'+ // dog in the window
+  shine('M58 32 L48 44')+wheel(50,17)+wheel(152,17)},
+ dream:{name:'Dream convertible',price:'$90K',svg:shadow+
+  '<rect x="70" y="40" width="22" height="24" rx="8" fill="#3b3068" '+W(3)+'/><rect x="44" y="44" width="20" height="20" rx="8" fill="#3b3068" '+W(3)+'/>'+
+  '<path d="M14 90 V76 Q14 62 32 60 L120 58 Q140 52 158 56 L172 60 Q188 63 188 76 V90 Z" fill="#7c5cff" '+W()+'/>'+
+  '<path d="M126 58 L114 34" stroke="'+O+'" stroke-width="10" stroke-linecap="round"/><path d="M126 58 L114 34" stroke="#bfe3ff" stroke-width="5" stroke-linecap="round"/>'+
+  '<path d="M14 76 H188" stroke="#5a3fd6" stroke-width="5"/><path d="M128 64 Q160 62 180 68" stroke="#ffc83d" stroke-width="4" fill="none" stroke-linecap="round"/>'+
+  '<rect x="180" y="66" width="10" height="8" rx="3" fill="#ffe26b" '+W(2.5)+'/><rect x="10" y="66" width="8" height="8" rx="3" fill="#ff9a9a" '+W(2.5)+'/>'+
+  '<rect x="96" y="66" width="14" height="4" rx="2" fill="'+O+'"/><path d="M92 62 V88" stroke="'+O+'" stroke-width="3"/>'+
+  shine('M30 68 L56 66')+wheel(48,15)+wheel(156,15)+
+  '<path d="M156 22 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#ffe26b" '+W(2)+'/><path d="M30 30 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#ffe26b" '+W(2)+'/>'}
+};
+return CARS;
+
+})();
+
+// ============ THINGS A BLIP BUYS WITH THEIR SAVINGS ============
+// Bought automatically, one per year, in this order, once the Blip is 18+.
+// Homes trade in at full value, cars at half. Money is in $K like S.money.
+const LADDER = [
+  {key:'hatch',     kind:'car',  name:'used hatchback',    price:15},
+  {key:'starter',   kind:'home', name:'starter home',      price:100},
+  {key:'trip',      kind:'trip', name:'dream trip',        price:20, fx:{j:15}},
+  {key:'suv',       kind:'car',  name:'family SUV',        price:40},
+  {key:'family',    kind:'home', name:'family house',      price:250},
+  {key:'dreamcar',  kind:'car',  name:'dream convertible', price:90},
+  {key:'dreamhome', kind:'home', name:'dream home',        price:600}
+];
+const ITEM = Object.fromEntries(LADDER.map(x => [x.key, x]));
+const CAR_KEY = {hatch:'hatch', suv:'suv', dreamcar:'dream'};       // item -> CAR_ART
+const HOME_KEY = {starter:'starter', family:'family', dreamhome:'dream'}; // item -> HOME_ART
+const ITEM_ICON = {starter:'house', family:'bighouse', dreamhome:'mansion', trip:'plane'};
+function owned(){ return S.owned || (S.owned = {car:null, home:null, bought:[]}); }
+function tradeIn(item){
+  const o = owned();
+  if (item.kind === 'car' && o.car) return ITEM[o.car].price / 2;
+  if (item.kind === 'home' && o.home) return ITEM[o.home].price;
+  return 0;
+}
+function nextItem(){ const o = owned(); return LADDER.find(x => !o.bought.some(b => b.key === x.key)) || null; }
+function itemCost(item){ return Math.max(0, item.price - tradeIn(item)); }
+function netWorth(){
+  const o = owned();
+  return S.money + (o.home ? ITEM[o.home].price : 0) + (o.car ? ITEM[o.car].price / 2 : 0);
+}
+function buyThings(){
+  const item = nextItem();
+  if (!item || S.age < 18) return [];
+  const cost = itemCost(item);
+  if (S.money < cost) return [];
+  const o = owned();
+  S.money -= cost;
+  if (item.kind === 'car') o.car = item.key;
+  if (item.kind === 'home') o.home = item.key;
+  if (item.fx) applyFx(item.fx);
+  o.bought.push({key:item.key, age:S.age});
+  return [{key:item.key, cost, traded:item.price - cost}];
+}
+function itemArt(key, cls){
+  if (CAR_KEY[key]) return '<svg class="'+(cls||'')+'" viewBox="0 0 200 120">'+CAR_ART[CAR_KEY[key]].svg+'</svg>';
+  return '<svg class="'+(cls||'')+'" viewBox="0 0 100 100">'+ICONS[ITEM_ICON[key]]+'</svg>';
+}
+function pron(){ return S.girl ? 'her' : 'his'; }
+function buyLine(b){
+  const it = ITEM[b.key];
+  if (it.kind === 'trip') return esc(S.name)+' went on '+pron()+' dream trip! ✈️';
+  if (b.key === 'hatch') return esc(S.name)+' bought '+pron()+' first car!';
+  if (b.key === 'starter') return esc(S.name)+' bought '+pron()+' first home!';
+  return esc(S.name)+' bought a '+it.name+'!';
+}
+
+// Where the Blip lives right now, and where things go in each scene (percent of the scene box).
+const SCENE_LAYOUT = {
+  parents:   {blip:[3, 4],  car:null},
+  apartment: {blip:[14, 3], car:[262, 146, 92]},
+  starter:   {blip:[1, 3],  car:[96, 140, 84]},
+  family:    {blip:[17, 3], car:[284, 146, 74]},
+  dream:     {blip:[22, 3], car:[252, 148, 96]}
+};
+function homeScene(){
+  const o = owned();
+  const key = S.age < 18 ? 'parents' : (o.home ? HOME_KEY[o.home] : 'apartment');
+  const L = SCENE_LAYOUT[key], home = HOME_ART[key];
+  const car = (o.car && L.car) ? '<svg x="'+L.car[0]+'" y="'+L.car[1]+'" width="'+L.car[2]+'" height="'+(L.car[2]*.6)+'" viewBox="0 0 200 120">'+CAR_ART[CAR_KEY[o.car]].svg+'</svg>' : '';
+  const label = key === 'parents' ? 'Mom and Dad\'s house' : key === 'apartment' ? 'First apartment' : home.title;
+  return '<div class="lifescene"><svg viewBox="0 0 360 220" class="scene">'+home.svg+car+'</svg>'+
+    '<div class="sblip" style="left:'+L.blip[0]+'%;bottom:'+L.blip[1]+'%">'+charSVG(S)+'</div><div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(label)+'</div></div>';
+}
+
+function lifeHTML(){
+  const o = owned(), nxt = nextItem();
+  let earned = '<div class="card"><h2 class="earnh">💰 Earned by '+esc(S.name)+'<small>Net worth '+fmtMoney(netWorth())+'</small></h2>';
+  earned += '<div class="muted small">Savings '+fmtMoney(S.money)+'. '+esc(S.name)+' buys things automatically. Only good habits grow it.</div>';
+  if (o.bought.length) earned += o.bought.map(b => '<div class="own">'+itemArt(b.key, CAR_KEY[b.key] ? 'oicon car' : 'oicon')+'<span>'+ITEM[b.key].name.replace(/^./, c => c.toUpperCase())+
+    ((o.car === b.key || o.home === b.key || b.key === 'trip') ? '' : ' <i>traded in</i>')+'</span><span class="a">age '+b.age+'</span></div>').join('');
+  if (S.age < 18) earned += '<p class="nexttxt">'+esc(S.name)+' starts earning at 18. First up: a '+LADDER[0].name+'.</p>';
+  else if (nxt) {
+    const cost = itemCost(nxt), pct = Math.min(100, Math.round(S.money / cost * 100));
+    earned += '<div class="nexttxt">Next: '+itemArt(nxt.key, 'nicon')+' <b>'+nxt.name.replace(/^./, c => c.toUpperCase())+'</b> · '+(S.money >= cost ? 'buying soon!' : fmtMoney(cost - S.money)+' to go')+
+      (tradeIn(nxt) ? '<br><span class="muted small">'+fmtMoney(nxt.price)+' minus '+fmtMoney(tradeIn(nxt))+' trade-in</span>' : '')+
+      '<i class="nbar"><u style="width:'+pct+'%"></u></i></div>';
+  } else earned += '<p class="nexttxt">🌟 '+esc(S.name)+' has everything '+(S.girl ? 'she' : 'he')+' ever dreamed of!</p>';
+  earned += '</div>';
+  return header().replace('<div class="logo">Lifetime<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
+    '<div class="card scenecard">'+homeScene()+'</div>'+earned+storyHTML(true);
+}
+
+function storyHTML(inLife){
+  const head = inLife ? '' : header();
+  if (!S.log.length) return head+'<div class="card"><h2>Life story</h2><p class="muted">'+esc(S.name)+'\'s story starts after your first check-in.</p></div>';
   let rows = '';
   for (let i = S.log.length-1; i >= 0; i--) {
     const e = S.log[i], t = TIER[e.tier];
@@ -1036,11 +1264,12 @@ function storyHTML(){
       '<div class="t">'+e.emoji+' '+esc(e.text)+'</div>'+
       '<div class="m"><span class="pill" style="background:'+t.color+'">'+e.tier+'</span>'+(e.mins == null ? 'No check-in' : fmtTime(e.mins)+' on phone')+'</div>'+
       (e.ms ? '<div class="ms"><b>'+e.ms.emoji+' '+esc(e.ms.title)+'</b><br><span class="muted">'+esc(e.ms.text)+'</span></div>' : '')+
+      (e.buys ? e.buys.map(b => '<div class="ms">🎉 <b>Bought a '+esc(ITEM[b.key].name)+'</b> <span class="muted">−'+fmtMoney(b.cost)+'</span></div>').join('') : '')+
       '</div></div>';
   }
   const met = S.log.filter(e=>e.tier==='good'||e.tier==='great').length;
   const cards = LIFE_CARD_AGES.filter(a => S.age >= a).map(a => '<button class="btn ghost lcbtn" data-age="'+a+'">✨ Age '+a+' card</button>').join('');
-  return header()+'<div class="card"><h2>'+esc(S.name)+'\'s life story</h2><p class="muted">Goal met on '+met+' of '+S.log.length+' days.</p>'+
+  return head+'<div class="card"><h2>'+esc(S.name)+'\'s life story</h2><p class="muted">Goal met on '+met+' of '+S.log.length+' days.</p>'+
     (cards ? '<div class="row lcrow">'+cards+'</div>' : '')+rows+'</div>';
 }
 
@@ -1200,13 +1429,16 @@ function showYear(e){
     '<div class="fx">'+fxHTML(e.fx, e.earned)+'</div>'+
     (e.shrunk ? '<p class="muted">⭐ Already near the top! Keep it up to stay there.</p>' : '');
   for (const n of e.notes) h += '<p><b>'+n+'</b></p>';
+  if (e.buys) for (const b of e.buys) h += '<div class="mscard buy"><div class="k">Big purchase!</div>'+itemArt(b.key, CAR_KEY[b.key] ? 'buyart car' : 'buyart')+
+    '<div class="t">'+buyLine(b)+'</div><p>−'+fmtMoney(b.cost)+' from savings'+(b.traded ? ' (after a '+fmtMoney(b.traded)+' trade-in)' : '')+(ITEM[b.key].fx ? ' · +'+ITEM[b.key].fx.j+' 😊' : '')+'</p></div>';
   if (e.ms) h += '<div class="mscard"><div class="k">Big life moment</div><div class="e">'+e.ms.emoji+'</div><div class="t">'+esc(e.ms.title)+'</div><p>'+esc(e.ms.text)+'</p></div>';
   if (S.done) h += '<div class="mscard"><div class="k">The end of an era</div><div class="e">🎂</div><div class="t">'+esc(S.name)+' turned '+SETTINGS.lifeLength+'!</div><p>Their story is complete. See how it went on the Today screen.</p></div>';
   const card = LIFE_CARD_AGES.includes(e.age);
   h += card ? '<button class="btn" id="lcard">See '+esc(S.name)+'\'s life card ✨</button>' : '<button class="btn" data-close>Continue</button>';
   modal(h);
   if (card) $('lcard').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); showLifeCard(e.age); };
-  if (e.tier === 'great' || e.ms) confetti(e.tier === 'great' ? ['🎉','⭐','✨','🎊'] : [e.ms.emoji,'✨']);
+  if (e.buys) confetti(['🎉','💰','✨','🔑']);
+  else if (e.tier === 'great' || e.ms) confetti(e.tier === 'great' ? ['🎉','⭐','✨','🎊'] : [e.ms.emoji,'✨']);
 }
 
 // ============ HOME SCREEN ICON ============
