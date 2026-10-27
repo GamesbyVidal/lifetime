@@ -512,9 +512,9 @@ let draft = {name:'', skin:SKINS[1], hair:HAIRS[0], avg:240, goal:210, step:0};
 function load(){ try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
 
-function newLife(name, skin, hair, goal, gen, bonus){
+function newLife(name, skin, hair, goal, gen, bonus, inherit){
   const b = bonus || 0;
-  return {
+  return {inherit: inherit || null,
     name, skin, hair, goal, gen: gen || 1,
     age: 0, h: 50 + b, s: 50 + b, j: 50 + b, money: 0,
     streak: 0, best: 0, edu: null, eduTier: 0, job: null, pay: 0, talent: null, partner: null,
@@ -614,6 +614,10 @@ function liveYear(mins, tier){
   const wasInDebt = S.money < 0;
   S.money += earned;
   if (wasInDebt && S.money >= 0) notes.push('🎉 Student loans paid off!');
+  if (S.age === 18 && S.inherit && S.inherit.fund > 0) {
+    S.money += S.inherit.fund;
+    notes.push('🎁 '+S.inherit.from+' left a college fund: '+fmtMoney(S.inherit.fund)+'.');
+  }
   const buys = buyThings();
 
   const ms = milestone(S.age, met);
@@ -1332,14 +1336,20 @@ const SCENE_LAYOUT = {
 function homeScene(){
   const o = owned();
   const key = S.age < 18 ? 'parents' : (o.home ? HOME_KEY[o.home] : 'apartment');
-  const L = SCENE_LAYOUT[key], home = HOME_ART[key];
-  const car = (o.car && L.car) ? '<svg x="'+L.car[0]+'" y="'+L.car[1]+'" width="'+L.car[2]+'" height="'+(L.car[2]*.6)+'" viewBox="0 0 200 120">'+CAR_ART[CAR_KEY[o.car]].svg+'</svg>' : '';
+  // Later generations grow up in the home their parent ended up in, with the parent's old car in the driveway.
+  const inh = S.inherit || {}, art = key === 'parents' && inh.home ? inh.home : key;
+  const L = SCENE_LAYOUT[art], home = HOME_ART[art];
+  const carKey = key === 'parents' ? inh.car : (o.car && CAR_KEY[o.car]);
+  const car = (carKey && L.car) ? '<svg x="'+L.car[0]+'" y="'+L.car[1]+'" width="'+L.car[2]+'" height="'+(L.car[2]*.6)+'" viewBox="0 0 200 120">'+CAR_ART[carKey].svg+'</svg>' : '';
   const label = key === 'parents' ? 'Mom and Dad\'s house' : key === 'apartment' ? 'First apartment' : home.title;
   const wx = weatherNow();
   let extra = '', friend = '';
   if (key === 'parents') {
     const fresh = newYardThing();
-    extra = yardThings().map(g => YARD.P[g.k][1]).join('');
+    // Inherited homes have their own driveways and trees, so a couple of things move or stay out.
+    const dogX = art === 'parents' ? 0 : 76;
+    extra = yardThings().filter(g => !(g.k === 'treehouse' && art === 'dream'))
+      .map(g => g.k === 'dog' && dogX ? '<g transform="translate('+dogX+' 0)">'+YARD.P.dog[1]+'</g>' : YARD.P[g.k][1]).join('');
     if (fresh) extra += YARD.SPARK(YARD.P[fresh.k][2], YARD.P[fresh.k][3]);
     if (hasFriend()) {
       const f = {name:'Pal', age:S.age, log:[{tier:'great'}], h:70, s:70, j:80, girl:!S.girl, skin:SKINS[(SKINS.indexOf(S.skin)+2) % SKINS.length], hair:HAIRS[(HAIRS.indexOf(S.hair)+2) % HAIRS.length]};
@@ -1350,7 +1360,7 @@ function homeScene(){
   if (wx !== 'sun') extra += YARD[wx === 'rain' ? 'rainy' : 'cloudy'];
   return '<div class="lifescene"><svg viewBox="0 0 360 220" class="scene">'+home.svg+car+extra+'</svg>'+
     '<div class="sblip" id="sblip" style="left:'+L.blip[0]+'%;bottom:'+L.blip[1]+'%"><div class="bubble" id="sbub"></div>'+charSVG(S)+'</div>'+friend+
-    (/id="ydog"/.test(extra) ? '<div class="bubble dogbub" id="dogbub"></div>' : '')+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(label)+'</div></div>';
+    (/id="ydog"/.test(extra) ? '<div class="bubble dogbub" id="dogbub"'+(art === 'parents' ? '' : ' style="left:57%"')+'></div>' : '')+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(label)+'</div></div>';
 }
 
 // One line under the scene: what's new in the yard, or what the weather means.
@@ -1403,6 +1413,7 @@ function growHTML(){
   let h = '<div class="card"><h2 class="earnh">🌱 Growing up<small>Age '+S.age+'</small></h2><div class="muted small">At 18 these decide '+esc(S.name)+'\'s college. At 22, the first job.</div>'+
     bar('h','💪','Health','var(--h)')+bar('s','🧠','Smarts','var(--s)')+bar('j','😊','Joy','var(--j)')+
     '<div class="track">🎓 On track for <b>'+(at ? at[1] : 'no college yet')+'</b>'+(up ? '<br><span class="muted small">Smarts '+up[0]+' gets '+him+' into '+up[1]+'. '+(up[0] - S.s)+' to go.</span>' : '')+'</div>';
+  if (S.inherit && S.inherit.fund > 0) h += '<div class="talent">🎁 '+esc(S.inherit.from)+' left a <b>'+fmtMoney(S.inherit.fund)+'</b> college fund. It arrives at 18.</div>';
   const names = {athlete:'Sports', scientist:'Science', performer:'Performing', gamer:'Video games'};
   if (S.talent) h += '<div class="talent">⭐ Talent: <b>'+names[S.talent]+'</b></div>';
   else {
@@ -1410,6 +1421,13 @@ function growHTML(){
     h += '<div class="talent">❓ A talent shows up at 10. Right now it looks like <b>'+{h:'Sports', s:'Science', j:'Performing'}[top]+'</b>.</div>';
   }
   return h+'</div>';
+}
+
+// What a finished life passes to the next Blip: the home, a small college fund (never enough for a house), and the old car.
+function inheritance(){
+  const o = owned();
+  return {from:S.name, home: o.home ? HOME_KEY[o.home] : null, car: o.home && o.car ? CAR_KEY[o.car] : null,
+    fund: Math.min(60, Math.round(Math.max(0, S.money) * 0.1))};
 }
 
 function lifeHTML(){
@@ -1543,7 +1561,7 @@ function bindSetup(){
   if ($('start')) $('start').onclick = () => {
     const name = draft.name.trim();
     const keepTest = draft.testMode || false;
-    S = newLife(name, draft.skin, draft.hair, draft.goal, draft.gen, draft.bonus);
+    S = newLife(name, draft.skin, draft.hair, draft.goal, draft.gen, draft.bonus, draft.inherit);
     S.girl = !!draft.girl;
     S.avg = draft.avg;
     S.testMode = keepTest;
@@ -1594,7 +1612,7 @@ function bind(){
   };
   if ($('nextGen')) $('nextGen').onclick = () => {
     const bonus = Math.min(15, Math.round(lifeScore()/10));
-    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, step:0, testMode:S.testMode};
+    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, inherit:inheritance(), step:0, testMode:S.testMode};
     S = null; try { localStorage.removeItem(KEY); } catch(e){}
     render();
   };
