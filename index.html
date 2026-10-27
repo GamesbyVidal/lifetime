@@ -215,6 +215,14 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .scenecard{padding:0;overflow:hidden}.lifescene{position:relative}.lifescene .scene{display:block;width:100%;height:auto}
 .sblip{position:absolute;width:30%}.sblip svg{width:100%;height:auto;display:block}.sblip svg>circle:first-of-type{display:none}
 .where{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.88);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
+.sblip.friend{width:22%}.lifescene .spark{animation:twk 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}@keyframes twk{50%{transform:scale(.5);opacity:.6}}
+.snote{padding:10px 14px;font-size:14px}.snote .pop{background:#ffe26b;border-radius:999px;padding:2px 8px;font-weight:600}
+.sk{display:grid;grid-template-columns:22px 58px 1fr 62px;align-items:center;gap:6px;margin-top:10px;font-size:15px}.sk .nbar{margin:0;height:11px}.sk .v{font-weight:600;text-align:right}.sk em{font-style:normal;font-size:12px}.sk em.up{color:#2fae5b}.sk em.dn{color:#d64545}
+.track{margin-top:14px;padding:10px 12px;background:#eef6ff;border-radius:14px;font-size:14px}.talent{margin-top:8px;padding:10px 12px;background:#fff6dc;border-radius:14px;font-size:14px}
+.road{display:flex;margin:14px 0 4px;position:relative}.road:before{content:"";position:absolute;left:8%;right:8%;top:19px;border-top:4px dashed #cfc6ef}
+.stop{flex:1;min-width:0;text-align:center;position:relative;font-size:11px;line-height:1.2}.stop .dot{width:38px;height:38px;margin:0 auto 4px;border-radius:50%;background:#f1edff;border:3px solid #3b2a4a;display:grid;place-items:center;font-size:18px;overflow:hidden}
+.stop .dot svg{width:100%;height:100%}.stop b{display:block;font-size:14px}.stop span{color:var(--soft)}.stop.now .dot{background:#9be08f}.stop.next .dot{background:#ffe26b;transform:scale(1.12);box-shadow:0 0 0 5px rgba(255,226,107,.45)}
+.tmr{margin-top:12px;padding:10px 12px;background:#fff6dc;border-radius:14px;font-size:14px}
 h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 2px}h2.earnh small{font-size:13px;color:var(--soft);font-weight:500;white-space:nowrap}
 .own{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0edf8;font-size:15px}.own:last-of-type{border-bottom:0}.own i{color:var(--soft);font-size:12px;font-style:normal}
 .own .a{margin-left:auto;font-size:12px;color:var(--soft)}.oicon{width:34px;height:34px;flex:none}.oicon.car{width:46px;height:28px}
@@ -1218,6 +1226,64 @@ function buyLine(b){
   return esc(S.name)+' bought a '+it.name+'!';
 }
 
+// ============ THE YARD ============
+// Good childhood years leave something behind at Mom and Dad's house. The weather follows your last check-in.
+const YARD = (function(){
+const O='#3b2a4a';
+const W=(w)=>'stroke="'+O+'" stroke-width="'+(w||3.5)+'" stroke-linejoin="round" stroke-linecap="round"';
+const icon=(k,x,y,w)=>'<svg x="'+x+'" y="'+y+'" width="'+w+'" height="'+w+'" viewBox="0 0 100 100">'+ICONS[k]+'</svg>';
+// Each thing: [name, svg, sparkle x, sparkle y]
+const P={
+ dog:['the family dog', icon('dog',116,146,38), 120, 146],
+ treehouse:['a treehouse','<rect x="14" y="80" width="46" height="30" rx="4" fill="#c98c55" '+W()+'/><path d="M8 84 L37 62 L66 84 Z" fill="#e8705a" '+W()+'/><rect x="30" y="90" width="14" height="12" rx="2" fill="#fff3b0" '+W(2.5)+'/>'+
+   '<path d="M50 110 V170 M60 110 V170 M50 124 H60 M50 138 H60 M50 152 H60" stroke="'+O+'" stroke-width="3"/>', 66, 68],
+ rocket:['a toy rocket','<path d="M346 150 q8 10 8 26 h-16 q0 -16 8 -26z" fill="#f4f4fb" '+W(3)+'/><path d="M338 176 l-6 8 h8 z M354 176 l6 8 h-8 z" fill="#ff6b6b" '+W(2.5)+'/><circle cx="346" cy="166" r="3.5" fill="#4da3ff" '+W(2)+'/>', 356, 148],
+ blocks:['a block tower','<rect x="140" y="196" width="14" height="14" rx="2" fill="#ff6b6b" '+W(2.5)+'/><rect x="154" y="196" width="14" height="14" rx="2" fill="#4da3ff" '+W(2.5)+'/><rect x="147" y="182" width="14" height="14" rx="2" fill="#ffc83d" '+W(2.5)+'/>', 166, 180],
+ notes:['music','<g fill="'+O+'"><circle cx="302" cy="104" r="4"/><circle cx="318" cy="92" r="4"/></g><path d="M305 104 V88 M321 92 V76 M305 88 L321 76" stroke="'+O+'" stroke-width="3" fill="none"/>', 324, 74],
+ pool:['a kiddie pool','<ellipse cx="300" cy="202" rx="24" ry="9" fill="#7fc8ff" '+W(3)+'/><ellipse cx="300" cy="200" rx="15" ry="4" fill="#bfe8ff"/>', 326, 192],
+ volcano:['a science fair volcano','<path d="M176 210 l10 -20 h8 l10 20 z" fill="#b97a45" '+W(2.5)+'/><path d="M186 190 q-4 -8 4 -10 q8 2 4 10" fill="#ff7a59" '+W(2)+'/>', 206, 184],
+ skateboard:['a skateboard','<rect x="210" y="200" width="30" height="6" rx="3" fill="#7c5cff" '+W(2.5)+'/><circle cx="216" cy="209" r="3" fill="'+O+'"/><circle cx="234" cy="209" r="3" fill="'+O+'"/>', 244, 196],
+ ball:['a soccer ball','<circle cx="262" cy="200" r="9" fill="#fff" '+W(3)+'/><path d="M262 195 l4 3 -1.5 5 h-5 l-1.5 -5 z" fill="'+O+'"/>', 272, 188],
+ dino:['a toy dinosaur','<path d="M326 210 v-10 q0 -8 10 -8 h6 q2 -10 10 -8 q4 4 -2 8 v8 q4 6 0 10 z" fill="#5cc26b" '+W(2.5)+'/><circle cx="350" cy="187" r="1.5" fill="'+O+'"/>', 330, 188],
+ trophy:['a trophy','<g transform="translate(181 128)"><path d="M0 0 h14 v6 q0 8 -7 9 q-7 -1 -7 -9 z" fill="#ffc83d" '+W(2.5)+'/><rect x="3" y="15" width="8" height="4" fill="#ffc83d" '+W(2)+'/></g>', 200, 126],
+ guitar:['a guitar','<g transform="rotate(-12 208 166)"><rect x="206" y="128" width="5" height="28" fill="#9b6a43" '+W(2)+'/><ellipse cx="208" cy="166" rx="9" ry="11" fill="#ff8a5c" '+W(2.5)+'/><circle cx="208" cy="166" r="3" fill="'+O+'"/></g>', 196, 128],
+ hoop:['a basketball hoop','<rect x="226" y="100" width="22" height="14" rx="2" fill="#fff" '+W(2.5)+'/><path d="M231 114 h12 l-2 9 h-8 z" fill="none" stroke="#ff7a59" stroke-width="2.5"/>', 252, 98],
+ flag:['a flag from their travels','<path d="M235 36 V12" stroke="'+O+'" stroke-width="3"/><path d="M235 12 l20 6 -20 6 z" fill="#ffc83d" '+W(2.5)+'/>', 258, 10],
+ bike:['a bike','<g fill="none" '+W(2.5)+'><circle cx="328" cy="168" r="8"/><circle cx="352" cy="168" r="8"/><path d="M328 168 l10 -12 h10 l4 12 M338 156 l2 -6 M346 156 l-8 12"/></g>', 356, 146]
+};
+// Which life event leaves which thing. Only good years count.
+const BY_EMOJI={'🐕':'dog','🏠':'treehouse','🚀':'rocket','🧱':'blocks','🎵':'notes','🎹':'notes','🏊':'pool','🌋':'volcano','🛹':'skateboard','⚽':'ball','🦖':'dino',
+ '🏆':'trophy','🥇':'trophy','🚲':'bike','🏐':'ball','🎸':'guitar','🏀':'hoop','🌎':'flag','🏔️':'flag'};
+const KITE='<path d="M108 70 Q120 120 150 172" stroke="'+O+'" stroke-width="1.5" fill="none" stroke-dasharray="3 3"/><path d="M108 30 L124 50 L108 74 L92 50 Z" fill="#ff5d8f" '+W()+'/><path d="M108 30 V74 M92 50 H124" stroke="'+O+'" stroke-width="2"/><path d="M108 74 q-6 8 0 14 q6 6 0 14" stroke="'+O+'" stroke-width="2" fill="none"/>';
+const CL=(x,y,s)=>'<g transform="translate('+x+' '+y+') scale('+s+')"><path d="M0 16 a12 12 0 0 1 20 -8 a14 14 0 0 1 26 4 a10 10 0 0 1 2 20 h-46 a9 9 0 0 1 -2 -16z" fill="#c6cbd8" '+W()+'/></g>';
+const RAIN=[40,70,100,190,280,305,330,350].map((x,i)=>'<path d="M'+x+' '+(70+i%3*10)+' l-5 12 M'+(x-12)+' '+(100+i%2*14)+' l-5 12" stroke="#7fb4ff" stroke-width="3" stroke-linecap="round"/>').join('');
+const SPARK=(x,y)=>'<path class="spark" d="M'+x+' '+(y-9)+' l3 6 6 3 -6 3 -3 6 -3 -6 -6 -3 6 -3z" fill="#fff59a" '+W(2)+'/>';
+return {P, BY_EMOJI, KITE, SPARK,
+  cloudy: '<rect width="360" height="176" fill="#8a93ad" opacity=".3"/>'+CL(270,14,1.6),
+  rainy: '<rect width="360" height="176" fill="#5b6a8a" opacity=".45"/>'+CL(270,14,1.6)+CL(30,20,1.3)+RAIN};
+})();
+function yardThings(){
+  const got = [];
+  for (const e of S.log) {
+    if (e.age >= 18 || !(e.tier === 'great' || e.tier === 'good')) continue;
+    const k = YARD.BY_EMOJI[e.emoji];
+    if (k && !got.some(g => g.k === k)) got.push({k, age:e.age, text:e.text});
+  }
+  return got;
+}
+// A school friend comes over if the first day of school went well.
+function hasFriend(){ return S.log.some(e => e.age === 5 && (e.tier === 'great' || e.tier === 'good') && e.ms && /friends/.test(e.ms.text)); }
+function weatherNow(){
+  const last = S.log[S.log.length-1];
+  if (!last) return 'sun';
+  if (['bad','awful','skipped'].includes(last.tier)) return 'rain';
+  return last.tier === 'meh' ? 'cloud' : 'sun';
+}
+function newYardThing(){
+  const last = S.log[S.log.length-1];
+  if (!last) return null;
+  return yardThings().find(g => g.age === last.age) || null;
+}
 // Where the Blip lives right now, and where things go in each scene (percent of the scene box).
 const SCENE_LAYOUT = {
   parents:   {blip:[3, 4],  car:null},
@@ -1232,8 +1298,80 @@ function homeScene(){
   const L = SCENE_LAYOUT[key], home = HOME_ART[key];
   const car = (o.car && L.car) ? '<svg x="'+L.car[0]+'" y="'+L.car[1]+'" width="'+L.car[2]+'" height="'+(L.car[2]*.6)+'" viewBox="0 0 200 120">'+CAR_ART[CAR_KEY[o.car]].svg+'</svg>' : '';
   const label = key === 'parents' ? 'Mom and Dad\'s house' : key === 'apartment' ? 'First apartment' : home.title;
-  return '<div class="lifescene"><svg viewBox="0 0 360 220" class="scene">'+home.svg+car+'</svg>'+
-    '<div class="sblip" style="left:'+L.blip[0]+'%;bottom:'+L.blip[1]+'%">'+charSVG(S)+'</div><div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(label)+'</div></div>';
+  const wx = weatherNow();
+  let extra = '', friend = '';
+  if (key === 'parents') {
+    const fresh = newYardThing();
+    extra = yardThings().map(g => YARD.P[g.k][1]).join('');
+    if (fresh) extra += YARD.SPARK(YARD.P[fresh.k][2], YARD.P[fresh.k][3]);
+    if (hasFriend()) {
+      const f = {name:'Pal', age:S.age, log:[{tier:'great'}], h:70, s:70, j:80, girl:!S.girl, skin:SKINS[(SKINS.indexOf(S.skin)+2) % SKINS.length], hair:HAIRS[(HAIRS.indexOf(S.hair)+2) % HAIRS.length]};
+      friend = '<div class="sblip friend" style="left:60%;bottom:0">'+charSVG(f)+'</div>';
+    }
+  }
+  if (wx === 'sun' && S.streak >= 3) extra += YARD.KITE;
+  if (wx !== 'sun') extra += YARD[wx === 'rain' ? 'rainy' : 'cloudy'];
+  return '<div class="lifescene"><svg viewBox="0 0 360 220" class="scene">'+home.svg+car+extra+'</svg>'+
+    '<div class="sblip" style="left:'+L.blip[0]+'%;bottom:'+L.blip[1]+'%">'+charSVG(S)+'</div>'+friend+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(label)+'</div></div>';
+}
+
+// One line under the scene: what's new in the yard, or what the weather means.
+function sceneNote(){
+  const wx = weatherNow(), fresh = S.age < 18 ? newYardThing() : null;
+  if (fresh) return '<span class="pop">✨ New</span> <b>'+YARD.P[fresh.k][0].replace(/^./, c => c.toUpperCase())+'</b> from "'+esc(fresh.text)+'"';
+  if (wx === 'rain') return '☔ Rainy year. Hit your goal to bring the sun back.';
+  if (wx === 'cloud') return '⛅ Cloudy year. Stay under your goal for sunshine.';
+  if (S.streak >= 3) return '🪁 '+S.streak+' day streak. The kite is up!';
+  if (S.age < 18) return '🌱 Good years leave things in the yard. Bad years leave nothing.';
+  return '';
+}
+
+// What hitting or missing the goal does on each big day.
+const PATH_HINT = {
+  5: ['makes friends fast', 'cries at the door'],
+  10: ['finds a real talent', 'becomes a gamer'],
+  14: ['finds a crew', 'gets lost staring at the phone'],
+  16: ['passes the driving test', 'runs over the mailbox'],
+  18: ['gets the best college grades allow', 'bombs the entrance exam'],
+  22: ['nails the job interview', 'oversleeps the interview'],
+  28: ['might find love', 'adopts a grumpy cat instead'],
+  35: ['could get promoted', 'gets passed over'],
+  45: ['runs a marathon', 'has a midlife crisis'],
+  65: ['retires in style', 'falls for a scam']
+};
+function pathHTML(){
+  const ages = Object.keys(UPCOMING).map(Number).filter(a => a > S.age).slice(0, 4);
+  if (!ages.length) return '';
+  const nb = ages[0], left = nb - S.age - (canCheckIn() ? 1 : 0);
+  const when = left === 0 ? 'Today' : left === 1 ? 'Tomorrow' : 'In '+left+' days';
+  const stop = (e, a, t, cls) => '<div class="stop '+(cls||'')+'"><div class="dot">'+e+'</div><b>'+a+'</b><span>'+t+'</span></div>';
+  const sc = {baby:.62, kid:.8, middle:.86, teen:.92, young:.97, adult:1, senior:.95}[stage(S.age)], cy = 230 - 148*sc;
+  const face = '<svg viewBox="'+(100-64*sc)+' '+(cy-70*sc)+' '+(128*sc)+' '+(128*sc)+'">'+charSVG(S).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')+'</svg>';
+  let h = '<div class="card"><h2 class="earnh">🛣️ Coming up<small>'+(left < 2 ? when+' is big!' : when)+'</small></h2><div class="road">'+
+    stop(face, S.age, 'Now', 'now')+ages.map((a, i) => stop(UPCOMING[a][0], a, UPCOMING[a][1], i === 0 ? 'next' : '')).join('')+'</div>';
+  const hint = PATH_HINT[nb], he = S.girl ? 'she' : 'he';
+  if (hint) h += '<div class="tmr"><b>'+(left < 2 ? when : 'At '+nb)+': '+UPCOMING[nb][1]+'</b><br>Hit your goal that day and '+esc(S.name)+' '+hint[0]+'. Miss it and '+he+' '+hint[1]+'.</div>';
+  return h+'</div>';
+}
+
+// Before 18 there's no money yet, so show how the kid is growing and where it leads.
+function growHTML(){
+  const last = S.log[S.log.length-1], fx = (last && last.age === S.age && last.fx) || {};
+  const bar = (k, e, n, c) => '<div class="sk"><span>'+e+'</span><span>'+n+'</span><i class="nbar"><u style="width:'+S[k]+'%;background:'+c+'"></u></i><span class="v">'+S[k]+
+    (fx[k] ? ' <em class="'+(fx[k] > 0 ? 'up' : 'dn')+'">'+(fx[k] > 0 ? '+' : '')+fx[k]+'</em>' : '')+'</span></div>';
+  const sch = [[75,'Starfield University'],[55,'State University'],[35,'Community college']];
+  const at = sch.find(x => S.s >= x[0]), up = sch.slice().reverse().find(x => S.s < x[0]);
+  const him = S.girl ? 'her' : 'him';
+  let h = '<div class="card"><h2 class="earnh">🌱 Growing up<small>Age '+S.age+'</small></h2><div class="muted small">At 18 these decide '+esc(S.name)+'\'s college. At 22, the first job.</div>'+
+    bar('h','💪','Health','var(--h)')+bar('s','🧠','Smarts','var(--s)')+bar('j','😊','Joy','var(--j)')+
+    '<div class="track">🎓 On track for <b>'+(at ? at[1] : 'no college yet')+'</b>'+(up ? '<br><span class="muted small">Smarts '+up[0]+' gets '+him+' into '+up[1]+'. '+(up[0] - S.s)+' to go.</span>' : '')+'</div>';
+  const names = {athlete:'Sports', scientist:'Science', performer:'Performing', gamer:'Video games'};
+  if (S.talent) h += '<div class="talent">⭐ Talent: <b>'+names[S.talent]+'</b></div>';
+  else {
+    const top = [['h',S.h],['s',S.s],['j',S.j]].sort((a, b) => b[1]-a[1])[0][0];
+    h += '<div class="talent">❓ A talent shows up at 10. Right now it looks like <b>'+{h:'Sports', s:'Science', j:'Performing'}[top]+'</b>.</div>';
+  }
+  return h+'</div>';
 }
 
 function lifeHTML(){
@@ -1251,7 +1389,7 @@ function lifeHTML(){
   } else earned += '<p class="nexttxt">🌟 '+esc(S.name)+' has everything '+(S.girl ? 'she' : 'he')+' ever dreamed of!</p>';
   earned += '</div>';
   return header().replace('<div class="logo">Lifetime<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
-    '<div class="card scenecard">'+homeScene()+'</div>'+earned+storyHTML(true);
+    '<div class="card scenecard">'+homeScene()+(sceneNote() ? '<div class="snote">'+sceneNote()+'</div>' : '')+'</div>'+pathHTML()+(S.age < 18 ? growHTML() : '')+earned+storyHTML(true);
 }
 
 function storyHTML(inLife){
