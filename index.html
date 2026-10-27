@@ -540,7 +540,7 @@ function dayKey(n){ const d = new Date(n * 864e5); return d.getUTCFullYear()+'-'
 function canCheckIn(){ return S.testMode || S.lastDate !== today(); }
 function clamp(v){ return Math.max(0, Math.min(100, Math.round(v))); }
 function fmtTime(m){ const h = Math.floor(m/60), mm = m%60; return h ? (mm ? h+'h '+mm+'m' : h+'h') : mm+'m'; }
-function fmtMoney(k){ if (k >= 1000) return '$'+(k/1000).toFixed(k >= 10000 ? 0 : 1)+'M'; return '$'+Math.round(k)+'K'; }
+function fmtMoney(k){ if (k < 0) return '-'+fmtMoney(-k); if (k >= 1000) return '$'+(k/1000).toFixed(k >= 10000 ? 0 : 1)+'M'; return '$'+Math.round(k)+'K'; }
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
 // ============ ONE YEAR PASSES ============
@@ -610,12 +610,18 @@ function liveYear(mins, tier){
   let earned = 0;
   // Good years add to savings. Bad years eat into them (impulse buys, missed work, late fees).
   if (met) { if (S.pay > 0) earned = Math.round(S.pay * 0.3); }
-  else earned = -Math.min(S.money, Math.round(Math.max(S.pay * 0.2, S.money * 0.03)));
+  else earned = -Math.min(Math.max(0, S.money), Math.round(Math.max(S.pay * 0.2, S.money * 0.03)));
+  const wasInDebt = S.money < 0;
   S.money += earned;
+  if (wasInDebt && S.money >= 0) notes.push('🎉 Student loans paid off!');
   const buys = buyThings();
 
   const ms = milestone(S.age, met);
   if (ms && ms.fx) applyFx(ms.fx);
+  if (S.age === 22 && LOANS[S.eduTier]) {
+    S.money -= LOANS[S.eduTier];
+    notes.push('🎓 Graduated with '+fmtMoney(LOANS[S.eduTier])+' in student loans. Good years pay them off.');
+  }
 
   const entry = {age:S.age, date:today(), mins, goal:g, tier, emoji:ev[0], text:ev[1], fx: shown, shrunk, earned, notes, ms: ms ? {emoji:ms.emoji, title:ms.title, text:ms.text} : null};
   if (buys.length) entry.buys = buys;
@@ -1091,6 +1097,9 @@ const ICONS={
  house: shadow(92,38)+'<g '+W+'><rect x="20" y="46" width="60" height="42" rx="5" fill="#ffe3c4"/><path d="M12 50 L50 18 L88 50 Z" fill="#e8705a"/><rect x="42" y="62" width="16" height="26" rx="3" fill="#8a5a3c"/></g><circle cx="31" cy="62" r="6" fill="#bfe3ff" stroke="'+O+'" stroke-width="3"/><circle cx="69" cy="62" r="6" fill="#bfe3ff" stroke="'+O+'" stroke-width="3"/>',
  bighouse: shadow(94,44)+'<g '+W+'><rect x="10" y="44" width="80" height="46" rx="5" fill="#d9f0ff"/><path d="M4 48 L36 18 L64 18 L96 48 Z" fill="#7c5cff"/><rect x="42" y="64" width="16" height="26" rx="3" fill="#8a5a3c"/></g><circle cx="24" cy="62" r="6" fill="#fff6c9" stroke="'+O+'" stroke-width="3"/><circle cx="76" cy="62" r="6" fill="#fff6c9" stroke="'+O+'" stroke-width="3"/><circle cx="50" cy="32" r="5" fill="#fff6c9" stroke="'+O+'" stroke-width="3"/>'
  ,mansion: shadow(94,46)+'<g '+W+'><rect x="30" y="40" width="40" height="50" rx="4" fill="#fff6e6"/><path d="M24 44 L50 20 L76 44 Z" fill="#ff7a59"/><rect x="6" y="56" width="26" height="34" rx="4" fill="#fff6e6"/><rect x="68" y="56" width="26" height="34" rx="4" fill="#fff6e6"/><path d="M2 58 L19 46 L36 58 Z M64 58 L81 46 L98 58 Z" fill="#ff7a59"/><path d="M44 90 V72 Q50 64 56 72 V90 Z" fill="#8a5a3c"/></g><circle cx="50" cy="52" r="5" fill="#bfe3ff" stroke="'+O+'" stroke-width="3"/>'
+ ,boat: shadow(94,40)+'<g '+W+'><path d="M10 64 H90 L78 84 H22 Z" fill="#ffffff"/><path d="M52 12 V60" fill="none"/><path d="M56 16 L84 56 H56 Z" fill="#ff7a8a"/><path d="M48 22 L22 56 H48 Z" fill="#ffd27a"/></g><path d="M22 74 H78" stroke="#4da3ff" stroke-width="5" stroke-linecap="round"/><path d="M4 90 q8 -6 16 0 t16 0 t16 0 t16 0 t16 0 t16 0" stroke="#4da3ff" stroke-width="4" fill="none" stroke-linecap="round"/>'
+ ,beach: shadow(94,44)+'<g '+W+'><path d="M70 90 Q70 50 78 30" fill="none"/><path d="M78 30 Q62 22 52 30 Q66 30 78 30 Q90 18 98 26 Q88 28 78 30 Q84 40 80 50 Q76 40 78 30" fill="#5cc26b"/><rect x="10" y="42" width="52" height="32" rx="4" fill="#9ee6e0"/><path d="M4 46 L36 22 L68 46 Z" fill="#ffd27a"/><path d="M16 74 V90 M56 74 V90" fill="none"/><rect x="28" y="54" width="14" height="20" rx="3" fill="#8a5a3c"/></g><circle cx="52" cy="58" r="5" fill="#fff6c9" stroke="'+O+'" stroke-width="3"/>'
+ ,island: '<path d="M2 82 q8 -6 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 V100 H2 Z" fill="#7fc8ff"/><g '+W+'><path d="M14 84 Q50 56 86 84 Z" fill="#ffe3a3"/><path d="M50 72 Q48 46 56 26" fill="none"/><path d="M56 26 Q40 16 28 26 Q44 26 56 26 Q72 12 84 22 Q70 24 56 26 Q66 34 64 48 Q56 36 56 26" fill="#5cc26b"/></g><circle cx="60" cy="34" r="4" fill="#9b6a43" stroke="'+O+'" stroke-width="2.5"/><path d="M76 12 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#ffe26b"/>'
 };
 return ICONS;
 
@@ -1198,12 +1207,22 @@ const LADDER = [
   {key:'suv',       kind:'car',  name:'family SUV',        price:40},
   {key:'family',    kind:'home', name:'family house',      price:250},
   {key:'dreamcar',  kind:'car',  name:'dream convertible', price:90},
-  {key:'dreamhome', kind:'home', name:'dream home',        price:600}
+  {key:'dreamhome', kind:'home', name:'dream home',        price:600},
+  {key:'boat',      kind:'extra', name:'sailboat',          price:150},
+  {key:'beach',     kind:'extra', name:'beach house',       price:900},
+  {key:'island',    kind:'extra', name:'private island',    price:3000}
 ];
+// Big purchases wait for the right time of life, so high earners can't have it all by 30.
+function unlockAge(item){
+  const settled = S.partner ? 28 : 35;
+  return {suv:settled, family:settled, dreamcar:45, dreamhome:45, boat:45, beach:50, island:55}[item.key] || 18;
+}
+// Student loans from college, paid off by good years. In $K.
+const LOANS = {3:200, 2:60, 1:30};
 const ITEM = Object.fromEntries(LADDER.map(x => [x.key, x]));
 const CAR_KEY = {hatch:'hatch', suv:'suv', dreamcar:'dream'};       // item -> CAR_ART
 const HOME_KEY = {starter:'starter', family:'family', dreamhome:'dream'}; // item -> HOME_ART
-const ITEM_ICON = {starter:'house', family:'bighouse', dreamhome:'mansion', trip:'plane'};
+const ITEM_ICON = {starter:'house', family:'bighouse', dreamhome:'mansion', trip:'plane', boat:'boat', beach:'beach', island:'island'};
 function owned(){ return S.owned || (S.owned = {car:null, home:null, bought:[]}); }
 function tradeIn(item){
   const o = owned();
@@ -1215,11 +1234,12 @@ function nextItem(){ const o = owned(); return LADDER.find(x => !o.bought.some(b
 function itemCost(item){ return Math.max(0, item.price - tradeIn(item)); }
 function netWorth(){
   const o = owned();
-  return S.money + (o.home ? ITEM[o.home].price : 0) + (o.car ? ITEM[o.car].price / 2 : 0);
+  const extras = o.bought.filter(b => ITEM[b.key].kind === 'extra').reduce((t, b) => t + ITEM[b.key].price * (b.key === 'boat' ? .5 : 1), 0);
+  return S.money + (o.home ? ITEM[o.home].price : 0) + (o.car ? ITEM[o.car].price / 2 : 0) + extras;
 }
 function buyThings(){
   const item = nextItem();
-  if (!item || S.age < 18) return [];
+  if (!item || S.age < unlockAge(item)) return [];
   const cost = itemCost(item);
   if (S.money < cost) return [];
   const o = owned();
@@ -1395,13 +1415,15 @@ function growHTML(){
 function lifeHTML(){
   const o = owned(), nxt = nextItem();
   let earned = '<div class="card"><h2 class="earnh">💰 Earned by '+esc(S.name)+'<small>Net worth '+fmtMoney(netWorth())+'</small></h2>';
-  earned += '<div class="muted small">Savings '+fmtMoney(S.money)+'. '+esc(S.name)+' buys things automatically. Only good habits grow it.</div>';
+  earned += '<div class="muted small">'+(S.money < 0 ? '🎓 Student loans: '+fmtMoney(-S.money)+' left. Good years pay them off.' : 'Savings '+fmtMoney(S.money)+'. '+esc(S.name)+' buys things automatically. Only good habits grow it.')+'</div>';
   if (o.bought.length) earned += o.bought.map(b => '<div class="own">'+itemArt(b.key, CAR_KEY[b.key] ? 'oicon car' : 'oicon')+'<span>'+ITEM[b.key].name.replace(/^./, c => c.toUpperCase())+
-    ((o.car === b.key || o.home === b.key || b.key === 'trip') ? '' : ' <i>traded in</i>')+'</span><span class="a">age '+b.age+'</span></div>').join('');
+    ((o.car === b.key || o.home === b.key || ['trip','extra'].includes(ITEM[b.key].kind)) ? '' : ' <i>traded in</i>')+'</span><span class="a">age '+b.age+'</span></div>').join('');
   if (S.age < 18) earned += '<p class="nexttxt">'+esc(S.name)+' starts earning at 18. First up: a '+LADDER[0].name+'.</p>';
   else if (nxt) {
-    const cost = itemCost(nxt), pct = Math.min(100, Math.round(S.money / cost * 100));
-    earned += '<div class="nexttxt">Next: '+itemArt(nxt.key, 'nicon')+' <b>'+nxt.name.replace(/^./, c => c.toUpperCase())+'</b> · '+(S.money >= cost ? 'buying soon!' : fmtMoney(cost - S.money)+' to go')+
+    const cost = itemCost(nxt), pct = Math.max(0, Math.min(100, Math.round(S.money / cost * 100))), at = unlockAge(nxt);
+    const status = S.money < 0 ? 'after the loans' : S.money < cost ? fmtMoney(cost - S.money)+' to go' : S.age + 1 < at ? 'saved! Waits until age '+at : 'buying soon!';
+    earned += '<div class="nexttxt">Next: '+itemArt(nxt.key, 'nicon')+' <b>'+nxt.name.replace(/^./, c => c.toUpperCase())+'</b> · '+status+
+      (S.money < cost && S.age + 1 < at ? '<br><span class="muted small">Unlocks at age '+at+(nxt.key === 'suv' || nxt.key === 'family' ? (S.partner ? '' : ' (28 with a partner)') : '')+'</span>' : '')+
       (tradeIn(nxt) ? '<br><span class="muted small">'+fmtMoney(nxt.price)+' minus '+fmtMoney(tradeIn(nxt))+' trade-in</span>' : '')+
       '<i class="nbar"><u style="width:'+pct+'%"></u></i></div>';
   } else earned += '<p class="nexttxt">🌟 '+esc(S.name)+' has everything '+(S.girl ? 'she' : 'he')+' ever dreamed of!</p>';
