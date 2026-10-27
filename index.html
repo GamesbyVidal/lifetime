@@ -215,7 +215,12 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .scenecard{padding:0;overflow:hidden}.lifescene{position:relative}.lifescene .scene{display:block;width:100%;height:auto}
 .sblip{position:absolute;width:30%}.sblip svg{width:100%;height:auto;display:block}.sblip svg>circle:first-of-type{display:none}
 .where{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.88);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
-.sblip.friend{width:22%}.lifescene .spark{animation:twk 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}@keyframes twk{50%{transform:scale(.5);opacity:.6}}
+.sblip.friend{width:22%}.lifescene #sblip{cursor:pointer;-webkit-tap-highlight-color:transparent}.lifescene #sblip.hop{animation:hop .55s ease}.lifescene #sblip.droop{animation:droop .7s ease}
+.lifescene .bubble{left:45%;top:8%;transform:translate(0,-100%) scale(.6);transform-origin:16px 100%;max-width:190px;font-size:13px;padding:6px 10px;border-width:2.5px}
+.lifescene .bubble.show{transform:translate(0,-100%) scale(1)}.lifescene .bubble:after{left:20px}
+.lifescene .dogbub{left:36%;top:66%}
+.ydog{cursor:pointer;transform-box:fill-box;transform-origin:50% 100%}.ydog.wag{animation:wag .7s ease}
+@keyframes wag{20%{transform:translateY(-14px) rotate(-8deg)}40%{transform:translateY(0) rotate(8deg)}60%{transform:translateY(-6px) rotate(-6deg)}80%{transform:rotate(4deg)}}.lifescene .spark{animation:twk 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}@keyframes twk{50%{transform:scale(.5);opacity:.6}}
 .snote{padding:10px 14px;font-size:14px}.snote .pop{background:#ffe26b;border-radius:999px;padding:2px 8px;font-weight:600}
 .sk{display:grid;grid-template-columns:22px 58px 1fr 62px;align-items:center;gap:6px;margin-top:10px;font-size:15px}.sk .nbar{margin:0;height:11px}.sk .v{font-weight:600;text-align:right}.sk em{font-style:normal;font-size:12px}.sk em.up{color:#2fae5b}.sk em.dn{color:#d64545}
 .track{margin-top:14px;padding:10px 12px;background:#eef6ff;border-radius:14px;font-size:14px}.talent{margin-top:8px;padding:10px 12px;background:#fff6dc;border-radius:14px;font-size:14px}
@@ -885,8 +890,8 @@ const STREAK_LINES = ['{n} days in a row! I\'ve never felt this good.', 'Our str
 const TICKLE_LINES = ['Okay okay, I\'m awake!', 'That tickles! 😆', 'Hey! Personal space!', 'Stop poking me! ...Okay, one more.'];
 
 let taps = [], bubbleTimer;
-function tapCharacter(){
-  const wrap = $('buddy');
+function tapCharacter(wrapId, bubId){
+  const wrap = $(typeof wrapId === 'string' ? wrapId : 'buddy');
   if (!wrap) return;
   const now = Date.now();
   taps = taps.filter(t => now - t < 3000); taps.push(now);
@@ -899,12 +904,24 @@ function tapCharacter(){
   else line = pick(LINES[st][up ? 'up' : 'down']);
   wrap.classList.remove('hop', 'droop'); void wrap.offsetWidth;
   wrap.classList.add(up ? 'hop' : 'droop');
-  const bub = $('bubble');
+  const bub = $(typeof bubId === 'string' ? bubId : 'bubble');
   bub.textContent = line;
   bub.classList.add('show');
   clearTimeout(bubbleTimer);
   bubbleTimer = setTimeout(() => bub.classList.remove('show'), 3200);
   if (!S.tapped) { S.tapped = true; save(); const h = $('taphint'); if (h) h.remove(); }
+}
+
+const DOG_LINES = ['Woof!', 'Woof woof! 🐾', '*wags tail*', '❤️', '*rolls over for belly rubs*', 'Ball? BALL?!', '*licks your face*', 'Arf! 🦴'];
+let dogTimer;
+function tapDog(){
+  const d = $('ydog'), bub = $('dogbub');
+  if (!d || !bub) return;
+  d.classList.remove('wag'); void d.getBoundingClientRect(); d.classList.add('wag');
+  bub.textContent = pick(DOG_LINES);
+  bub.classList.add('show');
+  clearTimeout(dogTimer);
+  dogTimer = setTimeout(() => bub.classList.remove('show'), 2400);
 }
 
 // ============ SCREENS ============
@@ -1234,7 +1251,7 @@ const W=(w)=>'stroke="'+O+'" stroke-width="'+(w||3.5)+'" stroke-linejoin="round"
 const icon=(k,x,y,w)=>'<svg x="'+x+'" y="'+y+'" width="'+w+'" height="'+w+'" viewBox="0 0 100 100">'+ICONS[k]+'</svg>';
 // Each thing: [name, svg, sparkle x, sparkle y]
 const P={
- dog:['the family dog', icon('dog',116,146,38), 120, 146],
+ dog:['the family dog', '<g id="ydog" class="ydog">'+icon('dog',116,146,38)+'</g>', 120, 146],
  treehouse:['a treehouse','<rect x="14" y="80" width="46" height="30" rx="4" fill="#c98c55" '+W()+'/><path d="M8 84 L37 62 L66 84 Z" fill="#e8705a" '+W()+'/><rect x="30" y="90" width="14" height="12" rx="2" fill="#fff3b0" '+W(2.5)+'/>'+
    '<path d="M50 110 V170 M60 110 V170 M50 124 H60 M50 138 H60 M50 152 H60" stroke="'+O+'" stroke-width="3"/>', 66, 68],
  rocket:['a toy rocket','<path d="M346 150 q8 10 8 26 h-16 q0 -16 8 -26z" fill="#f4f4fb" '+W(3)+'/><path d="M338 176 l-6 8 h8 z M354 176 l6 8 h-8 z" fill="#ff6b6b" '+W(2.5)+'/><circle cx="346" cy="166" r="3.5" fill="#4da3ff" '+W(2)+'/>', 356, 148],
@@ -1312,7 +1329,8 @@ function homeScene(){
   if (wx === 'sun' && S.streak >= 3) extra += YARD.KITE;
   if (wx !== 'sun') extra += YARD[wx === 'rain' ? 'rainy' : 'cloudy'];
   return '<div class="lifescene"><svg viewBox="0 0 360 220" class="scene">'+home.svg+car+extra+'</svg>'+
-    '<div class="sblip" style="left:'+L.blip[0]+'%;bottom:'+L.blip[1]+'%">'+charSVG(S)+'</div>'+friend+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(label)+'</div></div>';
+    '<div class="sblip" id="sblip" style="left:'+L.blip[0]+'%;bottom:'+L.blip[1]+'%"><div class="bubble" id="sbub"></div>'+charSVG(S)+'</div>'+friend+
+    (/id="ydog"/.test(extra) ? '<div class="bubble dogbub" id="dogbub"></div>' : '')+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(label)+'</div></div>';
 }
 
 // One line under the scene: what's new in the yard, or what the weather means.
@@ -1519,6 +1537,8 @@ let cdTimer;
 function bind(){
   clearInterval(cdTimer);
   if ($('buddy')) $('buddy').onclick = tapCharacter;
+  if ($('sblip')) $('sblip').onclick = () => tapCharacter('sblip', 'sbub');
+  if ($('ydog')) $('ydog').onclick = tapDog;
   if ($('share')) $('share').onclick = shareLife;
   if ($('tslide')) {
     const set = m => { m = Math.max(0, Math.min(960, m)); homeMins = m; $('tslide').value = m; $('tval').textContent = fmtTime(m); $('verdict').outerHTML = verdictHTML(m); };
