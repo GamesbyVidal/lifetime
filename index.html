@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lifetime</title>
-<meta name="description" content="One day for you is one year for them. Beat your screen time goal and your little person lives their best life.">
+<meta name="description" content="One day for you is one year for them. Beat your screen time goal and your Blip lives their best life.">
 <meta property="og:title" content="Lifetime">
 <meta property="og:image" content="https://gamesbyvidal.github.io/lifetime/og.png">
 <meta property="og:image:width" content="1200">
@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://gamesbyvidal.github.io/lifetime/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta property="og:description" content="One day for you is one year for them. Beat your screen time goal and your little person lives their best life.">
+<meta property="og:description" content="One day for you is one year for them. Beat your screen time goal and your Blip lives their best life.">
 <meta name="theme-color" content="#2b2350">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1079,8 +1079,8 @@ function setupHTML(){
       '<div class="card futures"><div class="row">'+
         '<div class="future up">'+previewSVG(30, {job:'Doctor', pay:200, log:[{tier:'good'}], j:90})+'<b>2 hours a day</b><span>Doctor, marathon runner, happy</span></div>'+
         '<div class="future down">'+previewSVG(30, {log:[{tier:'awful'}], j:20})+'<b>7 hours a day</b><span>Tired, broke, glued to the couch</span></div>'+
-      '</div><h2>Which life will they live?</h2><p class="muted">Every day you hit your screen time goal, your little person has a great year. Every day you miss it... less great. '+(nextGen ? 'Time to raise the next generation.' : 'It\'s up to you.')+'</p>'+
-      '<button class="btn" id="next">'+(nextGen ? 'Meet the next generation' : 'Meet your little person')+' →</button>'+
+      '</div><h2>Which life will they live?</h2><p class="muted">Every day you hit your screen time goal, your Blip has a great year. Every day you miss it... less great. '+(nextGen ? 'Time to raise the next generation.' : 'It\'s up to you.')+'</p>'+
+      '<button class="btn" id="next">'+(nextGen ? 'Meet the next generation' : 'Meet your Blip')+' →</button>'+
       (nextGen ? '' : '<button class="linkbtn" id="restore">Have a backup code? Restore it</button>')+'</div>';
   }
   if (step === 1) return top+'<div class="card"><h2 class="big">Boy or girl?</h2><div class="row">'+[false,true].map(g=>'<button class="pick'+(draft.girl === g ? ' on' : '')+'" data-girl="'+g+'">'+
@@ -1267,7 +1267,7 @@ function showLifeCard(age){
   modal(lifeCardHTML(age)+'<p class="muted small">📸 Screenshot this card to share it</p>'+
     (navigator.share ? '<button class="btn alt" id="lcshare">Share Lifetime</button>' : '')+
     '<button class="btn ghost" data-close style="margin-top:8px">Done</button>', 'lcmodal');
-  if ($('lcshare')) $('lcshare').onclick = () => { try { navigator.share({title:'Lifetime', text:S.name+' just turned '+age+' in Lifetime! My screen time decides how their life goes.', url:location.href.split('#')[0].split('?')[0]}).catch(()=>{}); } catch(e){} };
+  if ($('lcshare')) $('lcshare').onclick = () => { try { navigator.share({title:'Lifetime', text:'My Blip '+S.name+' just turned '+age+' in Lifetime! My screen time decides how their life goes.', url:location.href.split('#')[0].split('?')[0]}).catch(()=>{}); } catch(e){} };
   confetti(['🎉','⭐','✨','💖']);
 }
 
@@ -1307,7 +1307,7 @@ function readMeet(){
 }
 function weekText(){
   const last = S.log.slice(-7), met = last.filter(isMet).length;
-  return S.name+' is '+S.age+' in Lifetime 🌱\n'+last.map(e => SQUARE[e.tier] || '⬜').join('')+'\n'+
+  return 'My Blip '+S.name+' is '+S.age+' in Lifetime 🌱\n'+last.map(e => SQUARE[e.tier] || '⬜').join('')+'\n'+
     met+' of '+last.length+' days on goal'+(S.streak >= 2 ? ' · 🔥 '+S.streak : '')+'\nMeet '+S.name+': '+meetLink();
 }
 function shareLife(){
@@ -1324,11 +1324,11 @@ function meetHTML(m){
   const bar = (label, v) => '<div class="mst"><span>'+label+'</span><i><u style="width:'+Math.max(0, Math.min(100, v))+'%"></u></i></div>';
   const sub = ['Age '+m.a].concat(m.jb ? [esc(m.jb)] : []).concat(m.st >= 2 ? ['🔥 '+m.st+' day streak'] : []).join(' · ');
   const best = (m.b || []).slice(0, 3).map(momentFromRef).filter(Boolean);
-  return '<div class="meet"><div class="k">Lifetime</div><h1>Meet '+esc(m.n)+'</h1><div class="sub">'+sub+'</div><div class="pc">'+charSVG(c)+'</div>'+
+  return '<div class="meet"><div class="k">A Blip in Lifetime</div><h1>Meet '+esc(m.n)+'</h1><div class="sub">'+sub+'</div><div class="pc">'+charSVG(c)+'</div>'+
     '<div class="mstats">'+bar('💪 Health', m.h)+bar('🧠 Smarts', m.s)+bar('😊 Joy', m.j)+'</div>'+
     (best.length ? '<div class="mbest"><div class="bh">Best moments</div>'+best.map(x => '<div class="be"><span>'+esc(x[0])+'</span><div>'+esc(x[1])+'</div></div>').join('')+'</div>' : '')+
     '<p class="hook">'+esc(m.n)+'\'s owner hit their screen time goal on <b>'+m.m+' of '+m.t+' days</b>. Every day they did, '+esc(m.n)+' had a great year.</p>'+
-    '<button class="cta" id="raise">'+(S ? 'Back to '+esc(S.name)+' →' : 'Raise your own little person →')+'</button>'+(S ? '' : '<div class="tiny">Free. No sign up.</div>')+'</div>';
+    '<button class="cta" id="raise">'+(S ? 'Back to '+esc(S.name)+' →' : 'Raise your own Blip →')+'</button>'+(S ? '' : '<div class="tiny">Free. No sign up.</div>')+'</div>';
 }
 
 // ============ BACKUP & REMINDER ============

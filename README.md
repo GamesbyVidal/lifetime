@@ -1,6 +1,6 @@
 # Lifetime
 
-One day for you is one year for them. Set a daily screen time goal, check in each night, and your little person lives a great life when you hit it.
+One day for you is one year for them. Set a daily screen time goal, check in each night, and your Blip lives a great life when you hit it.
 
 Play it at https://gamesbyvidal.github.io/lifetime/
 
