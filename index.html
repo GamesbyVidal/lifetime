@@ -232,6 +232,12 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .shimg{position:relative;display:block;width:100%;height:100%;opacity:0;transition:opacity .3s}.shimg.on{opacity:1}.btn.sharebtn{background:linear-gradient(90deg,#ff7a59,#ff5a8a);color:#fff;margin-top:12px}.btn.sharebtn:disabled{opacity:.5}
 .meet .mscene{margin:14px 0;border-radius:20px;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 24px rgba(20,10,60,.3)}.meet .mscene svg{display:block;width:100%;height:auto}.meet .where{color:#3b2a4a;text-align:left}
 .meet .chal{background:#fff6dc;color:#3b2a4a;border-radius:16px;padding:12px;font-size:14px;margin:14px 0;text-align:left;line-height:1.35}
+.tbig{text-align:center;background:linear-gradient(135deg,#fff8e1,#e8fff0)}.tbig .k{font-size:13px;font-weight:600;color:#7c5cff;margin-bottom:6px}.tbig .n{font:700 52px Fredoka,system-ui;color:#2b2350;line-height:1}.tbig .n em{font-size:24px;font-style:normal;color:#7a7195;margin:0 4px 0 2px}.tbig .l{color:#7a7195;margin-top:4px}
+.tbig .eq{margin-top:14px;background:#fff;border-radius:14px;padding:10px;font-size:15px}
+.tbars{display:flex;gap:6px;align-items:flex-end;height:118px;margin-top:10px}.tbars div{flex:1;min-width:0;text-align:center;font-size:10px;color:#7a7195}.tbars i{display:block;background:linear-gradient(#5cc26b,#3fae5a);border-radius:8px 8px 3px 3px;margin:0 auto 3px;width:70%;min-height:4px}.tbars b{display:block;color:#2b2350;white-space:nowrap}
+.pace{margin-top:12px;background:#eef6ff;border-radius:14px;padding:10px;font-size:14px}
+.tr{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid #f0ecfb;opacity:.6}.tr.on{opacity:1}.tr>span{font-size:24px;width:32px;text-align:center}.tr>div{flex:1;min-width:0}.tr b{display:block;font-size:15px}.tr small{color:#7a7195}.tr .when{color:#7c5cff;font-weight:600}.tr>i{font-style:normal}.tr .nbar{margin-top:5px}.tr .nbar u{background:#ffc23d}
+.tshare{text-align:center}.tshare h2{margin:0 0 2px}
 h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 2px}h2.earnh small{font-size:13px;color:var(--soft);font-weight:500;white-space:nowrap}
 .own{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0edf8;font-size:15px}.own:last-of-type{border-bottom:0}.own i{color:var(--soft);font-size:12px;font-style:normal}
 .own .a{margin-left:auto;font-size:12px;color:var(--soft)}.oicon{width:34px;height:34px;flex:none}.oicon.car{width:46px;height:28px}
@@ -253,6 +259,7 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 <nav class="nav hide" id="nav"><div>
   <button data-tab="home" class="on"><b>☀️</b>Today</button>
   <button data-tab="story"><b>🏡</b>Blip's life</button>
+  <button data-tab="time"><b>⏳</b>Time back</button>
   <button data-tab="settings"><b>⚙️</b>Settings</button>
 </div></nav>
 
@@ -949,6 +956,7 @@ function render(){
   document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   if (tab === 'home') app.innerHTML = homeHTML();
   else if (tab === 'story') app.innerHTML = lifeHTML();
+  else if (tab === 'time') app.innerHTML = timeHTML();
   else app.innerHTML = settingsHTML();
   bind();
 }
@@ -1572,6 +1580,7 @@ function bindSetup(){
     S = newLife(name, draft.skin, draft.hair, draft.goal, draft.gen, draft.bonus, draft.inherit);
     S.girl = !!draft.girl;
     S.avg = draft.avg;
+    if (draft.tbPrev) S.tbPrev = draft.tbPrev;
     S.testMode = keepTest;
     save(); tab = 'home'; render(); updateIcon();
     modal('<div class="birth">'+charSVG(S)+'</div><h2>'+esc(name)+' is born!</h2>'+
@@ -1588,6 +1597,8 @@ function bind(){
   if ($('sblip')) $('sblip').onclick = () => tapCharacter('sblip', 'sbub');
   if ($('ydog')) $('ydog').onclick = tapDog;
   if ($('share')) $('share').onclick = () => shareModal(null);
+  if ($('tbpost')) $('tbpost').onclick = postTimeBack;
+  if ($('tbinvite')) $('tbinvite').onclick = inviteFriend;
   if ($('tslide')) {
     const set = m => { m = Math.max(0, Math.min(960, m)); homeMins = m; $('tslide').value = m; $('tval').textContent = fmtTime(m); $('verdict').outerHTML = verdictHTML(m); };
     $('tslide').oninput = e => set(+e.target.value);
@@ -1620,7 +1631,7 @@ function bind(){
   };
   if ($('nextGen')) $('nextGen').onclick = () => {
     const bonus = Math.min(15, Math.round(lifeScore()/10));
-    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, inherit:inheritance(), step:0, testMode:S.testMode};
+    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, inherit:inheritance(), tbPrev:timeBack(), step:0, testMode:S.testMode};
     S = null; try { localStorage.removeItem(KEY); } catch(e){}
     render();
   };
@@ -1761,6 +1772,73 @@ function shareLife(){
   if (navigator.share) { navigator.share({text}).catch(() => {}); return; }
   try { navigator.clipboard.writeText(text).then(copied, fallback); } catch(e) { fallback(); }
 }
+// ============ TIME BACK ============
+// Real time you got back: your old daily average minus each day's check-in. Skipped days don't count.
+const TIME_IDEAS = [
+  [30, '🍳', 'Cook a real breakfast'],
+  [60, '🥪', 'Have a long lunch with a friend'],
+  [180, '🚶', 'Walk 10 miles'],
+  [360, '📚', 'Read a whole novel'],
+  [960, '😴', 'Sleep two full nights'],
+  [1200, '🎸', 'Learn your first 3 guitar chords'],
+  [1440, '☀️', 'Live a whole extra day'],
+  [2400, '💼', 'Take a full work week off'],
+  [3000, '🏃', 'Train for your first 5K'],
+  [6000, '🗣️', 'Learn to hold a basic conversation in Spanish'],
+  [10080, '🏝️', 'Take a whole week of vacation'],
+  [30000, '✍️', 'Write your own novel']
+];
+function oldAvg(){ return S.avg || S.goal + 30; }
+function savedOn(e){ return e.mins == null ? 0 : Math.max(0, (e.avg || oldAvg()) - e.mins); }
+function timeBack(){ return (S.tbPrev || 0) + S.log.reduce((t, e) => t + savedOn(e), 0); }
+function fmtHM(m){ m = Math.round(m); const h = Math.floor(m / 60); return h ? h+'h '+(m % 60)+'m' : m+'m'; }
+function bigHM(m){ m = Math.round(m); return Math.floor(m / 60)+'<em>h</em> '+(m % 60)+'<em>m</em>'; }
+function lowerFirst(t){ return t.charAt(0).toLowerCase() + t.slice(1); }
+function timeHTML(){
+  const total = timeBack(), counted = S.log.filter(e => e.mins != null);
+  const done = TIME_IDEAS.filter(x => total >= x[0]), next = TIME_IDEAS.find(x => total < x[0]);
+  const perDay = Math.max(0, oldAvg() - S.goal);
+  let h = header().replace('<div class="logo">Lifetime<small>One day for you. One year for them.</small></div>', '<div class="logo">Time back<small>Real time you didn\'t spend on your phone</small></div>');
+  const ideaRow = (x, on, extra) => '<div class="tr'+(on ? ' on' : '')+'"><span>'+x[1]+'</span><div><b>'+x[2]+'</b><small>'+fmtHrs(x[0])+'</small>'+(extra || '')+'</div><i>'+(on ? '✓' : '🔒')+'</i></div>';
+  if (!total) {
+    // Nothing saved yet: show what hitting the goal would add up to.
+    const year = perDay * 365, yearIdeas = TIME_IDEAS.filter(x => x[0] <= year);
+    h += '<div class="card tbig"><div class="k">Your clock starts with your first check-in</div><div class="n">'+bigHM(0)+'</div>'+
+      '<div class="eq">'+(perDay ? 'Hit your '+fmtTime(S.goal)+' goal and you get back <b>'+fmtHM(perDay)+' a day</b>. That\'s <b>'+Math.round(year / 1440)+' full days</b> in your first year.' :
+        'Every minute under your old '+fmtTime(oldAvg())+' a day counts. Check in tonight to start your clock.')+'</div></div>';
+    h += '<div class="card"><h2 class="earnh">🎁 Waiting for you<small>at your goal</small></h2>'+
+      (yearIdeas.length > 6 ? yearIdeas.slice(0, 2).concat(yearIdeas.slice(-4)) : yearIdeas.length ? yearIdeas : TIME_IDEAS.slice(0, 3)).map(x => ideaRow(x, false, perDay ? '<small class="when"> · day '+Math.ceil(x[0] / perDay)+'</small>' : '')).join('')+
+      '<p class="muted small" style="margin:10px 0 0">All in your first year. Your Blip gets a great life, and you get your time back.</p></div>';
+  } else {
+    const days = counted.slice(-7), mx = Math.max(30, ...days.map(savedOn));
+    const pace = counted.length ? total / counted.length * 365 / 1440 : 0;
+    const top = done[done.length - 1];
+    h += '<div class="card tbig"><div class="n">'+bigHM(total)+'</div><div class="l">back in your life since you started</div>'+
+      (top ? '<div class="eq">That\'s enough time to <b>'+lowerFirst(top[2])+'</b> '+top[1]+'</div>' : '<div class="eq">'+fmtHM(next[0] - total)+' more and you could <b>'+lowerFirst(next[2])+'</b> '+next[1]+'</div>')+'</div>';
+    h += '<div class="card"><h2 class="earnh">📅 Last '+days.length+' check-in'+(days.length > 1 ? 's' : '')+'<small>vs. your old '+fmtTime(oldAvg())+' a day</small></h2><div class="tbars">'+
+      days.map(e => '<div><i style="height:'+Math.round(savedOn(e) / mx * 80)+'px"></i><b>'+fmtHM(savedOn(e))+'</b><span>'+(e.date ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][(dayNum(e.date) + 4) % 7] : '')+'</span></div>').join('')+'</div>'+
+      '<div class="pace">At this pace you get back <b>'+Math.round(pace)+' full day'+(Math.round(pace) === 1 ? '' : 's')+'</b> a year'+(pace >= 7 ? ' 🌴' : '')+'</div></div>';
+    h += '<div class="card"><h2 class="earnh">🏆 What you could do with it<small>'+done.length+' of '+TIME_IDEAS.length+'</small></h2>'+done.map(x => ideaRow(x, true)).join('')+
+      (next ? ideaRow(next, false, '<i class="nbar"><u style="width:'+Math.round(total / next[0] * 100)+'%"></u></i>') : '')+'</div>';
+  }
+  h += '<div class="card tshare"><h2>Better with friends</h2><p class="muted small">Time back is easier when someone\'s doing it with you.</p>'+
+    '<button class="btn sharebtn" id="tbpost">📸 Post my time back</button><button class="btn alt" id="tbinvite" style="margin-top:8px">🤝 Challenge a friend</button></div>';
+  return h;
+}
+function fmtHrs(m){ return m < 60 ? m+' minutes' : (m / 60)+' hour'+(m === 60 ? '' : 's'); }
+function inviteFriend(){
+  const total = timeBack();
+  const text = (total ? 'I\'ve gotten '+fmtHM(total)+' of my life back from my phone with Lifetime. ' : 'I\'m cutting my screen time with Lifetime. ')+
+    'Every day you hit your goal, your little Blip has a great year. Want to try it with me? '+appURL();
+  if (navigator.share) { navigator.share({text}).catch(() => {}); return; }
+  try { navigator.clipboard.writeText(text).then(() => { $('tbinvite').textContent = '✓ Copied! Paste it in a text'; }); } catch(e) {}
+}
+function postTimeBack(){
+  const total = timeBack(), top = TIME_IDEAS.filter(x => total >= x[0]).pop();
+  if (!total) return shareModal({emoji:'⏳', title:'I\'m getting my time back', text:'My goal: '+fmtTime(S.goal)+' a day.'});
+  shareModal({emoji:'⏳', title:'I got '+fmtHM(total)+' back', text: top ? 'That\'s enough time to '+lowerFirst(top[2])+'.' : 'And counting.'});
+}
+
 // ============ SHARE PICTURE ============
 // A 1080x1350 picture of the Blip at home with a headline, drawn from one SVG onto a canvas.
 const SQ_COLOR = {great:'#5cc26b', good:'#5cc26b', meh:'#ffc83d', bad:'#ff6b6b', awful:'#ff6b6b', skipped:'#e6e1f5'};
@@ -1793,7 +1871,8 @@ function shareArt(m){
   for (const l of title) { texts.push([l, y, 50, 700, 1]); y += 62; }
   for (const l of sub) { texts.push([l, y, 34, 500, .92]); y += 46; }
   texts.push(['Lifetime', 104, 62, 700, 1]);
-  if (S.streak >= 2) texts.push(['🔥 '+S.streak+' day streak', 1236, 32, 500, 1]);
+  const tb = timeBack(), foot = (S.streak >= 2 ? ['🔥 '+S.streak+' day streak'] : []).concat(tb >= 60 ? ['⏳ '+Math.floor(tb / 60)+'h of my life back'] : []);
+  if (foot.length) texts.push([foot.join('  ·  '), 1236, 32, 500, 1]);
   texts.push(['One day for you. One year for them.', 1290, 30, 500, .95]);
   texts.push([appURL().replace(/^https?:\/\//, '').replace(/\/(index\.html)?$/, ''), 1330, 30, 700, 1]);
   const days = S.log.slice(-7);
