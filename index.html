@@ -215,7 +215,7 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .scenecard{padding:0;overflow:hidden}.lifescene{position:relative}.lifescene .scene{display:block;width:100%;height:auto}
 .sblip{position:absolute;width:30%}.sblip svg{width:100%;height:auto;display:block}.sblip svg>circle:first-of-type{display:none}
 .where{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.88);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
-.sblip.friend{width:22%}.lifescene #sblip{cursor:pointer;-webkit-tap-highlight-color:transparent}.lifescene #sblip.hop{animation:hop .55s ease}.lifescene #sblip.droop{animation:droop .7s ease}
+.lifescene #sblip{cursor:pointer;-webkit-tap-highlight-color:transparent}.lifescene #sblip.hop{animation:hop .55s ease}.lifescene #sblip.droop{animation:droop .7s ease}
 .lifescene .bubble{left:45%;top:8%;transform:translate(0,-100%) scale(.6);transform-origin:16px 100%;max-width:190px;font-size:13px;padding:6px 10px;border-width:2.5px}
 .lifescene .bubble.show{transform:translate(0,-100%) scale(1)}.lifescene .bubble:after{left:20px}
 .lifescene .dogbub{left:36%;top:66%}
@@ -1312,8 +1312,6 @@ function yardThings(){
   }
   return got;
 }
-// A school friend comes over if the first day of school went well.
-function hasFriend(){ return S.log.some(e => e.age === 5 && (e.tier === 'great' || e.tier === 'good') && e.ms && /friends/.test(e.ms.text)); }
 function weatherNow(){
   const last = S.log[S.log.length-1];
   if (!last) return 'sun';
@@ -1343,7 +1341,7 @@ function homeScene(){
   const car = (carKey && L.car) ? '<svg x="'+L.car[0]+'" y="'+L.car[1]+'" width="'+L.car[2]+'" height="'+(L.car[2]*.6)+'" viewBox="0 0 200 120">'+CAR_ART[carKey].svg+'</svg>' : '';
   const label = key === 'parents' ? 'Mom and Dad\'s house' : key === 'apartment' ? 'First apartment' : home.title;
   const wx = weatherNow();
-  let extra = '', friend = '';
+  let extra = '';
   if (key === 'parents') {
     const fresh = newYardThing();
     // Inherited homes have their own driveways and trees, so a couple of things move or stay out.
@@ -1351,15 +1349,11 @@ function homeScene(){
     extra = yardThings().filter(g => !(g.k === 'treehouse' && art === 'dream'))
       .map(g => g.k === 'dog' && dogX ? '<g transform="translate('+dogX+' 0)">'+YARD.P.dog[1]+'</g>' : YARD.P[g.k][1]).join('');
     if (fresh) extra += YARD.SPARK(YARD.P[fresh.k][2], YARD.P[fresh.k][3]);
-    if (hasFriend()) {
-      const f = {name:'Pal', age:S.age, log:[{tier:'great'}], h:70, s:70, j:80, girl:!S.girl, skin:SKINS[(SKINS.indexOf(S.skin)+2) % SKINS.length], hair:HAIRS[(HAIRS.indexOf(S.hair)+2) % HAIRS.length]};
-      friend = '<div class="sblip friend" style="left:60%;bottom:0">'+charSVG(f)+'</div>';
-    }
   }
   if (wx === 'sun' && S.streak >= 3) extra += YARD.KITE;
   if (wx !== 'sun') extra += YARD[wx === 'rain' ? 'rainy' : 'cloudy'];
   return '<div class="lifescene"><svg viewBox="0 0 360 220" class="scene">'+home.svg+car+extra+'</svg>'+
-    '<div class="sblip" id="sblip" style="left:'+L.blip[0]+'%;bottom:'+L.blip[1]+'%"><div class="bubble" id="sbub"></div>'+charSVG(S)+'</div>'+friend+
+    '<div class="sblip" id="sblip" style="left:'+L.blip[0]+'%;bottom:'+L.blip[1]+'%"><div class="bubble" id="sbub"></div>'+charSVG(S)+'</div>'+
     (/id="ydog"/.test(extra) ? '<div class="bubble dogbub" id="dogbub"'+(art === 'parents' ? '' : ' style="left:57%"')+'></div>' : '')+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(label)+'</div></div>';
 }
 
