@@ -568,6 +568,8 @@ function checkIn(mins){
   const entry = liveYear(mins, tier);
   S.lastDate = today();
   save();
+  track('checkin');
+  if ([2,3,7,14,30,60,100].includes(S.log.length) && !S.testMode) track('day-'+S.log.length);
   render();
   showYear(entry);
 }
@@ -945,12 +947,33 @@ function tapDog(){
   dogTimer = setTimeout(() => bub.classList.remove('show'), 2400);
 }
 
+// ============ USAGE STATS ============
+// GoatCounter (free, no cookies, nothing personal) on the same gamesbyvidal account as Freefall.
+// Only on the real site, so testing doesn't count. Numbers at https://gamesbyvidal.goatcounter.com
+// Events (all start with "lifetime-"): new-blip, checkin, day-N (2,3,7,14,30,60,100 check-ins),
+// share-open, share-sent, invite, friend-link-opened, raise-from-link, next-generation, opened-installed.
+const onRealSite = location.hostname === 'gamesbyvidal.github.io';
+if (onRealSite) {
+  const counter = document.createElement('script');
+  counter.async = true;
+  counter.src = 'https://gc.zgo.at/count.js';
+  counter.dataset.goatcounter = 'https://gamesbyvidal.goatcounter.com/count';
+  document.head.appendChild(counter);
+}
+const trackQueue = [];
+function track(name){
+  if (!onRealSite) return;
+  const send = n => { try { window.goatcounter.count({path:'lifetime-'+n, title:'Lifetime: '+n, event:true}); } catch(e) {} };
+  if (window.goatcounter && window.goatcounter.count) send(name);
+  else { trackQueue.push(name); if (trackQueue.length === 1) setTimeout(function flush(){ if (window.goatcounter && window.goatcounter.count) while (trackQueue.length) send(trackQueue.shift()); else if (trackQueue.length < 20) setTimeout(flush, 1500); }, 1500); }
+}
+
 // ============ SCREENS ============
 const $ = id => document.getElementById(id);
 function render(){
   const app = $('app');
   const meet = readMeet();
-  if (meet) { $('nav').classList.add('hide'); app.innerHTML = meetHTML(meet); $('raise').onclick = () => { history.replaceState(null, '', location.pathname); tab = 'home'; render(); window.scrollTo(0,0); }; return; }
+  if (meet) { $('nav').classList.add('hide'); app.innerHTML = meetHTML(meet); $('raise').onclick = () => { if (!S) track('raise-from-link'); history.replaceState(null, '', location.pathname); tab = 'home'; render(); window.scrollTo(0,0); }; return; }
   if (!S) { $('nav').classList.add('hide'); app.innerHTML = setupHTML(); bindSetup(); return; }
   $('nav').classList.remove('hide');
   document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
@@ -1578,6 +1601,7 @@ function bindSetup(){
     const name = draft.name.trim();
     const keepTest = draft.testMode || false;
     S = newLife(name, draft.skin, draft.hair, draft.goal, draft.gen, draft.bonus, draft.inherit);
+    track(draft.gen > 1 ? 'next-generation' : 'new-blip');
     S.girl = !!draft.girl;
     S.avg = draft.avg;
     if (draft.tbPrev) S.tbPrev = draft.tbPrev;
@@ -1827,6 +1851,7 @@ function timeHTML(){
 }
 function fmtHrs(m){ return m < 60 ? m+' minutes' : (m / 60)+' hour'+(m === 60 ? '' : 's'); }
 function inviteFriend(){
+  track('invite');
   const total = timeBack();
   const text = (total ? 'I\'ve gotten '+fmtHM(total)+' of my life back from my phone with Lifetime. ' : 'I\'m cutting my screen time with Lifetime. ')+
     'Every day you hit your goal, your little Blip has a great year. Want to try it with me? '+appURL();
@@ -1908,6 +1933,7 @@ function sharePicture(m){
 // Opens a preview of the picture with one share button. The picture is made first,
 // so the share happens right on the tap (phones require that).
 function shareModal(moment){
+  track('share-open');
   const m = shareMoment(moment);
   const text = (moment ? S.name+': '+m.emoji+' '+m.title+'\n' : weekText().split('\nMeet ')[0]+'\n')+'Meet '+S.name+': '+meetLink();
   modal('<h2>Share '+esc(S.name)+'</h2><div class="shwrap"><div class="shload">Drawing the picture...</div><img id="shimg" class="shimg" alt=""></div>'+
@@ -1921,10 +1947,10 @@ function shareModal(moment){
     const file = new File([blob], 'lifetime-'+S.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')+'.png', {type:'image/png'});
     go.disabled = false;
     if (navigator.canShare && navigator.canShare({files:[file]})) {
-      go.onclick = () => navigator.share({files:[file], text}).catch(() => {});
+      go.onclick = () => { track('share-sent'); navigator.share({files:[file], text}).catch(() => {}); };
     } else if (navigator.share) {
       note.textContent = 'Tip: press and hold the picture to save it, then add it to your post.';
-      go.onclick = () => navigator.share({text}).catch(() => {});
+      go.onclick = () => { track('share-sent'); navigator.share({text}).catch(() => {}); };
     } else {
       go.textContent = '⬇️ Save picture';
       go.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = file.name; a.click(); };
@@ -2022,6 +2048,8 @@ document.querySelectorAll('.nav button').forEach(b => b.onclick = () => { tab = 
 catchUp();
 render();
 updateIcon();
+if (readMeet()) track('friend-link-opened');
+else if (S && isInstalled()) track('opened-installed');
 window.addEventListener('hashchange', render);
 // If the app sat open overnight, catch up when it comes back on screen.
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { catchUp(); render(); } });
