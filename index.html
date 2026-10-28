@@ -521,7 +521,19 @@ let tab = 'home';
 let draft = {name:'', skin:SKINS[1], hair:HAIRS[0], avg:240, goal:210, step:0};
 
 function load(){ try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} appBackup(); }
+
+// ============ PHONE APP (App Store / Google Play version) ============
+// The same file runs as the website and inside the phone app (see app/README.md).
+// In the app, iPhone can clear website-style storage, so the save is also kept in the app's own storage.
+const IS_APP = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
+const WEB_URL = 'https://gamesbyvidal.github.io/lifetime/';
+function appPrefs(){ return IS_APP && Capacitor.Plugins && Capacitor.Plugins.Preferences; }
+function appBackup(){ const p = appPrefs(); if (!p) return; try { if (S) p.set({key:KEY, value:JSON.stringify(S)}); else p.remove({key:KEY}); } catch(e){} }
+function appRestore(){
+  const p = appPrefs(); if (!p || S) return;
+  p.get({key:KEY}).then(r => { if (r && r.value && !localStorage.getItem(KEY)) { localStorage.setItem(KEY, r.value); location.reload(); } }).catch(() => {});
+}
 
 function newLife(name, skin, hair, goal, gen, bonus, inherit){
   const b = bonus || 0;
@@ -952,18 +964,20 @@ function tapDog(){
 // Only on the real site, so testing doesn't count. Numbers at https://gamesbyvidal.goatcounter.com
 // Events (all start with "lifetime-"): new-blip, checkin, day-N (2,3,7,14,30,60,100 check-ins),
 // share-open, share-sent, invite, friend-link-opened, raise-from-link, next-generation, opened-installed.
-const onRealSite = location.hostname === 'gamesbyvidal.github.io';
+// In the phone app, visits show under /lifetime-app/ and events start with "lifetime-app-".
+const onRealSite = location.hostname === 'gamesbyvidal.github.io' || IS_APP;
 if (onRealSite) {
   const counter = document.createElement('script');
   counter.async = true;
   counter.src = 'https://gc.zgo.at/count.js';
   counter.dataset.goatcounter = 'https://gamesbyvidal.goatcounter.com/count';
+  if (IS_APP) counter.dataset.goatcounterSettings = JSON.stringify({allow_local:true, path:'/lifetime-app/'});
   document.head.appendChild(counter);
 }
 const trackQueue = [];
 function track(name){
   if (!onRealSite) return;
-  const send = n => { try { window.goatcounter.count({path:'lifetime-'+n, title:'Lifetime: '+n, event:true}); } catch(e) {} };
+  const send = n => { try { window.goatcounter.count({path:(IS_APP ? 'lifetime-app-' : 'lifetime-')+n, title:'Lifetime: '+n, event:true}); } catch(e) {} };
   if (window.goatcounter && window.goatcounter.count) send(name);
   else { trackQueue.push(name); if (trackQueue.length === 1) setTimeout(function flush(){ if (window.goatcounter && window.goatcounter.count) while (trackQueue.length) send(trackQueue.shift()); else if (trackQueue.length < 20) setTimeout(flush, 1500); }, 1500); }
 }
@@ -1517,9 +1531,9 @@ function settingsHTML(){
     (isInstalled() ? '' : '<div class="card"><h2>📲 Put Lifetime on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
       '<p class="muted">Get '+esc(S.name)+' as an app icon that opens full screen. It also keeps their save safer on iPhone.</p></div></div>'+
       '<p class="small"><b>iPhone:</b> tap the Share button <span class="kbd">⬆︎</span> in Safari, then <b>Add to Home Screen</b>.<br><b>Android:</b> tap the <span class="kbd">⋮</span> menu in Chrome, then <b>Add to Home screen</b> or <b>Install app</b>.</p></div>')+
-    '<div class="card"><h2>⏰ Daily reminder</h2><p class="muted">Add a daily "Check in on '+esc(S.name)+'" reminder to your phone\'s calendar.</p>'+
+    (IS_APP ? '' : '<div class="card"><h2>⏰ Daily reminder</h2><p class="muted">Add a daily "Check in on '+esc(S.name)+'" reminder to your phone\'s calendar.</p>'+
       '<div class="switch"><span>Remind me at</span><input type="time" id="rtime" value="21:00"></div>'+
-      '<div class="row"><button class="btn ghost" id="ics">📅 Phone calendar</button><button class="btn ghost" id="gcal">Google Calendar</button></div></div>'+
+      '<div class="row"><button class="btn ghost" id="ics">📅 Phone calendar</button><button class="btn ghost" id="gcal">Google Calendar</button></div></div>')+
     '<div class="card"><h2>💾 Backup</h2><p class="muted">'+esc(S.name)+' only lives in this browser. Clearing your history, or not opening the app for a few weeks on iPhone, can erase them. Copy this backup code somewhere safe, like your Notes app or an email to yourself.</p>'+
       '<button class="btn alt" id="bkcopy">Copy backup code</button>'+(S.backedUp ? '<p class="muted small">Last backup: '+esc(S.backedUp)+'</p>' : '')+
       '<button class="btn ghost" id="restore" style="margin-top:10px">Restore from a backup</button></div>'+
@@ -1656,7 +1670,7 @@ function bind(){
   if ($('nextGen')) $('nextGen').onclick = () => {
     const bonus = Math.min(15, Math.round(lifeScore()/10));
     draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, inherit:inheritance(), tbPrev:timeBack(), step:0, testMode:S.testMode};
-    S = null; try { localStorage.removeItem(KEY); } catch(e){}
+    S = null; appBackup(); try { localStorage.removeItem(KEY); } catch(e){}
     render();
   };
 }
@@ -1715,7 +1729,7 @@ function updateIcon(){
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(iconSVG(S));
   } catch(e) {}
 }
-function isInstalled(){ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
+function isInstalled(){ return IS_APP || (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
 
 // ============ LIFE CARDS (shareable, at 18, 40 and the end) ============
 const LIFE_CARD_AGES = [18, 40, SETTINGS.lifeLength];
@@ -1752,7 +1766,7 @@ function showLifeCard(age){
 // that carries a small snapshot of the character in the link itself (no server needed).
 const SQUARE = {great:'🟩', good:'🟩', meh:'🟨', bad:'🟥', awful:'🟥', skipped:'⬜'};
 const isMet = e => e.tier === 'good' || e.tier === 'great';
-function appURL(){ return location.href.split('#')[0].split('?')[0]; }
+function appURL(){ return IS_APP ? WEB_URL : location.href.split('#')[0].split('?')[0]; }
 function b64url(str){ return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 function unb64url(str){ str = str.replace(/-/g, '+').replace(/_/g, '/'); while (str.length % 4) str += '='; return decodeURIComponent(escape(atob(str))); }
 function meetLink(){
@@ -2048,6 +2062,7 @@ document.querySelectorAll('.nav button').forEach(b => b.onclick = () => { tab = 
 catchUp();
 render();
 updateIcon();
+appRestore();
 if (readMeet()) track('friend-link-opened');
 else if (S && isInstalled()) track('opened-installed');
 window.addEventListener('hashchange', render);
