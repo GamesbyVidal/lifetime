@@ -238,6 +238,12 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .pace{margin-top:12px;background:#eef6ff;border-radius:14px;padding:10px;font-size:14px}
 .tr{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid #f0ecfb;opacity:.6}.tr.on{opacity:1}.tr>span{font-size:24px;width:32px;text-align:center}.tr>div{flex:1;min-width:0}.tr b{display:block;font-size:15px}.tr small{color:#7a7195}.tr .when{color:#7c5cff;font-weight:600}.tr>i{font-style:normal}.tr .nbar{margin-top:5px}.tr .nbar u{background:#ffc23d}
 .tshare{text-align:center}.tshare h2{margin:0 0 2px}
+.tgh{font-weight:600;margin:14px 0 6px;font-size:15px}.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tile{background:#f4f1fb;border:0;border-radius:14px;padding:6px 3px 8px;text-align:center;font-size:11px;line-height:1.2;color:var(--ink)}.tile svg{display:block;margin:0 auto}.tile b{display:block;font-size:11.5px;margin-top:2px;font-weight:600}.tile span{color:var(--soft)}
+.tile.got{background:linear-gradient(180deg,#fff6d6,#fff);box-shadow:inset 0 0 0 2px #ffd970}.tile.got span{color:#2fae5b;font-weight:600}.tbar{display:block;height:5px;border-radius:9px;background:#e2ddf0;margin:4px 6px 0;overflow:hidden}.tbar u{display:block;height:100%;background:#ffc23d}
+.tk{color:#d99a12;font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:.5px}.tk.lk{color:var(--soft);font-size:13px}.trbig svg{display:block;margin:0 auto 6px}.tnb{margin:0 10px 8px}
+.tpair{display:flex;align-items:flex-end;justify-content:center;margin:8px 0 4px}.tblip{width:110px;margin-left:-16px}.tblip svg{width:100%;height:auto;display:block}.tblip svg>circle:first-of-type{display:none}
+.twin .card{background:linear-gradient(180deg,#fff6d6,#fff 60%)}.tmore{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin:0 0 6px;font-size:13px;font-weight:600}.tmore span{display:flex;align-items:center;gap:2px}
 h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 2px}h2.earnh small{font-size:13px;color:var(--soft);font-weight:500;white-space:nowrap}
 .own{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0edf8;font-size:15px}.own:last-of-type{border-bottom:0}.own i{color:var(--soft);font-size:12px;font-style:normal}
 .own .a{margin-left:auto;font-size:12px;color:var(--soft)}.oicon{width:34px;height:34px;flex:none}.oicon.car{width:46px;height:28px}
@@ -582,6 +588,7 @@ function checkIn(mins){
   save();
   track('checkin');
   if ([2,3,7,14,30,60,100].includes(S.log.length) && !S.testMode) track('day-'+S.log.length);
+  checkTrophies();
   render();
   showYear(entry);
 }
@@ -1483,6 +1490,109 @@ function inheritance(){
     fund: Math.min(60, Math.round(Math.max(0, S.money) * 0.1))};
 }
 
+// ============ TROPHY CASE ============
+// Trophies are just for bragging: they never unlock shop items. Earned ones stay in the case for every generation.
+const TROPHY_ART = (function(){
+const O='#3b2a4a';
+const METAL={bronze:['#e8a568','#b8743c'],silver:['#e3e8f0','#a9b3c4'],gold:['#ffcf3f','#d99a12'],diamond:['#a6ecff','#4fc3e8']};
+const LOCK={fill:'#dcd8e8',dark:'#bdb7d0',em:'#c9c3db',out:'#a9a2c2',wood:'#cbc6da'};
+const EMB={
+  hour:(c)=>'<path d="M42 27 H58 L51 38 L58 49 H42 L49 38 Z" fill="'+c.w+'" stroke="'+c.o+'" stroke-width="2.5" stroke-linejoin="round"/>'+(c.l?'':'<path d="M45 46 H55 L50 41 Z M47 31 H53 L50 35 Z" fill="#f2b84b"/>'),
+  flame:(c)=>'<path d="M50 25 C59 33 61 40 57 46 C55 50 45 50 43 46 C39 40 45 36 47 31 C49 35 51 33 50 25 Z" fill="'+(c.l?c.w:'#ff7a3d')+'" stroke="'+c.o+'" stroke-width="2.5" stroke-linejoin="round"/>'+(c.l?'':'<path d="M50 37 C54 41 54 45 50 47 C46 45 47 41 50 37Z" fill="#ffe14d"/>'),
+  heart:(c)=>'<path d="M50 48 C37 40 39 27 50 32 C61 27 63 40 50 48 Z" fill="'+(c.l?c.w:'#ff6b8b')+'" stroke="'+c.o+'" stroke-width="2.5" stroke-linejoin="round"/>',
+  hearts:(c)=>'<path d="M44 46 C34 40 36 30 44 34 C52 30 54 40 44 46 Z" fill="'+(c.l?c.w:'#ff6b8b')+'" stroke="'+c.o+'" stroke-width="2.3" stroke-linejoin="round"/><path d="M57 44 C49 39 51 31 57 34 C63 31 65 39 57 44 Z" fill="'+(c.l?c.w:'#ffa0b4')+'" stroke="'+c.o+'" stroke-width="2.3" stroke-linejoin="round"/>',
+  house:(c)=>'<path d="M41 38 L50 29 L59 38 V48 H41 Z" fill="'+c.w+'" stroke="'+c.o+'" stroke-width="2.5" stroke-linejoin="round"/><path d="M39 39 L50 28 L61 39" fill="none" stroke="'+(c.l?c.o:'#e8705a')+'" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="47" y="41" width="6" height="7" fill="'+(c.l?c.o:'#c98c55')+'"/>',
+  castle:(c)=>'<path d="M39 48 V33 H43 V36 H47 V30 H53 V36 H57 V33 H61 V48 Z" fill="'+c.w+'" stroke="'+c.o+'" stroke-width="2.5" stroke-linejoin="round"/><path d="M50 30 V23 L56 25 L50 27" fill="'+(c.l?c.o:'#ff5d8f')+'" stroke="'+c.o+'" stroke-width="1.8" stroke-linejoin="round"/><rect x="47" y="41" width="6" height="7" rx="3" fill="'+(c.l?c.o:'#7c5cff')+'"/>',
+  star:(c)=>'<path d="M50 26 L54 35 L63 36 L56 42 L58 51 L50 46 L42 51 L44 42 L37 36 L46 35 Z" fill="'+(c.l?c.w:'#fff59a')+'" stroke="'+c.o+'" stroke-width="2.5" stroke-linejoin="round"/>',
+  sprout:(c)=>'<path d="M50 49 V36" stroke="'+c.o+'" stroke-width="3" stroke-linecap="round"/><path d="M50 38 C42 38 40 32 41 28 C47 28 51 32 50 38 Z M50 36 C58 35 61 30 60 26 C53 26 50 30 50 36 Z" fill="'+(c.l?c.w:'#6fd06a')+'" stroke="'+c.o+'" stroke-width="2.3" stroke-linejoin="round"/>'
+};
+// Inner markup for a 100x100 viewBox. Locked trophies are gray with a "?" plaque.
+return function(t, locked){
+  const m=METAL[t.metal], f=locked?LOCK.fill:m[0], d=locked?LOCK.dark:m[1], o=locked?LOCK.out:O, c={w:locked?LOCK.em:'#fff',o,l:locked};
+  const handles='M28 24 Q13 24 15 36 Q17 47 31 48 M72 24 Q87 24 85 36 Q83 47 69 48';
+  let s='<path d="'+handles+'" fill="none" stroke="'+o+'" stroke-width="9" stroke-linecap="round"/><path d="'+handles+'" fill="none" stroke="'+f+'" stroke-width="4" stroke-linecap="round"/>'+
+    '<path d="M26 16 H74 V32 Q74 60 50 63 Q26 60 26 32 Z" fill="'+f+'" stroke="'+o+'" stroke-width="3.5" stroke-linejoin="round"/>'+
+    '<path d="M26 16 H74 V21 H26 Z" fill="'+d+'" stroke="'+o+'" stroke-width="3.5" stroke-linejoin="round"/>'+
+    (locked?'':'<path d="M32 26 Q31 44 39 54" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".7"/>')+
+    '<path d="M45 62 H55 L57 72 H43 Z" fill="'+d+'" stroke="'+o+'" stroke-width="3" stroke-linejoin="round"/>'+
+    '<rect x="34" y="71" width="32" height="7" rx="2.5" fill="'+f+'" stroke="'+o+'" stroke-width="3"/>'+
+    '<rect x="27" y="78" width="46" height="15" rx="3.5" fill="'+(locked?LOCK.wood:'#8a5a3c')+'" stroke="'+o+'" stroke-width="3.5"/>'+
+    '<rect x="35" y="81.5" width="30" height="8" rx="2" fill="'+(locked?LOCK.fill:'#f5d27a')+'" stroke="'+o+'" stroke-width="1.6"/>'+
+    '<text x="50" y="88.3" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="7.5" fill="'+(locked?LOCK.out:O)+'">'+(locked?'?':t.tag)+'</text>'+
+    EMB[t.em](c);
+  if (t.metal==='diamond' && !locked) s+='<path d="M80 8 l2.5 5 5 2.5 -5 2.5 -2.5 5 -2.5 -5 -5 -2.5 5 -2.5z M17 6 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2z" fill="#fff" stroke="'+O+'" stroke-width="1.6" stroke-linejoin="round"/>';
+  return s;
+};
+})();
+
+// have(): progress [now, needed]. Change the numbers here to move the cutoffs.
+const boughtKind = kind => owned().bought.some(b => ITEM[b.key].kind === kind);
+const TROPHIES = [
+  {k:'tb1',   group:'⏳ Time back', em:'hour',   metal:'bronze',  tag:'1h',    name:'First hour back',  how:'Save 1 hour of phone time.',   have:() => [timeBack(), 60],   prog:p => fmtHM(p[0])+' of 1h'},
+  {k:'tb10',  group:'⏳ Time back', em:'hour',   metal:'silver',  tag:'10h',   name:'Ten hours back',   how:'Save 10 hours of phone time.', have:() => [timeBack(), 600],  prog:p => fmtHM(p[0])+' of 10h'},
+  {k:'tb24',  group:'⏳ Time back', em:'hour',   metal:'gold',    tag:'1 day', name:'A whole day back', how:'Save 24 hours of phone time.', have:() => [timeBack(), 1440], prog:p => fmtHM(p[0])+' of 24h'},
+  {k:'tb100', group:'⏳ Time back', em:'hour',   metal:'diamond', tag:'100h',  name:'100 hours back',   how:'Save 100 hours of phone time.',have:() => [timeBack(), 6000], prog:p => fmtHM(p[0])+' of 100h'},
+  {k:'st7',   group:'🔥 Streaks',   em:'flame',  metal:'silver',  tag:'7',     name:'One week strong',  how:'Hit your goal 7 days in a row.',  have:() => [S.streak, 7],  prog:p => 'Streak '+p[0]+' of 7'},
+  {k:'st30',  group:'🔥 Streaks',   em:'flame',  metal:'gold',    tag:'30',    name:'Unstoppable',      how:'Hit your goal 30 days in a row.', have:() => [S.streak, 30], prog:p => 'Streak '+p[0]+' of 30'},
+  {k:'fr1',   group:'🤝 Friends',   em:'heart',  metal:'silver',  tag:'1',     name:'Bring a friend',   how:'Invite a friend to raise their own Blip.', have:() => [S.invites || 0, 1], prog:p => p[0]+' of 1 invited', invite:true},
+  {k:'fr3',   group:'🤝 Friends',   em:'hearts', metal:'gold',    tag:'3',     name:'Squad goals',      how:'Invite 3 friends to raise their own Blip.', have:() => [S.invites || 0, 3], prog:p => p[0]+' of 3 invited', invite:true},
+  {k:'home1', group:'🏡 Life',      em:'house',  metal:'bronze',  tag:'Home',  name:'Home sweet home',  how:'Your Blip buys their first home.', have:() => [boughtKind('home') ? 1 : 0, 1], prog:() => S.age < 18 ? 'Starts at 18' : 'Saving up'},
+  {k:'home3', group:'🏡 Life',      em:'castle', metal:'gold',    tag:'Dream', name:'Living the dream', how:'Your Blip buys the dream home.', have:() => [owned().bought.some(b => b.key === 'dreamhome') ? 1 : 0, 1], prog:() => S.age < 18 ? 'Starts at 18' : 'Saving up'},
+  {k:'age80', group:'🏡 Life',      em:'star',   metal:'gold',    tag:'80',    name:'A full life',      how:'Your Blip reaches age '+SETTINGS.lifeLength+'.', have:() => [S.age, SETTINGS.lifeLength], prog:p => 'Age '+p[0]+' of '+p[1]},
+  {k:'gen2',  group:'🏡 Life',      em:'sprout', metal:'diamond', tag:'Gen 2', name:'Family legacy',    how:'Raise a second Blip after the first one turns '+SETTINGS.lifeLength+'.', have:() => [S.gen > 1 ? 1 : 0, 1], prog:() => 'After age '+SETTINGS.lifeLength}
+];
+function trophySVG(t, locked, w){ return '<svg viewBox="0 0 100 100" width="'+w+'" height="'+w+'" aria-hidden="true">'+TROPHY_ART(t, locked)+'</svg>'; }
+function trophyCase(){ return S.trophies || (S.trophies = {}); }
+
+let trophyQueue = [];
+// Adds any newly earned trophies to the case. Returns them so the caller can celebrate.
+function checkTrophies(){
+  const got = trophyCase(), fresh = [];
+  TROPHIES.forEach(t => { if (got[t.k]) return; const p = t.have(); if (p[0] >= p[1]) { got[t.k] = {name:S.name, age:S.age, date:today()}; fresh.push(t); track('trophy-'+t.k); } });
+  if (fresh.length) { save(); trophyQueue = trophyQueue.concat(fresh); }
+  return fresh;
+}
+// Celebrates queued trophies once no other pop-up is open (several at once share one pop-up).
+function showTrophies(){
+  if (!trophyQueue.length || document.querySelector('.modal')) return;
+  const list = trophyQueue; trophyQueue = [];
+  const t = list[list.length - 1], rest = list.slice(0, -1);
+  modal('<div class="tk">🏆 Trophy'+(list.length > 1 ? ' x'+list.length : '')+' earned!</div><div class="tpair">'+trophySVG(t, false, 120)+'<div class="tblip">'+charSVG(S)+'</div></div>'+
+    '<h2>'+esc(t.name)+'</h2><p>'+esc(trophyBrag(t))+'</p>'+
+    (rest.length ? '<div class="tmore">'+rest.map(r => '<span>'+trophySVG(r, false, 40)+esc(r.name)+'</span>').join('')+'</div>' : '')+
+    '<button class="btn sharebtn" id="trshare">📸 Share my trophy</button><button class="btn alt" data-close style="margin-top:10px">Nice!</button>', 'twin');
+  confetti(['🏆','✨','🎉','⭐']);
+  $('trshare').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); shareTrophy(t); };
+}
+function trophyBrag(t){
+  if (t.k.startsWith('tb')) return 'You\'ve saved '+fmtHM(timeBack())+' by staying off your phone.';
+  if (t.k.startsWith('st')) return 'You hit your goal '+t.have()[1]+' days in a row!';
+  if (t.invite) return 'Thanks for inviting '+(t.k === 'fr1' ? 'a friend' : t.have()[1]+' friends')+' to raise their own Blip!';
+  return t.how.replace('Your Blip', S.name).replace(' after the first one turns '+SETTINGS.lifeLength, '');
+}
+function shareTrophy(t){ shareModal({emoji:'🏆', title:'Trophy: '+t.name, text:trophyBrag(t)}); }
+
+function trophyCaseHTML(){
+  const got = trophyCase(), n = TROPHIES.filter(t => got[t.k]).length;
+  let h = '<div class="card" id="trophies"><h2 class="earnh">🏆 Trophy case<small>'+n+' of '+TROPHIES.length+'</small></h2><div class="muted small">Earn them by living well. Each one is yours to keep. Tap one to see more.</div>';
+  [...new Set(TROPHIES.map(t => t.group))].forEach(g => {
+    h += '<div class="tgh">'+g+'</div><div class="tiles">'+TROPHIES.filter(t => t.group === g).map(t => {
+      const e = got[t.k], p = t.have();
+      return '<button class="tile'+(e ? ' got' : '')+'" data-trophy="'+t.k+'">'+trophySVG(t, !e, 56)+'<b>'+t.name+'</b><span>'+(e ? '✓ Earned' : esc(t.prog(p)))+'</span>'+
+        (e ? '' : '<i class="tbar"><u style="width:'+Math.min(100, Math.round(Math.max(0, p[0]) / p[1] * 100))+'%"></u></i>')+'</button>';
+    }).join('')+'</div>';
+  });
+  return h+'</div>';
+}
+function trophyInfo(k){
+  const t = TROPHIES.find(x => x.k === k), e = trophyCase()[k], p = t.have();
+  if (e) return modal('<div class="trbig">'+trophySVG(t, false, 130)+'</div><div class="tk">Earned</div><h2>'+esc(t.name)+'</h2><p>'+esc(t.how)+'</p>'+
+    '<p class="muted small">'+esc(e.name)+' was '+e.age+'.</p><button class="btn sharebtn" id="trshare">📸 Share my trophy</button><button class="btn ghost" data-close style="margin-top:10px">Close</button>');
+  modal('<div class="trbig">'+trophySVG(t, true, 130)+'</div><div class="tk lk">Locked trophy</div><h2>'+esc(t.name)+'</h2><p>'+esc(t.how)+'<br><b>'+esc(t.prog(p))+'</b></p>'+
+    '<i class="nbar tnb"><u style="width:'+Math.min(100, Math.round(Math.max(0, p[0]) / p[1] * 100))+'%"></u></i>'+
+    (t.invite ? '<button class="btn sharebtn" id="trinvite">🤝 Invite a friend</button>' : '')+'<button class="btn ghost" data-close style="margin-top:10px">Close</button>');
+}
+
 function lifeHTML(){
   const o = owned(), nxt = nextItem();
   let earned = '<div class="card"><h2 class="earnh">💰 Earned by '+esc(S.name)+'<small>Net worth '+fmtMoney(netWorth())+'</small></h2>';
@@ -1500,7 +1610,7 @@ function lifeHTML(){
   } else earned += '<p class="nexttxt">🌟 '+esc(S.name)+' has everything '+(S.girl ? 'she' : 'he')+' ever dreamed of!</p>';
   earned += '</div>';
   return header().replace('<div class="logo">Lifetime<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
-    '<div class="card scenecard">'+homeScene()+(sceneNote() ? '<div class="snote">'+sceneNote()+'</div>' : '')+'</div>'+pathHTML()+(S.age < 18 ? growHTML() : '')+earned+storyHTML(true);
+    '<div class="card scenecard">'+homeScene()+(sceneNote() ? '<div class="snote">'+sceneNote()+'</div>' : '')+'</div>'+pathHTML()+(S.age < 18 ? growHTML() : '')+earned+trophyCaseHTML()+storyHTML(true);
 }
 
 function storyHTML(inLife){
@@ -1619,6 +1729,8 @@ function bindSetup(){
     S.girl = !!draft.girl;
     S.avg = draft.avg;
     if (draft.tbPrev) S.tbPrev = draft.tbPrev;
+    if (draft.trophies) S.trophies = draft.trophies;
+    if (draft.invites) S.invites = draft.invites;
     S.testMode = keepTest;
     save(); tab = 'home'; render(); updateIcon();
     modal('<div class="birth">'+charSVG(S)+'</div><h2>'+esc(name)+' is born!</h2>'+
@@ -1637,6 +1749,10 @@ function bind(){
   if ($('share')) $('share').onclick = () => shareModal(null);
   if ($('tbpost')) $('tbpost').onclick = postTimeBack;
   if ($('tbinvite')) $('tbinvite').onclick = inviteFriend;
+  document.querySelectorAll('[data-trophy]').forEach(b => b.onclick = () => { trophyInfo(b.dataset.trophy);
+    const t = TROPHIES.find(x => x.k === b.dataset.trophy);
+    if ($('trshare')) $('trshare').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); shareTrophy(t); };
+    if ($('trinvite')) $('trinvite').onclick = inviteFriend; });
   if ($('tslide')) {
     const set = m => { m = Math.max(0, Math.min(960, m)); homeMins = m; $('tslide').value = m; $('tval').textContent = fmtTime(m); $('verdict').outerHTML = verdictHTML(m); };
     $('tslide').oninput = e => set(+e.target.value);
@@ -1669,7 +1785,7 @@ function bind(){
   };
   if ($('nextGen')) $('nextGen').onclick = () => {
     const bonus = Math.min(15, Math.round(lifeScore()/10));
-    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, inherit:inheritance(), tbPrev:timeBack(), step:0, testMode:S.testMode};
+    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, inherit:inheritance(), tbPrev:timeBack(), trophies:S.trophies, invites:S.invites, step:0, testMode:S.testMode};
     S = null; appBackup(); try { localStorage.removeItem(KEY); } catch(e){}
     render();
   };
@@ -1866,11 +1982,14 @@ function timeHTML(){
 function fmtHrs(m){ return m < 60 ? m+' minutes' : (m / 60)+' hour'+(m === 60 ? '' : 's'); }
 function inviteFriend(){
   track('invite');
+  S.invites = (S.invites || 0) + 1; save(); checkTrophies();
+  const btn = this && this.id ? this : $('tbinvite');
   const total = timeBack();
   const text = (total ? 'I\'ve gotten '+fmtHM(total)+' of my life back from my phone with Lifetime. ' : 'I\'m cutting my screen time with Lifetime. ')+
     'Every day you hit your goal, your little Blip has a great year. Want to try it with me? '+appURL();
-  if (navigator.share) { navigator.share({text}).catch(() => {}); return; }
-  try { navigator.clipboard.writeText(text).then(() => { $('tbinvite').textContent = '✓ Copied! Paste it in a text'; }); } catch(e) {}
+  const done = () => { if ($('tbinvite') || document.querySelector('[data-trophy]')) render(); document.querySelectorAll('.modal').forEach(m => m.remove()); showTrophies(); };
+  if (navigator.share) { navigator.share({text}).catch(() => {}).then(done); return; }
+  try { navigator.clipboard.writeText(text).then(() => { if (btn) btn.textContent = '✓ Copied! Paste it in a text'; setTimeout(done, 1200); }, done); } catch(e) { done(); }
 }
 function postTimeBack(){
   const total = timeBack(), top = TIME_IDEAS.filter(x => total >= x[0]).pop();
@@ -2041,7 +2160,7 @@ function modal(inner, cls){
   const m = document.createElement('div');
   m.className = 'modal' + (cls ? ' ' + cls : '');
   m.innerHTML = '<div class="card">'+inner+'</div>';
-  m.onclick = ev => { if (ev.target === m || ev.target.hasAttribute('data-close')) m.remove(); };
+  m.onclick = ev => { if (ev.target === m || ev.target.hasAttribute('data-close')) { m.remove(); setTimeout(showTrophies, 250); } };
   document.body.appendChild(m);
 }
 
@@ -2063,6 +2182,8 @@ catchUp();
 render();
 updateIcon();
 appRestore();
+// Players from before the trophy case get theirs on the next visit.
+if (S && !readMeet()) { checkTrophies(); setTimeout(showTrophies, 600); }
 if (readMeet()) track('friend-link-opened');
 else if (S && isInstalled()) track('opened-installed');
 window.addEventListener('hashchange', render);
