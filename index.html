@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Lifetime</title>
+<title>Blip: Screen Time Game</title>
 <meta name="description" content="One day for you is one year for them. Beat your screen time goal and your Blip lives their best life.">
-<meta property="og:title" content="Lifetime">
+<meta property="og:title" content="Blip: Screen Time Game">
 <meta property="og:image" content="https://gamesbyvidal.github.io/lifetime/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -16,7 +16,7 @@
 <meta name="theme-color" content="#2b2350">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Lifetime">
+<meta name="apple-mobile-web-app-title" content="Blip">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
@@ -137,6 +137,8 @@ details ul{padding-left:18px;margin:6px 0}
 .pick.on{border-color:var(--accent2);background:#f5f2ff}
 .goalval{font-size:34px;font-weight:700;color:var(--accent2);text-align:center}
 input[type=range]{width:100%;accent-color:var(--accent2);height:30px}
+.bi{position:relative;display:inline-block}.bi svg{position:absolute;left:50%;top:-.08em;width:.42em;height:.42em;transform:translateX(-50%)}
+.intro .subname{font-size:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.75;margin-top:-2px}
 .intro{color:#fff;text-align:center;padding:10px 6px 4px}
 .intro h1{font-size:40px;margin:0}
 .intro p{font-size:18px;opacity:.9}
@@ -991,8 +993,14 @@ function render(){
   bind();
 }
 
+// The game's name. The dot on the i is a tiny Blip.
+let BRAND_STYLE = 'face';
+function brand(){
+  if (BRAND_STYLE !== 'face') return 'Blip';
+  return 'Bl<span class="bi">\u0131<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="#f1c27d" stroke="#3b2a4a" stroke-width="2.4"/><circle cx="7.3" cy="9.3" r="1.5" fill="#3b2a4a"/><circle cx="12.7" cy="9.3" r="1.5" fill="#3b2a4a"/><path d="M7.4 12.6 Q10 14.8 12.6 12.6" fill="none" stroke="#3b2a4a" stroke-width="1.5" stroke-linecap="round"/></svg></span>p';
+}
 function header(){
-  return '<div class="top"><div class="logo">Lifetime<small>One day for you. One year for them.</small></div>'+
+  return '<div class="top"><div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>'+
     '<div class="streak">🔥 '+S.streak+'</div></div>';
 }
 
@@ -1595,7 +1603,7 @@ function lifeHTML(){
       '<i class="nbar"><u style="width:'+pct+'%"></u></i></div>';
   } else earned += '<p class="nexttxt">🌟 '+esc(S.name)+' has everything '+(S.girl ? 'she' : 'he')+' ever dreamed of!</p>';
   earned += '</div>';
-  return header().replace('<div class="logo">Lifetime<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
+  return header().replace('<div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
     '<div class="card scenecard">'+homeScene()+(sceneNote() ? '<div class="snote">'+sceneNote()+'</div>' : '')+'</div>'+pathHTML()+(S.age < 18 ? growHTML() : '')+earned+trophyCaseHTML()+storyHTML(true);
 }
 
@@ -1624,7 +1632,7 @@ function settingsHTML(){
     '<div class="goalval" id="gv">'+fmtTime(S.goal)+'</div><input type="range" id="goal" min="15" max="720" step="15" value="'+S.goal+'"></div>'+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
     '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>'+
-    (isInstalled() ? '' : '<div class="card"><h2>📲 Put Lifetime on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
+    (isInstalled() ? '' : '<div class="card"><h2>📲 Put Blip on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
       '<p class="muted">Get '+esc(S.name)+' as an app icon that opens full screen. It also keeps their save safer on iPhone.</p></div></div>'+
       '<p class="small"><b>iPhone:</b> tap the Share button <span class="kbd">⬆︎</span> in Safari, then <b>Add to Home Screen</b>.<br><b>Android:</b> tap the <span class="kbd">⋮</span> menu in Chrome, then <b>Add to Home screen</b> or <b>Install app</b>.</p></div>')+
     '<div class="card"><h2>⏰ Daily reminder</h2><p class="muted">Add a daily "Check in on '+esc(S.name)+'" reminder to your phone\'s calendar.</p>'+
@@ -1649,7 +1657,7 @@ function setupHTML(){
   const top = '<div class="setuptop">'+back+dots+'</div>';
   if (step === 0) {
     const nextGen = draft.gen > 1;
-    return '<div class="intro"><h1>Lifetime</h1><p>One day for you is one year for them.</p></div>'+
+    return '<div class="intro"><h1>'+brand()+'</h1><div class="subname">Screen Time Game</div><p>One day for you is one year for them.</p></div>'+
       '<div class="card futures"><div class="row">'+
         '<div class="future up">'+previewSVG(30, {job:'Doctor', pay:200, log:[{tier:'good'}], j:90})+'<b>2 hours a day</b><span>Doctor, marathon runner, happy</span></div>'+
         '<div class="future down">'+previewSVG(30, {log:[{tier:'awful'}], j:20})+'<b>7 hours a day</b><span>Tired, broke, glued to the couch</span></div>'+
@@ -1822,7 +1830,7 @@ function updateIcon(){
       iconURL = cv.toDataURL('image/png');
       document.querySelectorAll('link[rel=apple-touch-icon],link[rel=icon]').forEach(l => l.href = iconURL);
       const base = location.href.split('#')[0].split('?')[0];
-      const man = {name:'Lifetime', short_name:'Lifetime', start_url:base, scope:base.replace(/[^/]*$/, ''), display:'standalone',
+      const man = {name:'Blip: Screen Time Game', short_name:'Blip', start_url:base, scope:base.replace(/[^/]*$/, ''), display:'standalone',
         background_color:'#2b2350', theme_color:'#2b2350', icons:[{src:iconURL, sizes:'512x512', type:'image/png', purpose:'any'}]};
       const ml = document.querySelector('link[rel=manifest]');
       if (ml) ml.href = URL.createObjectURL(new Blob([JSON.stringify(man)], {type:'application/manifest+json'}));
@@ -1850,7 +1858,7 @@ function lifeCardHTML(age){
   const head = end ? esc(S.name)+' lived '+lifeTitle(lifeScore())[1].toLowerCase()+'!' : age === 18 ? esc(S.name)+' is all grown up!' : esc(S.name)+' hit the big 4-0!';
   const best = bestMoments(age);
   const who = Object.assign({}, S, {age, log:[{tier: metN >= log.length/2 ? 'great' : 'awful'}]});
-  return '<div class="lifecard"><div class="k">Lifetime · '+(end ? 'Life story' : 'Milestone')+'</div><div class="age">'+age+'</div><div class="nm">'+head+'</div>'+
+  return '<div class="lifecard"><div class="k">Blip · '+(end ? 'Life story' : 'Milestone')+'</div><div class="age">'+age+'</div><div class="nm">'+head+'</div>'+
     '<div class="pc">'+charSVG(who)+'</div>'+
     (best.length ? '<div class="best"><div class="bh">Best moments</div>'+best.map(b => '<div class="be"><span>'+b.emoji+'</span><div>'+esc(b.text)+'</div></div>').join('')+'</div>' : '')+
     '<div class="foot"><b>Goal met '+metN+' of '+log.length+' days</b><br>gamesbyvidal.github.io/lifetime</div></div>';
@@ -1901,7 +1909,7 @@ function readMeet(){
 }
 function weekText(){
   const last = S.log.slice(-7), met = last.filter(isMet).length;
-  return 'My Blip '+S.name+' is '+S.age+' in Lifetime 🌱\n'+last.map(e => SQUARE[e.tier] || '⬜').join('')+'\n'+
+  return 'My Blip '+S.name+' is '+S.age+' 🌱\n'+last.map(e => SQUARE[e.tier] || '⬜').join('')+'\n'+
     met+' of '+last.length+' days on goal'+(S.streak >= 2 ? ' · 🔥 '+S.streak : '')+'\nMeet '+S.name+': '+meetLink();
 }
 function shareLife(){
@@ -1938,7 +1946,7 @@ function timeHTML(){
   const total = timeBack(), counted = S.log.filter(e => e.mins != null);
   const done = TIME_IDEAS.filter(x => total >= x[0]), next = TIME_IDEAS.find(x => total < x[0]);
   const perDay = Math.max(0, oldAvg() - S.goal);
-  let h = header().replace('<div class="logo">Lifetime<small>One day for you. One year for them.</small></div>', '<div class="logo">Time back<small>Real time you didn\'t spend on your phone</small></div>');
+  let h = header().replace('<div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>', '<div class="logo">Time back<small>Real time you didn\'t spend on your phone</small></div>');
   const ideaRow = (x, on, extra) => '<div class="tr'+(on ? ' on' : '')+'"><span>'+x[1]+'</span><div><b>'+x[2]+'</b><small>'+fmtHrs(x[0])+'</small>'+(extra || '')+'</div><i>'+(on ? '✓' : '🔒')+'</i></div>';
   if (!total) {
     // Nothing saved yet: show what hitting the goal would add up to.
@@ -1971,7 +1979,7 @@ function inviteFriend(){
   S.invites = (S.invites || 0) + 1; save(); checkTrophies();
   const btn = this && this.id ? this : $('tbinvite');
   const total = timeBack();
-  const text = (total ? 'I\'ve gotten '+fmtHM(total)+' of my life back from my phone with Lifetime. ' : 'I\'m cutting my screen time with Lifetime. ')+
+  const text = (total ? 'I\'ve gotten '+fmtHM(total)+' of my life back from my phone with Blip, a screen time game. ' : 'I\'m cutting my screen time with Blip, a screen time game. ')+
     'Every day you hit your goal, your little Blip has a great year. Want to try it with me? '+appURL();
   const done = () => { if ($('tbinvite') || document.querySelector('[data-trophy]')) render(); document.querySelectorAll('.modal').forEach(m => m.remove()); showTrophies(); };
   if (navigator.share) { navigator.share({text}).catch(() => {}).then(done); return; }
@@ -2014,7 +2022,7 @@ function shareArt(m){
   y += 76;
   for (const l of title) { texts.push([l, y, 50, 700, 1]); y += 62; }
   for (const l of sub) { texts.push([l, y, 34, 500, .92]); y += 46; }
-  texts.push(['Lifetime', 104, 62, 700, 1]);
+  texts.push(['Blip', 104, 62, 700, 1]);
   const tb = timeBack(), foot = (S.streak >= 2 ? ['🔥 '+S.streak+' day streak'] : []).concat(tb >= 60 ? ['⏳ '+Math.floor(tb / 60)+'h of my life back'] : []);
   if (foot.length) texts.push([foot.join('  ·  '), 1236, 32, 500, 1]);
   texts.push(['One day for you. One year for them.', 1290, 30, 500, .95]);
@@ -2063,7 +2071,7 @@ function shareModal(moment){
   sharePicture(m).then(blob => {
     const url = URL.createObjectURL(blob);
     $('shimg').src = url; $('shimg').classList.add('on');
-    const file = new File([blob], 'lifetime-'+S.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')+'.png', {type:'image/png'});
+    const file = new File([blob], 'blip-'+S.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')+'.png', {type:'image/png'});
     go.disabled = false;
     if (navigator.canShare && navigator.canShare({files:[file]})) {
       go.onclick = () => { track('share-sent'); navigator.share({files:[file], text}).catch(() => {}); };
@@ -2088,7 +2096,7 @@ function meetHTML(m){
   const have = key === 'parents' ? 'is growing up at Mom and Dad\'s house' : key === 'apartment' ? 'lives in a first apartment' : 'owns a '+HOME_ART[key].title.toLowerCase();
   const sub = ['Age '+m.a].concat(m.jb ? [esc(m.jb)] : []).concat(m.st >= 2 ? ['🔥 '+m.st+' day streak'] : []).join(' · ');
   const best = (m.b || []).slice(0, 3).map(momentFromRef).filter(Boolean);
-  return '<div class="meet"><div class="k">A Blip in Lifetime</div><h1>Meet '+esc(m.n)+'</h1><div class="sub">'+sub+'</div><div class="mscene"><div class="lifescene">'+sceneSVG(p, c)+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(sceneLabel(p))+'</div></div></div>'+
+  return '<div class="meet"><div class="k">Blip · Screen Time Game</div><h1>Meet '+esc(m.n)+'</h1><div class="sub">'+sub+'</div><div class="mscene"><div class="lifescene">'+sceneSVG(p, c)+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(sceneLabel(p))+'</div></div></div>'+
     (best.length ? '<div class="mbest"><div class="bh">Best moments</div>'+best.map(x => '<div class="be"><span>'+esc(x[0])+'</span><div>'+esc(x[1])+'</div></div>').join('')+'</div>' : '')+
     '<div class="chal"><b>Can your Blip beat '+esc(m.n)+'?</b><br>'+esc(m.n)+' is '+m.a+' and '+have+'. Their owner hit their screen time goal on <b>'+m.m+' of '+m.t+' days</b>. '+
     'Every day you hit yours, your Blip has a great year.</div>'+
@@ -2126,13 +2134,13 @@ function addReminder(kind){
   const p = n => String(n).padStart(2, '0');
   const local = d => d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'T'+p(d.getHours())+p(d.getMinutes())+'00';
   const title = 'Check in on '+S.name+' 🌱', url = location.href.split('#')[0].split('?')[0];
-  const details = 'How much screen time today? Open Lifetime and see what kind of year '+S.name+' has: '+url;
+  const details = 'How much screen time today? Open Blip and see what kind of year '+S.name+' has: '+url;
   if (kind === 'google') {
     window.open('https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(title)+
       '&dates='+local(start)+'/'+local(end)+'&recur='+encodeURIComponent('RRULE:FREQ=DAILY')+'&details='+encodeURIComponent(details), '_blank');
     return;
   }
-  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Lifetime//EN','BEGIN:VEVENT',
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Blip//EN','BEGIN:VEVENT',
     'UID:lifetime-'+Date.now()+'@gamesbyvidal.github.io','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').split('.')[0]+'Z',
     'DTSTART:'+local(start),'DTEND:'+local(end),'RRULE:FREQ=DAILY','SUMMARY:'+title,'DESCRIPTION:'+details,'URL:'+url,
     'BEGIN:VALARM','TRIGGER:PT0M','ACTION:DISPLAY','DESCRIPTION:'+title,'END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
