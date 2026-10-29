@@ -1,6 +1,6 @@
 {
   "appId": "io.github.gamesbyvidal.lifetime",
-  "appName": "Lifetime",
+  "appName": "Blip",
   "webDir": "www",
   "backgroundColor": "#2b2350",
   "ios": { "contentInset": "never" }

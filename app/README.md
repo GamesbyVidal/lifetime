@@ -1,4 +1,4 @@
-# Lifetime phone app
+# Lifetime phone app ("Blip: Screen Time Game" on the App Store)
 
 The App Store / Google Play version of Lifetime. It wraps the same game the website uses
 (`../index.html`) with [Capacitor](https://capacitorjs.com), so the website and the app stay one game.
