@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Lifetime</title>
+<title>Blip: Screen Time Game</title>
 <meta name="description" content="One day for you is one year for them. Beat your screen time goal and your Blip lives their best life.">
-<meta property="og:title" content="Lifetime">
+<meta property="og:title" content="Blip: Screen Time Game">
 <meta property="og:image" content="https://gamesbyvidal.github.io/lifetime/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -16,7 +16,7 @@
 <meta name="theme-color" content="#2b2350">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Lifetime">
+<meta name="apple-mobile-web-app-title" content="Blip">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
@@ -137,6 +137,11 @@ details ul{padding-left:18px;margin:6px 0}
 .pick.on{border-color:var(--accent2);background:#f5f2ff}
 .goalval{font-size:34px;font-weight:700;color:var(--accent2);text-align:center}
 input[type=range]{width:100%;accent-color:var(--accent2);height:30px}
+.intro h1{position:relative}.intro h1 svg.blogo{width:290px;max-width:80%;display:block;margin:-6px auto -18px}.intro .subname{position:relative;z-index:1;margin-top:6px}.intro .subname svg{width:230px;display:block;margin:0 auto}
+.logo{position:relative}.logo svg.blogo{width:118px;display:block;margin:-12px 0 -6px -6px}.top{align-items:flex-start}
+svg.blogo{cursor:pointer;overflow:visible}svg.blogo .lb{animation:peek 3.2s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}svg.blogo .lb.hop{animation:bhop .6s ease}
+@keyframes peek{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes bhop{30%{transform:translateY(-22px) rotate(-6deg)}60%{transform:translateY(0)}80%{transform:translateY(-6px)}}
+.logobub{left:58%;top:4%;transform:translate(0,-60%) scale(.6);transform-origin:0 100%;font-size:14px;padding:6px 10px;border-width:2.5px;max-width:200px;z-index:3}.logobub.show{transform:translate(0,-60%) scale(1)}.logobub:after{left:16px}
 .intro{color:#fff;text-align:center;padding:10px 6px 4px}
 .intro h1{font-size:40px;margin:0}
 .intro p{font-size:18px;opacity:.9}
@@ -1005,8 +1010,90 @@ function render(){
   bind();
 }
 
+// ============ THE BLIP LOGO ============
+// Candy sticker letters with a real Blip peeking over them (the player's own Blip once they have one).
+const LOGO = (function(){
+const O='#3b2a4a', CANDY=['#ffc23d','#ff5a8a','#7c5cff','#5cc26b'];
+const LETTERS=[['B',0,-6,-4],['l',94,4,6],['ı',142,-3,-2],['p',190,5,4]]; // letter, x, tilt, bounce
+const sparkle=(x,y,r,fill)=>'<path d="M'+x+' '+(y-r)+' Q'+(x+r*.18)+' '+(y-r*.18)+' '+(x+r)+' '+y+' Q'+(x+r*.18)+' '+(y+r*.18)+' '+x+' '+(y+r)+' Q'+(x-r*.18)+' '+(y+r*.18)+' '+(x-r)+' '+y+' Q'+(x-r*.18)+' '+(y-r*.18)+' '+x+' '+(y-r)+'Z" fill="'+(fill||'#fff59a')+'" stroke="'+O+'" stroke-width="3" stroke-linejoin="round"/>';
+function head(c, x, y, w){
+  const sc = {baby:.62, kid:.8, middle:.86, teen:.92, young:.97, adult:1, senior:.95}[stage(c.age)], cy = 230 - 148*sc;
+  return '<svg x="'+x+'" y="'+y+'" width="'+w+'" height="'+w+'" viewBox="'+(100-64*sc)+' '+(cy-70*sc)+' '+(128*sc)+' '+(128*sc)+'">'+
+    charSVG(c).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '').replace(/<circle cx="100" cy="122" r="86"[^>]*\/>/, '')+'</svg>';
+}
+function letters(){
+  let back = '', front = '';
+  LETTERS.forEach(([ch, x, rot, b], i) => {
+    const t = '<text x="'+x+'" y="'+(150+b)+'" font-family="Fredoka,sans-serif" font-weight="700" font-size="150"', g = '<g transform="rotate('+rot+' '+(x+40)+' 150)">';
+    back += g+t+' fill="'+O+'" stroke="'+O+'" stroke-width="14" stroke-linejoin="round" transform="translate(6 8)">'+ch+'</text></g>';
+    front += g+t+' fill="'+CANDY[i]+'" stroke="'+O+'" stroke-width="9" stroke-linejoin="round" paint-order="stroke">'+ch+'</text></g>';
+  });
+  return [back, front];
+}
+return {
+  // The wordmark as one SVG. c is the Blip who peeks over the letters.
+  svg(c){
+    const [back, front] = letters();
+    return '<svg viewBox="-14 -52 350 248" class="blogo" role="img" aria-label="Blip"><g class="lb">'+head(c, 86, -46, 124)+'</g>'+back+front+
+      '<g class="lh"><circle cx="118" cy="46" r="11" fill="'+c.skin+'" stroke="'+O+'" stroke-width="3.5"/><circle cx="166" cy="88" r="11" fill="'+c.skin+'" stroke="'+O+'" stroke-width="3.5"/></g>'+
+      sparkle(240, 40, 13)+sparkle(28, 20, 10, '#ffd1e0')+sparkle(300, 10, 9)+'</svg>';
+  },
+  ribbon(text){
+    const w = 250, h = 40;
+    return '<svg viewBox="-30 -6 '+(w+60)+' '+(h+22)+'" class="ribbon" role="img" aria-label="'+text+'"><g transform="rotate(-3 '+(w/2)+' 20)">'+
+      '<path d="M-24 10 H14 V'+(h+10)+' H-24 L-12 '+(h/2+10)+' Z" fill="#d93c6e" stroke="'+O+'" stroke-width="3.5" stroke-linejoin="round"/>'+
+      '<path d="M'+(w+24)+' 10 H'+(w-14)+' V'+(h+10)+' H'+(w+24)+' L'+(w+12)+' '+(h/2+10)+' Z" fill="#d93c6e" stroke="'+O+'" stroke-width="3.5" stroke-linejoin="round"/>'+
+      '<rect x="0" y="0" width="'+w+'" height="'+h+'" rx="8" fill="#ff5a8a" stroke="'+O+'" stroke-width="3.5"/>'+
+      '<text x="'+(w/2)+'" y="'+(h/2+7)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="21" fill="#fff">'+text+'</text></g></svg>';
+  },
+  // Draws the candy letters on a canvas (share pictures), centered on x.
+  draw(ctx, x, y, size){
+    const k = size / 150, w = 300 * k;
+    ctx.save(); ctx.translate(x - w / 2, y); ctx.scale(k, k); ctx.font = '700 150px Fredoka, system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.lineJoin = 'round';
+    LETTERS.forEach(([ch, lx, rot, b], i) => {
+      ctx.save(); ctx.translate(lx + 40, b); ctx.rotate(rot * Math.PI / 180); ctx.translate(-40, 0);
+      const t = ch === 'ı' ? 'i' : ch;
+      ctx.fillStyle = O; ctx.strokeStyle = O; ctx.lineWidth = 14; ctx.strokeText(t, 6, 8); ctx.fillText(t, 6, 8);
+      ctx.lineWidth = 9; ctx.strokeText(t, 0, 0); ctx.fillStyle = CANDY[i]; ctx.fillText(t, 0, 0);
+      ctx.restore();
+    });
+    ctx.restore();
+  }
+};
+})();
+// The Blip in the logo: yours once you have one, otherwise the one you're making.
+function logoBlip(age){
+  if (S && age == null) return S;
+  return {name:'x', age: age == null ? 8 : age, log:[{tier:'great'}], h:70, s:60, j:80, skin: draft.skin || SKINS[1], hair: draft.hair || HAIRS[0], girl: !!draft.girl};
+}
+function brand(){ return LOGO.svg(logoBlip()); }
+const LOGO_LINES = ['Hehe! That tickles!', 'Peekaboo!', 'Hi! I\'m a Blip!', 'One day for you, one year for me!', 'Put the phone down and play with me!', 'Wheee!'];
+// Tap the logo: the Blip hops and says something.
+document.addEventListener('click', ev => {
+  const svg = ev.target.closest && ev.target.closest('svg.blogo');
+  if (!svg) return;
+  const lb = svg.querySelector('.lb'); lb.classList.remove('hop'); void lb.getBoundingClientRect(); lb.classList.add('hop');
+  let bub = svg.parentNode.querySelector('.logobub');
+  if (!bub) { bub = document.createElement('div'); bub.className = 'bubble logobub'; svg.parentNode.appendChild(bub); }
+  bub.textContent = pick(LOGO_LINES); bub.classList.add('show');
+  clearTimeout(bub.t); bub.t = setTimeout(() => bub.classList.remove('show'), 1800);
+});
+// Welcome screen: the Blip in the logo grows up from baby to grandparent, over and over.
+let logoTimer;
+function startLogoLoop(){
+  clearInterval(logoTimer);
+  const ages = [1, 4, 8, 13, 17, 25, 40, 60, 78];
+  let i = 0;
+  logoTimer = setInterval(() => {
+    const box = $('introLogo');
+    if (!box) return clearInterval(logoTimer);
+    i = (i + 1) % ages.length;
+    const lb = box.querySelector('.lb');
+    if (lb) lb.outerHTML = LOGO.svg(logoBlip(ages[i])).match(/<g class="lb">[\s\S]*?<\/svg><\/g>/)[0];
+  }, 1100);
+}
 function header(){
-  return '<div class="top"><div class="logo">Lifetime<small>One day for you. One year for them.</small></div>'+
+  return '<div class="top"><div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>'+
     '<div class="streak">🔥 '+S.streak+'</div></div>';
 }
 
@@ -1609,7 +1696,7 @@ function lifeHTML(){
       '<i class="nbar"><u style="width:'+pct+'%"></u></i></div>';
   } else earned += '<p class="nexttxt">🌟 '+esc(S.name)+' has everything '+(S.girl ? 'she' : 'he')+' ever dreamed of!</p>';
   earned += '</div>';
-  return header().replace('<div class="logo">Lifetime<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
+  return header().replace('<div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
     '<div class="card scenecard">'+homeScene()+(sceneNote() ? '<div class="snote">'+sceneNote()+'</div>' : '')+'</div>'+pathHTML()+(S.age < 18 ? growHTML() : '')+earned+trophyCaseHTML()+storyHTML(true);
 }
 
@@ -1638,7 +1725,7 @@ function settingsHTML(){
     '<div class="goalval" id="gv">'+fmtTime(S.goal)+'</div><input type="range" id="goal" min="15" max="720" step="15" value="'+S.goal+'"></div>'+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
     '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>'+
-    (isInstalled() ? '' : '<div class="card"><h2>📲 Put Lifetime on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
+    (isInstalled() ? '' : '<div class="card"><h2>📲 Put Blip on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
       '<p class="muted">Get '+esc(S.name)+' as an app icon that opens full screen. It also keeps their save safer on iPhone.</p></div></div>'+
       '<p class="small"><b>iPhone:</b> tap the Share button <span class="kbd">⬆︎</span> in Safari, then <b>Add to Home Screen</b>.<br><b>Android:</b> tap the <span class="kbd">⋮</span> menu in Chrome, then <b>Add to Home screen</b> or <b>Install app</b>.</p></div>')+
     (IS_APP ? '' : '<div class="card"><h2>⏰ Daily reminder</h2><p class="muted">Add a daily "Check in on '+esc(S.name)+'" reminder to your phone\'s calendar.</p>'+
@@ -1663,7 +1750,7 @@ function setupHTML(){
   const top = '<div class="setuptop">'+back+dots+'</div>';
   if (step === 0) {
     const nextGen = draft.gen > 1;
-    return '<div class="intro"><h1>Lifetime</h1><p>One day for you is one year for them.</p></div>'+
+    return '<div class="intro"><h1 id="introLogo">'+LOGO.svg(logoBlip(1))+'</h1><div class="subname">'+LOGO.ribbon('a screen time game')+'</div><p>One day for you is one year for them.</p></div>'+
       '<div class="card futures"><div class="row">'+
         '<div class="future up">'+previewSVG(30, {job:'Doctor', pay:200, log:[{tier:'good'}], j:90})+'<b>2 hours a day</b><span>Doctor, marathon runner, happy</span></div>'+
         '<div class="future down">'+previewSVG(30, {log:[{tier:'awful'}], j:20})+'<b>7 hours a day</b><span>Tired, broke, glued to the couch</span></div>'+
@@ -1699,6 +1786,7 @@ function goStep(n){ draft.step = Math.max(0, Math.min(SETUP_STEPS - 1, n)); rend
 
 function bindSetup(){
   const step = draft.step || 0;
+  if ($('introLogo')) startLogoLoop();
   if ($('back')) $('back').onclick = () => goStep(step - 1);
   document.querySelectorAll('[data-girl]').forEach(b => b.onclick = () => { draft.girl = b.dataset.girl === 'true'; render(); setTimeout(() => goStep(2), 250); });
   document.querySelectorAll('[data-skin]').forEach(b => b.onclick = () => { draft.skin = b.dataset.skin; render(); });
@@ -1836,7 +1924,7 @@ function updateIcon(){
       iconURL = cv.toDataURL('image/png');
       document.querySelectorAll('link[rel=apple-touch-icon],link[rel=icon]').forEach(l => l.href = iconURL);
       const base = location.href.split('#')[0].split('?')[0];
-      const man = {name:'Lifetime', short_name:'Lifetime', start_url:base, scope:base.replace(/[^/]*$/, ''), display:'standalone',
+      const man = {name:'Blip: Screen Time Game', short_name:'Blip', start_url:base, scope:base.replace(/[^/]*$/, ''), display:'standalone',
         background_color:'#2b2350', theme_color:'#2b2350', icons:[{src:iconURL, sizes:'512x512', type:'image/png', purpose:'any'}]};
       const ml = document.querySelector('link[rel=manifest]');
       if (ml) ml.href = URL.createObjectURL(new Blob([JSON.stringify(man)], {type:'application/manifest+json'}));
@@ -1864,7 +1952,7 @@ function lifeCardHTML(age){
   const head = end ? esc(S.name)+' lived '+lifeTitle(lifeScore())[1].toLowerCase()+'!' : age === 18 ? esc(S.name)+' is all grown up!' : esc(S.name)+' hit the big 4-0!';
   const best = bestMoments(age);
   const who = Object.assign({}, S, {age, log:[{tier: metN >= log.length/2 ? 'great' : 'awful'}]});
-  return '<div class="lifecard"><div class="k">Lifetime · '+(end ? 'Life story' : 'Milestone')+'</div><div class="age">'+age+'</div><div class="nm">'+head+'</div>'+
+  return '<div class="lifecard"><div class="k">Blip · '+(end ? 'Life story' : 'Milestone')+'</div><div class="age">'+age+'</div><div class="nm">'+head+'</div>'+
     '<div class="pc">'+charSVG(who)+'</div>'+
     (best.length ? '<div class="best"><div class="bh">Best moments</div>'+best.map(b => '<div class="be"><span>'+b.emoji+'</span><div>'+esc(b.text)+'</div></div>').join('')+'</div>' : '')+
     '<div class="foot"><b>Goal met '+metN+' of '+log.length+' days</b><br>gamesbyvidal.github.io/lifetime</div></div>';
@@ -1915,7 +2003,7 @@ function readMeet(){
 }
 function weekText(){
   const last = S.log.slice(-7), met = last.filter(isMet).length;
-  return 'My Blip '+S.name+' is '+S.age+' in Lifetime 🌱\n'+last.map(e => SQUARE[e.tier] || '⬜').join('')+'\n'+
+  return 'My Blip '+S.name+' is '+S.age+' 🌱\n'+last.map(e => SQUARE[e.tier] || '⬜').join('')+'\n'+
     met+' of '+last.length+' days on goal'+(S.streak >= 2 ? ' · 🔥 '+S.streak : '')+'\nMeet '+S.name+': '+meetLink();
 }
 function shareLife(){
@@ -1952,7 +2040,7 @@ function timeHTML(){
   const total = timeBack(), counted = S.log.filter(e => e.mins != null);
   const done = TIME_IDEAS.filter(x => total >= x[0]), next = TIME_IDEAS.find(x => total < x[0]);
   const perDay = Math.max(0, oldAvg() - S.goal);
-  let h = header().replace('<div class="logo">Lifetime<small>One day for you. One year for them.</small></div>', '<div class="logo">Time back<small>Real time you didn\'t spend on your phone</small></div>');
+  let h = header().replace('<div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>', '<div class="logo">Time back<small>Real time you didn\'t spend on your phone</small></div>');
   const ideaRow = (x, on, extra) => '<div class="tr'+(on ? ' on' : '')+'"><span>'+x[1]+'</span><div><b>'+x[2]+'</b><small>'+fmtHrs(x[0])+'</small>'+(extra || '')+'</div><i>'+(on ? '✓' : '🔒')+'</i></div>';
   if (!total) {
     // Nothing saved yet: show what hitting the goal would add up to.
@@ -1985,7 +2073,7 @@ function inviteFriend(){
   S.invites = (S.invites || 0) + 1; save(); checkTrophies();
   const btn = this && this.id ? this : $('tbinvite');
   const total = timeBack();
-  const text = (total ? 'I\'ve gotten '+fmtHM(total)+' of my life back from my phone with Lifetime. ' : 'I\'m cutting my screen time with Lifetime. ')+
+  const text = (total ? 'I\'ve gotten '+fmtHM(total)+' of my life back from my phone with Blip, a screen time game. ' : 'I\'m cutting my screen time with Blip, a screen time game. ')+
     'Every day you hit your goal, your little Blip has a great year. Want to try it with me? '+appURL();
   const done = () => { if ($('tbinvite') || document.querySelector('[data-trophy]')) render(); document.querySelectorAll('.modal').forEach(m => m.remove()); showTrophies(); };
   if (navigator.share) { navigator.share({text}).catch(() => {}).then(done); return; }
@@ -2028,7 +2116,7 @@ function shareArt(m){
   y += 76;
   for (const l of title) { texts.push([l, y, 50, 700, 1]); y += 62; }
   for (const l of sub) { texts.push([l, y, 34, 500, .92]); y += 46; }
-  texts.push(['Lifetime', 104, 62, 700, 1]);
+  texts.push(['@logo', 120, 124, 700, 1]);
   const tb = timeBack(), foot = (S.streak >= 2 ? ['🔥 '+S.streak+' day streak'] : []).concat(tb >= 60 ? ['⏳ '+Math.floor(tb / 60)+'h of my life back'] : []);
   if (foot.length) texts.push([foot.join('  ·  '), 1236, 32, 500, 1]);
   texts.push(['One day for you. One year for them.', 1290, 30, 500, .95]);
@@ -2055,7 +2143,7 @@ function sharePicture(m){
         const x = c.getContext('2d');
         x.drawImage(img, 0, 0, 1080, 1350);
         x.textAlign = 'center'; x.fillStyle = '#fff';
-        for (const [t, y, size, w, a] of art.texts) { x.globalAlpha = a; x.font = w+' '+size+'px Fredoka, system-ui, sans-serif'; x.fillText(t, 540, y); }
+        for (const [t, y, size, w, a] of art.texts) { if (t === '@logo') { LOGO.draw(x, 540, y, size); continue; } x.globalAlpha = a; x.font = w+' '+size+'px Fredoka, system-ui, sans-serif'; x.fillText(t, 540, y); }
         c.toBlob(b => b ? ok(b) : bad(), 'image/png');
       } catch(e) { bad(e); }
     };
@@ -2077,7 +2165,7 @@ function shareModal(moment){
   sharePicture(m).then(blob => {
     const url = URL.createObjectURL(blob);
     $('shimg').src = url; $('shimg').classList.add('on');
-    const file = new File([blob], 'lifetime-'+S.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')+'.png', {type:'image/png'});
+    const file = new File([blob], 'blip-'+S.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')+'.png', {type:'image/png'});
     go.disabled = false;
     if (navigator.canShare && navigator.canShare({files:[file]})) {
       go.onclick = () => { track('share-sent'); navigator.share({files:[file], text}).catch(() => {}); };
@@ -2102,7 +2190,7 @@ function meetHTML(m){
   const have = key === 'parents' ? 'is growing up at Mom and Dad\'s house' : key === 'apartment' ? 'lives in a first apartment' : 'owns a '+HOME_ART[key].title.toLowerCase();
   const sub = ['Age '+m.a].concat(m.jb ? [esc(m.jb)] : []).concat(m.st >= 2 ? ['🔥 '+m.st+' day streak'] : []).join(' · ');
   const best = (m.b || []).slice(0, 3).map(momentFromRef).filter(Boolean);
-  return '<div class="meet"><div class="k">A Blip in Lifetime</div><h1>Meet '+esc(m.n)+'</h1><div class="sub">'+sub+'</div><div class="mscene"><div class="lifescene">'+sceneSVG(p, c)+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(sceneLabel(p))+'</div></div></div>'+
+  return '<div class="meet"><div class="k">Blip · Screen Time Game</div><h1>Meet '+esc(m.n)+'</h1><div class="sub">'+sub+'</div><div class="mscene"><div class="lifescene">'+sceneSVG(p, c)+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(sceneLabel(p))+'</div></div></div>'+
     (best.length ? '<div class="mbest"><div class="bh">Best moments</div>'+best.map(x => '<div class="be"><span>'+esc(x[0])+'</span><div>'+esc(x[1])+'</div></div>').join('')+'</div>' : '')+
     '<div class="chal"><b>Can your Blip beat '+esc(m.n)+'?</b><br>'+esc(m.n)+' is '+m.a+' and '+have+'. Their owner hit their screen time goal on <b>'+m.m+' of '+m.t+' days</b>. '+
     'Every day you hit yours, your Blip has a great year.</div>'+
@@ -2140,13 +2228,13 @@ function addReminder(kind){
   const p = n => String(n).padStart(2, '0');
   const local = d => d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'T'+p(d.getHours())+p(d.getMinutes())+'00';
   const title = 'Check in on '+S.name+' 🌱', url = location.href.split('#')[0].split('?')[0];
-  const details = 'How much screen time today? Open Lifetime and see what kind of year '+S.name+' has: '+url;
+  const details = 'How much screen time today? Open Blip and see what kind of year '+S.name+' has: '+url;
   if (kind === 'google') {
     window.open('https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(title)+
       '&dates='+local(start)+'/'+local(end)+'&recur='+encodeURIComponent('RRULE:FREQ=DAILY')+'&details='+encodeURIComponent(details), '_blank');
     return;
   }
-  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Lifetime//EN','BEGIN:VEVENT',
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Blip//EN','BEGIN:VEVENT',
     'UID:lifetime-'+Date.now()+'@gamesbyvidal.github.io','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').split('.')[0]+'Z',
     'DTSTART:'+local(start),'DTEND:'+local(end),'RRULE:FREQ=DAILY','SUMMARY:'+title,'DESCRIPTION:'+details,'URL:'+url,
     'BEGIN:VALARM','TRIGGER:PT0M','ACTION:DISPLAY','DESCRIPTION:'+title,'END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
