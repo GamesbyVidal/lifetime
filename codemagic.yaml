@@ -1,6 +1,7 @@
 # Codemagic builds the iPhone app online (no Mac needed) and sends it to TestFlight.
 # One-time setup in codemagic.io: Team settings > Integrations > Developer Portal,
 # add the App Store Connect API key and name it "Lifetime ASC key".
+# Builds only start by hand from codemagic.io (no automatic triggers), to stay in the free minutes.
 workflows:
   ios-testflight:
     name: Lifetime iPhone app (TestFlight)
@@ -14,8 +15,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: io.github.gamesbyvidal.lifetime
-    triggering:
-      events: []  # started by hand from codemagic.io (keeps us inside the free minutes)
     scripts:
       - name: Install
         script: cd app && npm ci
