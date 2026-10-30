@@ -13,3 +13,15 @@ The App Store / Google Play version of Lifetime. It wraps the same game the webs
 Bundle ID: `io.github.gamesbyvidal.lifetime`
 
 Local commands (need Node 22): `npm ci`, then `npm run sync` to copy the game into both apps.
+
+## Gift shop (in-app purchases)
+
+The shop tab only appears in the app (and when index.html is opened from a file or localhost
+for testing, where "buying" is simulated). Purchases use StoreKit 2 through
+`ios/App/App/StorePlugin.swift`, registered in `MainViewController.swift`.
+
+Product IDs in App Store Connect (all Non-Consumable):
+`blip.item.<key>` for single gifts (keys in `GIFT.ITEMS` in index.html) and
+`blip.bundle.holiday` ($2.99), `blip.bundle.founder` ($4.99).
+Prices load from Apple; until products exist (and the Paid Apps agreement is active)
+the shop shows "opens soon" and lets players try things on.

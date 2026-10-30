@@ -263,6 +263,25 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .confetti{position:fixed;top:-20px;font-size:22px;pointer-events:none;z-index:30;animation:drop linear forwards}
 @keyframes drop{to{transform:translateY(110vh) rotate(540deg)}}
 .hide{display:none!important}
+/* gift shop (phone app only) */
+.gtag{text-align:center;color:#fff;margin:-4px 0 14px;font-size:16px;line-height:1.35}.gtag span{display:block;font-size:13px;opacity:.8;margin-top:4px}
+.gnote{background:rgba(255,255,255,.14);color:#fff;border-radius:14px;padding:8px 12px;text-align:center;font-size:14px;margin:0 0 12px}
+.gtry{display:flex;align-items:center;gap:10px;padding:12px}.gduo{flex:1.1;display:flex;align-items:flex-end;justify-content:center;min-width:0}
+.gduo .gfull svg{width:132px;height:158px;display:block}.gduo .gdog{width:64px;height:78px;margin-left:-14px}.gduo .gdog:only-child{width:130px;height:156px;margin:0}
+.ginfo{flex:1;min-width:0}.ginfo .muted{margin:0}.gname{font-size:21px;font-weight:700;line-height:1.15}.gprice{font-size:22px;font-weight:700;color:var(--accent2);margin-top:2px}
+.ginfo .btn{padding:11px;font-size:16px;margin-top:10px}.ginfo .btn[disabled]{opacity:.7}.glock{margin-top:10px;font-weight:600;color:#b8860b;font-size:14px}.glock small{color:var(--soft);font-weight:400}
+.gtabs{display:flex;gap:8px;margin:0 0 12px}.gtabs button{flex:1;border:0;border-radius:999px;padding:9px 4px;font-size:15px;font-weight:600;background:rgba(255,255,255,.14);color:#fff}
+.gtabs button.on{background:#fff;color:var(--accent2)}
+.ggrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.gtile{position:relative;border:3px solid transparent;background:#fff;border-radius:18px;padding:4px 4px 8px;display:flex;flex-direction:column;align-items:center;overflow:hidden;color:var(--ink)}
+.gtile.on{border-color:var(--accent2)}.gtile svg{width:100%;height:auto;aspect-ratio:1;display:block}.gtile .gdog{aspect-ratio:96/116;max-height:110px}
+.gtile b{font-size:13px;line-height:1.15;margin-top:2px}.gtile .gp{color:var(--accent2);font-weight:600;font-size:13px}.gtile .gown{color:var(--good);font-weight:600;font-size:13px}
+.gtile .gfree{color:#b8860b;font-weight:600;font-size:11px;line-height:1.2}.gnew{position:absolute;left:6px;top:6px;background:#ff4f7b;color:#fff;font-style:normal;font-size:10px;font-weight:700;border-radius:6px;padding:1px 5px;z-index:1}
+.gbundle{display:flex;align-items:center;gap:10px;width:100%;border:0;border-radius:20px;padding:10px 12px;margin-bottom:12px;color:#fff;text-align:left;box-shadow:0 8px 24px rgba(20,10,60,.25)}
+.gbundle.hol{background:linear-gradient(120deg,#2e9e5b,#1f6e8c)}.gbundle.fdr{background:linear-gradient(120deg,#7c5cff,#ff5d8f)}.gbundle[disabled]{opacity:.75}
+.gbb{width:54px;height:64px;flex:none;background:rgba(255,255,255,.85);border-radius:50%;overflow:hidden}.gbb svg{width:54px;height:64px}
+.gbt{flex:1;min-width:0}.gbt b{display:block;font-size:17px}.gbt span{font-size:13px;opacity:.9}.gbp{background:#fff;color:#c8405f;font-weight:700;border-radius:999px;padding:6px 10px;font-size:15px;flex:none}
+.gfoot{color:#fff;opacity:.75;text-align:center;font-size:13px;margin:4px 0}.linkbtn.gfoot{display:block;margin:6px auto;background:none;border:0;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -546,6 +565,212 @@ function appRestore(){
   p.get({key:KEY}).then(r => { if (r && r.value && !localStorage.getItem(KEY)) { localStorage.setItem(KEY, r.value); location.reload(); } }).catch(() => {});
 }
 
+// ============ GIFT SHOP (phone app only) ============
+// Cosmetics only: gifts never change stats, events or screen-time features (those stay free).
+// Items are drawn inside the Blip's own head group (head circle 100,82 r48) or the dog icon (head 50,48 r28,
+// body 50,74 rx24 ry16), so they tilt, bob and scale with the character instead of sitting on top like stickers.
+// Purchases go through Apple (app/ios/App/App/StorePlugin.swift). Product IDs must match App Store Connect.
+const SHOP_PREVIEW = !IS_APP && (location.protocol === 'file:' || location.hostname === 'localhost'); // for testing on a computer only
+const SHOP_ON = IS_APP || SHOP_PREVIEW;
+const CLUB_ON = false; // Blip Club subscription: switch on once its monthly outfits are drawn
+const STORE_KEY = 'blip-store';
+const GIFT = (function(){
+const O='#3b2a4a';
+const W=(w)=>'stroke="'+O+'" stroke-width="'+(w||3.5)+'" stroke-linejoin="round" stroke-linecap="round"';
+let n=0;
+const shade=(cy,rx)=>{const id='gs'+(n++);return '<clipPath id="'+id+'"><circle cx="100" cy="82" r="48"/></clipPath><g clip-path="url(#'+id+')"><ellipse cx="100" cy="'+cy+'" rx="'+rx+'" ry="9" fill="rgba(43,29,58,.22)"/></g>';};
+const flake=(x,y,r,c)=>'<path d="M'+(x-r)+' '+y+' h'+(2*r)+' M'+(x-r*.5)+' '+(y-r*.87)+' l'+r+' '+(r*1.73)+' M'+(x+r*.5)+' '+(y-r*.87)+' l-'+r+' '+(r*1.73)+'" stroke="'+c+'" stroke-width="2" stroke-linecap="round"/>';
+const star=(x,y,r)=>{let d='';for(let i=0;i<10;i++){const a=Math.PI/5*i-Math.PI/2,q=i%2?r*.45:r;d+=(i?'L':'M')+(x+Math.cos(a)*q).toFixed(1)+' '+(y+Math.sin(a)*q).toFixed(1);}return d+'Z';};
+// Things worn on the Blip. slot: head, face, neck or outfit (one of each at a time).
+const WEAR={
+ beanie:{slot:'head', svg:()=>shade(62,46)+
+   '<path d="M54 54 Q54 12 100 10 Q146 12 146 54 Z" fill="#4da3ff" '+W()+'/>'+
+   '<path d="M74 22 Q70 36 72 50 M100 12 V50 M126 22 Q130 36 128 50" stroke="#2f7fd6" stroke-width="3" fill="none"/>'+
+   '<path d="M50 50 Q100 38 150 50 L150 64 Q100 52 50 64 Z" fill="#ffc83d" '+W()+'/>'+
+   '<path d="M60 52 v10 M72 49 v10 M84 47 v10 M96 46 v10 M108 46 v10 M120 47 v10 M132 49 v10 M144 52 v10" stroke="#e0a92a" stroke-width="2.5"/>'+
+   '<circle cx="100" cy="8" r="11" fill="#ff5d8f" '+W()+'/><path d="M95 4 l3 3 M103 3 l-2 4 M97 12 l4 -1" stroke="#ffb3c8" stroke-width="2"/>'},
+ snowbeanie:{slot:'head', svg:()=>shade(62,46)+
+   '<path d="M54 54 Q54 12 100 10 Q146 12 146 54 Z" fill="#2e9e5b" '+W()+'/>'+
+   flake(78,32,7,'#fff')+flake(100,24,7,'#fff')+flake(122,32,7,'#fff')+
+   '<path d="M50 50 Q100 38 150 50 L150 64 Q100 52 50 64 Z" fill="#fff6e6" '+W()+'/>'+
+   '<path d="M56 56 l6 -5 6 5 6 -5 6 5 6 -5 6 5 6 -5 6 5 6 -5 6 5 6 -5 6 5 6 -5 6 5 6 -5" stroke="#d62f3c" stroke-width="2.5" fill="none"/>'+
+   '<circle cx="100" cy="8" r="11" fill="#fff" '+W()+'/><path d="M95 4 l3 3 M103 3 l-2 4" stroke="#dcd6ea" stroke-width="2"/>'},
+ crown:{slot:'head', svg:()=>shade(52,32)+'<g transform="translate(0 4) rotate(-8 100 44)">'+
+   '<path d="M70 44 A30 7 0 0 1 130 44" fill="#e0a92a" '+W()+'/>'+
+   '<path d="M70 44 L66 12 L84 28 L100 6 L116 28 L134 12 L130 44 A30 7 0 0 1 70 44 Z" fill="#ffc83d" '+W()+'/>'+
+   '<path d="M71 38 A30 7 0 0 0 129 38" stroke="#fff3b0" stroke-width="3" fill="none" opacity=".8"/>'+
+   '<circle cx="100" cy="40" r="5" fill="#ff5a8a" '+W(2.5)+'/><circle cx="82" cy="38" r="3.5" fill="#4da3ff" '+W(2)+'/><circle cx="118" cy="38" r="3.5" fill="#4da3ff" '+W(2)+'/></g>'},
+ flowers:{slot:'head', svg:()=>{let s='<path d="M56 50 Q100 30 144 50" stroke="#4cae5c" stroke-width="5" fill="none"/>';
+   for(const [x,y,c] of [[58,50,'#ff5d8f'],[74,42,'#ffc83d'],[90,38,'#fff'],[106,37,'#ff8fb0'],[122,40,'#b78cff'],[138,46,'#ffc83d'],[146,52,'#ff5d8f']]){
+     s+='<path d="M'+(x-9)+' '+(y+4)+' q-6 -8 2 -10 M'+(x+9)+' '+(y+4)+' q6 -8 -2 -10" fill="#5cc26b" '+W(2)+'/>';
+     for(let a=0;a<5;a++){const r=a*72*Math.PI/180;s+='<circle cx="'+(x+Math.cos(r)*5).toFixed(1)+'" cy="'+(y+Math.sin(r)*5).toFixed(1)+'" r="4.6" fill="'+c+'" '+W(2)+'/>';}
+     s+='<circle cx="'+x+'" cy="'+y+'" r="3" fill="#ffb21f" '+W(1.5)+'/>';}
+   return s;}},
+ phones:{slot:'head', svg:()=>'<path d="M52 84 Q48 26 100 24 Q152 26 148 84" stroke="'+O+'" stroke-width="12" fill="none"/><path d="M52 84 Q48 26 100 24 Q152 26 148 84" stroke="#ff5d8f" stroke-width="6" fill="none"/>'+
+   '<rect x="40" y="74" width="20" height="32" rx="10" fill="#ff5d8f" '+W()+'/><rect x="140" y="74" width="20" height="32" rx="10" fill="#ff5d8f" '+W()+'/>'+
+   '<rect x="44" y="80" width="6" height="20" rx="3" fill="#ffb3c8"/>'},
+ halo:{slot:'head', svg:()=>'<ellipse cx="100" cy="14" rx="34" ry="9" fill="none" stroke="'+O+'" stroke-width="11"/><ellipse cx="100" cy="14" rx="34" ry="9" fill="none" stroke="#ffe26b" stroke-width="5.5"/>'+
+   '<path d="M80 9 Q92 6 104 7" stroke="#fffbe0" stroke-width="2.5" fill="none" stroke-linecap="round"/>'},
+ shades:{slot:'face', svg:()=>'<path d="M66 84 Q82 80 96 84 Q96 102 82 104 Q68 102 66 84 Z M104 84 Q118 80 134 84 Q132 102 118 104 Q104 102 104 84 Z" fill="#2b2350" '+W(3)+'/>'+
+   '<path d="M96 86 Q100 82 104 86" stroke="'+O+'" stroke-width="3.5" fill="none"/><path d="M66 85 L54 80 M134 85 L146 80" stroke="'+O+'" stroke-width="3.5"/>'+
+   '<path d="M72 88 l8 -3 M110 88 l8 -3" stroke="#8be0ff" stroke-width="3" stroke-linecap="round"/>'},
+ scarf:{slot:'neck', svg:()=>'<path d="M62 120 Q100 138 138 120 L140 134 Q100 154 60 134 Z" fill="#e63946" '+W()+'/>'+
+   '<path d="M70 126 Q100 140 130 126" stroke="#fff" stroke-width="3" fill="none" stroke-dasharray="7 6"/>'+
+   '<path d="M118 136 L114 176 L132 176 L134 134 Z" fill="#d62f3c" '+W()+'/><path d="M114 176 v6 M120 176 v6 M126 176 v6 M132 176 v6" stroke="'+O+'" stroke-width="2.5"/>'},
+ // Outfits recolor the Blip's own shirt and sleeves, then add the pattern on the body (see charSVG).
+ starsweater:{slot:'outfit', color:'#2e7d4f', body:(x,y,w,h)=>{const id='gs'+(n++), by=y+h*.62;
+   return '<clipPath id="'+id+'"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="24"/></clipPath><g clip-path="url(#'+id+')">'+
+     '<rect x="'+x+'" y="'+(by-7)+'" width="'+w+'" height="14" fill="#fff6e6"/>'+
+     '<path d="M'+x+' '+(by+3)+Array.from({length:Math.ceil(w/8)}, (_, i) => ' l4 -6 4 6').join('')+'" stroke="#d62f3c" stroke-width="2.5" fill="none"/>'+
+     '<rect x="'+x+'" y="'+(y+h-8)+'" width="'+w+'" height="8" fill="#246a42"/></g>'+
+     '<path d="'+star(100, y+h*.3, 11)+'" fill="#ffc83d" '+W(2.5)+'/>'+flake(x+14, y+16, 4, '#d8f5e4')+flake(x+w-14, y+16, 4, '#d8f5e4');}}
+};
+// Gifts for the family dog.
+const DOG={
+ collar:'<path d="M31 76 Q50 92 69 76" stroke="'+O+'" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M31 76 Q50 92 69 76" stroke="#4da3ff" stroke-width="5" fill="none" stroke-linecap="round"/>'+
+   '<circle cx="50" cy="88" r="2.5" fill="#c0c0d0" '+W(1.5)+'/><path d="M50 90 l6 4 -2 7 h-8 l-2 -7z" fill="#ffc83d" '+W(2)+'/>',
+ bandana:'<path d="M30 76 Q50 90 70 76 L67 82 Q58 102 50 104 Q42 102 33 82 Z" fill="#e63946" '+W(3)+'/>'+
+   '<circle cx="42" cy="88" r="2" fill="#fff"/><circle cx="57" cy="87" r="2" fill="#fff"/><circle cx="50" cy="96" r="2" fill="#fff"/>',
+ partyhat:'<g transform="rotate(12 56 22)"><path d="M44 26 L58 -6 L70 24 Q57 30 44 26 Z" fill="#b78cff" '+W(3)+'/><path d="M50 14 L64 12 M47 21 L67 19" stroke="#ffc83d" stroke-width="3"/><circle cx="58" cy="-7" r="4.5" fill="#ff5d8f" '+W(2)+'/></g>',
+ sweater:'<clipPath id="dogbody"><ellipse cx="50" cy="74" rx="24" ry="16"/></clipPath><g clip-path="url(#dogbody)"><rect x="20" y="64" width="60" height="30" fill="#2a9d8f"/><path d="M24 78 h52" stroke="#fff" stroke-width="3" stroke-dasharray="4 4"/></g>'+
+   '<ellipse cx="50" cy="74" rx="24" ry="16" fill="none" '+W(5)+'/>'
+};
+// The dog wearing a gift. The sweater goes on the body, under the head; everything else on top.
+function dog(k){
+  let s = ICONS.dog;
+  if (k === 'sweater') s = s.replace('<circle cx="50" cy="48" r="28"', '</g>'+DOG.sweater+'<g stroke="'+O+'" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><circle cx="50" cy="48" r="28"');
+  else if (k && DOG[k]) s += DOG[k];
+  return s;
+}
+// What's for sale. price is the US price, shown until Apple sends the local price.
+const ITEMS = {
+  beanie:{name:'Cozy beanie', tab:'hats', price:'$0.99'},
+  crown:{name:'Crown', tab:'hats', price:'$1.99'},
+  flowers:{name:'Flower crown', tab:'hats', price:'$0.99'},
+  phones:{name:'Headphones', tab:'hats', price:'$1.99'},
+  shades:{name:'Cool shades', tab:'hats', price:'$0.99'},
+  halo:{name:'Halo', tab:'hats', streak:30},
+  snowbeanie:{name:'Snowflake beanie', tab:'hats', price:'$0.99', isNew:true},
+  scarf:{name:'Winter scarf', tab:'outfits', price:'$0.99'},
+  starsweater:{name:'Christmas star sweater', tab:'outfits', price:'$1.99', isNew:true},
+  collar:{name:'Collar + name tag', tab:'pets', price:'$0.99', pet:true},
+  bandana:{name:'Bandana', tab:'pets', price:'$0.99', pet:true},
+  sweater:{name:'Cozy dog sweater', tab:'pets', price:'$0.99', pet:true},
+  partyhat:{name:'Party hat', tab:'pets', price:'$0.99', pet:true}
+};
+const BUNDLES = {
+  holiday:{name:'Holiday drop', price:'$2.99', items:['snowbeanie','starsweater','scarf','sweater'], cls:'hol'},
+  founder:{name:'Founder\'s pack', price:'$4.99', items:['crown','shades','collar'], cls:'fdr', note:'Launch only'}
+};
+const pid = k => 'blip.' + (BUNDLES[k] ? 'bundle.' : 'item.') + k;
+return {WEAR, DOG, dog, ITEMS, BUNDLES, pid};
+})();
+
+// Owned gifts live outside the Blip's save so they pass down to every future generation (heirlooms).
+let store = (function(){ try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch(e){ return {}; } })();
+store.owned = store.owned || []; store.wear = store.wear || {};
+let shopPick = null, shopTab = 'hats', shopPrices = {}, shopReady = SHOP_PREVIEW, shopBusy = false;
+function saveStore(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch(e){} }
+function myWear(){ return SHOP_ON ? store.wear : {}; }
+function ownsGift(k){ const it = GIFT.ITEMS[k]; return store.owned.includes(k) || !!(it && it.streak && S && S.best >= it.streak); }
+function giftPrice(k){ return shopPrices[GIFT.pid(k)] || (GIFT.ITEMS[k] || GIFT.BUNDLES[k]).price; }
+function wearItem(k){ const it = GIFT.ITEMS[k]; if (it.pet) store.wear.dog = k; else store.wear[GIFT.WEAR[k].slot] = k; saveStore(); }
+function isWorn(k){ return GIFT.ITEMS[k].pet ? store.wear.dog === k : store.wear[GIFT.WEAR[k].slot] === k; }
+function takeOff(k){ if (GIFT.ITEMS[k].pet) delete store.wear.dog; else delete store.wear[GIFT.WEAR[k].slot]; saveStore(); }
+function grant(ids){
+  for (const id of ids) {
+    const k = id.replace(/^blip\.(item|bundle)\./, '');
+    const got = GIFT.BUNDLES[k] ? GIFT.BUNDLES[k].items : GIFT.ITEMS[k] ? [k] : [];
+    for (const g of got) if (!store.owned.includes(g)) store.owned.push(g);
+  }
+  saveStore();
+}
+// The family dog, dressed in whatever it's wearing (swapped into home scenes and the shop).
+function dressDog(svg){ return store.wear.dog && SHOP_ON ? svg.split(ICONS.dog).join(GIFT.dog(store.wear.dog)) : svg; }
+
+function blipStore(){ return IS_APP && window.Capacitor && Capacitor.registerPlugin ? (blipStore.p = blipStore.p || Capacitor.registerPlugin('BlipStore')) : null; }
+function shopInit(){
+  const p = blipStore(); if (!p) return;
+  const ids = Object.keys(GIFT.ITEMS).filter(k => GIFT.ITEMS[k].price).concat(Object.keys(GIFT.BUNDLES)).map(GIFT.pid);
+  p.products({ids}).then(r => { for (const x of r.products) shopPrices[x.id] = x.price; shopReady = r.products.length > 0; if (tab === 'shop') render(); }).catch(() => {});
+  p.owned().then(r => { grant(r.ids); if (tab === 'shop') render(); }).catch(() => {});
+  p.addListener('changed', d => { if (d.owned) grant([d.id]); if (tab === 'shop') render(); });
+}
+
+// The player's own Blip wearing k (or what they have on), cropped to the head for tiles.
+function wearing(k){
+  const w = Object.assign({}, store.wear);
+  if (k && !GIFT.ITEMS[k].pet) w[GIFT.WEAR[k].slot] = k;
+  return w;
+}
+function giftBlip(k, crop){
+  const svg = charSVG(Object.assign({}, S, {wear: wearing(k)}));
+  if (!crop) return svg;
+  const sc = {baby:.62, kid:.8, middle:.86, teen:.92, young:.97, adult:1, senior:.95}[stage(S.age)];
+  const full = GIFT.WEAR[k] && (GIFT.WEAR[k].slot === 'neck' || GIFT.WEAR[k].slot === 'outfit');
+  const vb = full ? [100-82*sc, 230-232*sc, 164*sc, 232*sc] : [100-72*sc, 230-246*sc, 144*sc, 144*sc];
+  return svg.replace(' overflow="visible"', '').replace(/viewBox="[^"]*"/, 'viewBox="'+vb.map(v => v.toFixed(1)).join(' ')+'"');
+}
+function giftDog(k){ return '<svg viewBox="2 -14 96 116" class="gdog">'+GIFT.dog(k || store.wear.dog)+'</svg>'; }
+
+function shopHTML(){
+  const items = Object.keys(GIFT.ITEMS).filter(k => GIFT.ITEMS[k].tab === shopTab);
+  if (!shopPick || !GIFT.ITEMS[shopPick]) shopPick = items.find(k => isWorn(k)) || items[0];
+  const k = shopPick, it = GIFT.ITEMS[k], own = ownsGift(k), name = esc(S.name);
+  let btn;
+  if (own) btn = '<button class="btn alt" id="gwear">'+(isWorn(k) ? 'Take it off' : (it.pet ? 'Put it on the dog' : 'Wear it'))+'</button>';
+  else if (it.streak) btn = '<div class="glock">🔒 Free when you reach a '+it.streak+' day streak<br><small>Best so far: '+S.best+'</small></div>';
+  else btn = '<button class="btn" id="gbuy"'+(shopBusy ? ' disabled' : '')+'>'+(shopBusy ? 'One moment…' : 'Give to '+name)+'</button>';
+  const tryon = '<div class="card gtry"><div class="gduo">'+(it.pet ? '' : '<div class="gfull">'+giftBlip(k)+'</div>')+
+      (it.pet || store.wear.dog ? giftDog(it.pet ? k : null) : '')+'</div>'+
+    '<div class="ginfo"><p class="muted">'+(own ? (isWorn(k) ? 'Wearing' : 'In the closet') : 'Trying on')+'</p><div class="gname">'+esc(it.name)+'</div>'+
+    (own || it.streak ? '' : '<div class="gprice">'+giftPrice(k)+'</div>')+btn+'</div></div>';
+  const tabs = '<div class="gtabs">'+[['hats','Hats'],['outfits','Outfits'],['pets','Pets']].map(t => '<button data-gtab="'+t[0]+'" class="'+(t[0] === shopTab ? 'on' : '')+'">'+t[1]+'</button>').join('')+'</div>';
+  const tiles = '<div class="ggrid">'+items.map(g => {
+    const x = GIFT.ITEMS[g], o = ownsGift(g);
+    const tag = o ? '<span class="gown">'+(isWorn(g) ? 'Wearing ✓' : 'Owned ✓')+'</span>' : x.streak ? '<span class="gfree">Free at '+x.streak+'-day streak 🔒</span>' : '<span class="gp">'+giftPrice(g)+'</span>';
+    return '<button class="gtile'+(g === k ? ' on' : '')+'" data-gift="'+g+'">'+(x.isNew && !o ? '<i class="gnew">NEW</i>' : '')+
+      (x.pet ? giftDog(g) : giftBlip(g, true))+'<b>'+esc(x.name)+'</b>'+tag+'</button>';
+  }).join('')+'</div>';
+  const bundles = Object.keys(GIFT.BUNDLES).map(b => {
+    const B = GIFT.BUNDLES[b], all = B.items.every(ownsGift), blipItems = B.items.filter(g => !GIFT.ITEMS[g].pet);
+    const w = Object.assign({}, store.wear); for (const g of blipItems) w[GIFT.WEAR[g].slot] = g;
+    return '<button class="gbundle '+B.cls+'" data-bundle="'+b+'"'+(all ? ' disabled' : '')+'><span class="gbb">'+charSVG(Object.assign({}, S, {wear: w}))+'</span>'+
+      '<span class="gbt"><b>'+esc(B.name)+'</b><span>'+(B.note ? B.note+': ' : '')+B.items.map(g => GIFT.ITEMS[g].name).join(', ')+'</span></span>'+
+      '<span class="gbp">'+(all ? 'Owned ✓' : giftPrice(b))+'</span></button>';
+  }).join('');
+  const note = !shopReady ? '<p class="gnote">The shop opens soon. You can try everything on now.</p>' : '';
+  return '<div class="top"><div class="logo">Gift shop<small>For '+name+' 💜</small></div></div>'+
+    '<div class="gtag"><b>Your Blip earns their life.<br>You give them their style. 💜</b><span>★ Every gift is an heirloom for the next generation</span></div>'+
+    note+tryon+tabs+tiles+bundles+
+    '<p class="gfoot">Gifts are just for looks. They never change '+name+'\'s life or your screen time.</p>'+
+    (IS_APP ? '<button class="linkbtn gfoot" id="grestore">Restore purchases</button>' : '');
+}
+
+function bindShop(){
+  document.querySelectorAll('[data-gtab]').forEach(b => b.onclick = () => { shopTab = b.dataset.gtab; shopPick = null; render(); });
+  document.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => { shopPick = b.dataset.gift; render(); });
+  document.querySelectorAll('[data-bundle]').forEach(b => b.onclick = () => buyGift(b.dataset.bundle));
+  if ($('gwear')) $('gwear').onclick = () => { if (isWorn(shopPick)) takeOff(shopPick); else wearItem(shopPick); render(); };
+  if ($('gbuy')) $('gbuy').onclick = () => buyGift(shopPick);
+  if ($('grestore')) $('grestore').onclick = () => { const p = blipStore(); if (p) p.restore().then(r => { grant(r.ids); render(); modal('<h2>All set</h2><p class="muted">'+(r.ids.length ? 'Your gifts are back.' : 'No purchases found for this Apple ID.')+'</p><button class="btn" data-close>OK</button>'); }).catch(() => {}); };
+}
+function buyGift(k){
+  if (shopBusy) return;
+  const got = () => {
+    grant([GIFT.pid(k)]);
+    for (const g of (GIFT.BUNDLES[k] ? GIFT.BUNDLES[k].items : [k])) wearItem(g);
+    track('shop-buy-'+k); render(); confetti(['🎁','✨','💜','⭐']);
+  };
+  if (SHOP_PREVIEW) return got();
+  const p = blipStore();
+  if (!p || !shopReady) return modal('<h2>🎁 Almost open</h2><p class="muted">The gift shop opens soon. Try things on for now!</p><button class="btn" data-close>OK</button>');
+  shopBusy = true; render(); track('shop-tap-'+k);
+  p.buy({id: GIFT.pid(k)}).then(r => { shopBusy = false; if (r.status === 'bought') got(); else render();
+    if (r.status === 'pending') modal('<h2>Waiting for approval</h2><p class="muted">The gift arrives as soon as the purchase is approved.</p><button class="btn" data-close>OK</button>');
+  }).catch(() => { shopBusy = false; render(); });
+}
+
 function newLife(name, skin, hair, goal, gen, bonus, inherit){
   const b = bonus || 0;
   return {inherit: inherit || null,
@@ -824,8 +1049,10 @@ function charSVG(c){
   const sc = {baby:.62, kid:.8, middle:.86, teen:.92, young:.97, adult:1, senior:.95}[st];
   const hair = st === 'senior' ? '#e9e7ef' : c.hair;
   const dressy = (st === 'adult' && c.job && c.pay >= 60);
+  const wear = c === S ? myWear() : (c.wear || {}), outfit = wear.outfit && GIFT.WEAR[wear.outfit];
   let shirt = {baby:'#ffd36e', kid:'#ffb627', middle:'#00bbf9', teen:'#7b61ff', young:'#f15bb5', adult: dressy ? '#2f3e6e' : '#2a9d8f', senior:'#e07a5f'}[st];
-  if (sad) shirt = '#9a98a6';
+  if (outfit) shirt = outfit.color;
+  else if (sad) shirt = '#9a98a6';
   const pants = dressy && !sad ? '#232a45' : '#4a6fa5';
   const bodyX = c.h < 35 ? 62 : 68, bodyW = c.h < 35 ? 76 : 64;   // unhealthy = rounder
   const arm = 13 + c.h/25;                                          // stronger = thicker arms
@@ -852,7 +1079,8 @@ function charSVG(c){
   else b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate(-14 '+(bodyX+bodyW-4)+' '+ay+')"/>';
   // body and outfit details
   b += '<rect x="'+bodyX+'" y="'+bodyY+'" width="'+bodyW+'" height="'+bodyH+'" rx="24" fill="'+shirt+'" '+W+'/>';
-  if (!sad) {
+  if (outfit) b += outfit.body(bodyX, bodyY, bodyW, bodyH);
+  else if (!sad) {
     if (st === 'kid') b += '<path d="M78 124 L78 176 M122 124 L122 176" stroke="#e85d75" stroke-width="5"/><path d="M100 140 l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z" fill="#fff"/>';
     if (st === 'middle') b += '<path d="M78 124 L78 176 M122 124 L122 176" stroke="#ff7a59" stroke-width="5"/><path d="M88 150 h24" stroke="#fff" stroke-width="5" stroke-linecap="round"/>';
     if (st === 'teen' || (st === 'young' && !c.edu)) b += '<path d="M92 126 l-2 22 M108 126 l2 22" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M70 120 Q100 108 130 120" stroke="'+O+'" stroke-width="6" fill="none"/><circle cx="70" cy="120" r="9" fill="#ff5d8f" stroke="'+O+'" stroke-width="3"/><circle cx="130" cy="120" r="9" fill="#ff5d8f" stroke="'+O+'" stroke-width="3"/>';
@@ -895,10 +1123,11 @@ function charSVG(c){
     b += '<path d="M74 80 L88 84 M126 80 L112 84" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/>';
     b += '<path d="M90 116 Q100 108 110 116" stroke="'+O+'" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M126 102 q-4 8 0 11 q4 -3 0 -11z" fill="#5aa9ff"/>';
   }
-  if (st === 'senior' || c.s >= 70) b += '<g stroke="'+O+'" stroke-width="3" fill="rgba(255,255,255,.3)"><circle cx="82" cy="92" r="13"/><circle cx="118" cy="92" r="13"/><path d="M95 92 L105 92"/></g>';
+  if ((st === 'senior' || c.s >= 70) && !wear.face) b += '<g stroke="'+O+'" stroke-width="3" fill="rgba(255,255,255,.3)"><circle cx="82" cy="92" r="13"/><circle cx="118" cy="92" r="13"/><path d="M95 92 L105 92"/></g>';
+  for (const k of ['neck', 'head', 'face']) if (wear[k] && GIFT.WEAR[wear[k]]) b += GIFT.WEAR[wear[k]].svg(); // gifts from the shop
   b += '</g></g>';
   const sparkle = !sad && c.j >= 60 ? '<text x="26" y="70" font-size="20">✨</text><text x="152" y="120" font-size="16">✨</text>' : '';
-  return '<svg viewBox="0 0 200 240" aria-label="'+esc(c.name)+'">'+g+sparkle+'<g class="bob">'+b+'</g></svg>';
+  return '<svg viewBox="0 0 200 240"'+(wear.head ? ' overflow="visible"' : '')+' aria-label="'+esc(c.name)+'">'+g+sparkle+'<g class="bob">'+b+'</g></svg>';
 }
 
 // ============ THINGS THEY SAY WHEN TAPPED ============
@@ -1006,6 +1235,7 @@ function render(){
   if (tab === 'home') app.innerHTML = homeHTML();
   else if (tab === 'story') app.innerHTML = lifeHTML();
   else if (tab === 'time') app.innerHTML = timeHTML();
+  else if (tab === 'shop' && SHOP_ON) { app.innerHTML = shopHTML(); bindShop(); return; }
   else app.innerHTML = settingsHTML();
   bind();
 }
@@ -1494,7 +1724,7 @@ function sceneInner(p){
   if (p.fresh && YARD.P[p.fresh]) extra += YARD.SPARK(YARD.P[p.fresh][2], YARD.P[p.fresh][3]);
   if (p.wx === 'sun' && p.streak >= 3) extra += YARD.KITE;
   if (p.wx === 'rain' || p.wx === 'cloud') extra += YARD[p.wx === 'rain' ? 'rainy' : 'cloudy'];
-  return home.svg+car+extra;
+  return dressDog(home.svg+car+extra);
 }
 function sceneLabel(p){ return p.key === 'parents' ? 'Mom and Dad\'s house' : p.key === 'apartment' ? 'First apartment' : HOME_ART[p.art].title; }
 // One standalone SVG with the Blip drawn into the scene.
@@ -2265,6 +2495,7 @@ function confetti(set){
   }
 }
 
+if (SHOP_ON) { document.querySelector('.nav [data-tab=settings]').insertAdjacentHTML('beforebegin', '<button data-tab="shop"><b>🎁</b>Shop</button>'); shopInit(); }
 document.querySelectorAll('.nav button').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); window.scrollTo(0,0); });
 catchUp();
 render();
