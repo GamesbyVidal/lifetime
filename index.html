@@ -281,6 +281,7 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .gbundle.hol{background:linear-gradient(120deg,#2e9e5b,#1f6e8c)}.gbundle.fdr{background:linear-gradient(120deg,#7c5cff,#ff5d8f)}.gbundle[disabled]{opacity:.75}
 .gbb{width:54px;height:64px;flex:none;background:rgba(255,255,255,.85);border-radius:50%;overflow:hidden}.gbb svg{width:54px;height:64px}
 .gbt{flex:1;min-width:0}.gbt b{display:block;font-size:17px}.gbt span{font-size:13px;opacity:.9}.gbp{background:#fff;color:#c8405f;font-weight:700;border-radius:999px;padding:6px 10px;font-size:15px;flex:none}
+.gdn{border:0;background:#f1edff;color:var(--accent2);border-radius:999px;padding:3px 10px;font-weight:600;font-size:14px;margin-bottom:4px}.gdogpic svg{width:110px;height:130px}
 .gfoot{color:#fff;opacity:.75;text-align:center;font-size:13px;margin:4px 0}.linkbtn.gfoot{display:block;margin:6px auto;background:none;border:0;text-decoration:underline}
 </style>
 </head>
@@ -720,10 +721,11 @@ function shopHTML(){
   let btn;
   if (own) btn = '<button class="btn alt" id="gwear">'+(isWorn(k) ? 'Take it off' : (it.pet ? 'Put it on the dog' : 'Wear it'))+'</button>';
   else if (it.streak) btn = '<div class="glock">🔒 Free when you reach a '+it.streak+' day streak<br><small>Best so far: '+S.best+'</small></div>';
-  else btn = '<button class="btn" id="gbuy"'+(shopBusy ? ' disabled' : '')+'>'+(shopBusy ? 'One moment…' : 'Give to '+name)+'</button>';
+  else if (it.pet && !store.dogName) btn = '<button class="btn alt" id="gdogname">Name your dog</button>';
+  else btn = '<button class="btn" id="gbuy"'+(shopBusy ? ' disabled' : '')+'>'+(shopBusy ? 'One moment…' : 'Give to '+(it.pet ? esc(store.dogName) : name))+'</button>';
   const tryon = '<div class="card gtry"><div class="gduo">'+(it.pet ? '' : '<div class="gfull">'+giftBlip(k)+'</div>')+
       (it.pet || store.wear.dog ? giftDog(it.pet ? k : null) : '')+'</div>'+
-    '<div class="ginfo"><p class="muted">'+(own ? (isWorn(k) ? 'Wearing' : 'In the closet') : 'Trying on')+'</p><div class="gname">'+esc(it.name)+'</div>'+
+    '<div class="ginfo">'+(it.pet && store.dogName ? '<button class="gdn" id="gdogname">🐾 '+esc(store.dogName)+' ✏️</button>' : '')+'<p class="muted">'+(own ? (isWorn(k) ? 'Wearing' : 'In the closet') : 'Trying on')+'</p><div class="gname">'+esc(it.name)+'</div>'+
     (own || it.streak ? '' : '<div class="gprice">'+giftPrice(k)+'</div>')+btn+'</div></div>';
   const tabs = '<div class="gtabs">'+[['hats','Hats'],['outfits','Outfits'],['pets','Pupgrades 🐶']].map(t => '<button data-gtab="'+t[0]+'" class="'+(t[0] === shopTab ? 'on' : '')+'">'+t[1]+'</button>').join('')+'</div>';
   const tiles = '<div class="ggrid">'+items.map(g => {
@@ -753,7 +755,15 @@ function bindShop(){
   document.querySelectorAll('[data-bundle]').forEach(b => b.onclick = () => buyGift(b.dataset.bundle));
   if ($('gwear')) $('gwear').onclick = () => { if (isWorn(shopPick)) takeOff(shopPick); else wearItem(shopPick); render(); };
   if ($('gbuy')) $('gbuy').onclick = () => buyGift(shopPick);
+  if ($('gdogname')) $('gdogname').onclick = nameDog;
   if ($('grestore')) $('grestore').onclick = () => { const p = blipStore(); if (p) p.restore().then(r => { grant(r.ids); render(); modal('<h2>All set</h2><p class="muted">'+(r.ids.length ? 'Your gifts are back.' : 'No purchases found for this Apple ID.')+'</p><button class="btn" data-close>OK</button>'); }).catch(() => {}); };
+}
+// The family dog gets its own name, so Pupgrades go to the dog and not the Blip.
+function nameDog(){
+  modal('<div class="gdogpic">'+giftDog()+'</div><h2>What\'s the family dog\'s name?</h2>'+
+    '<input type="text" id="dogname" maxlength="16" placeholder="Biscuit" value="'+esc(store.dogName || '')+'"><button class="btn" id="dogok">Save</button>');
+  const go = () => { const v = $('dogname').value.trim(); store.dogName = v || 'Biscuit'; saveStore(); document.querySelector('.modal').remove(); render(); };
+  $('dogok').onclick = go; $('dogname').onkeydown = e => { if (e.key === 'Enter') go(); }; $('dogname').focus();
 }
 function buyGift(k){
   if (shopBusy) return;
