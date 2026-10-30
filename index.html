@@ -725,7 +725,7 @@ function shopHTML(){
       (it.pet || store.wear.dog ? giftDog(it.pet ? k : null) : '')+'</div>'+
     '<div class="ginfo"><p class="muted">'+(own ? (isWorn(k) ? 'Wearing' : 'In the closet') : 'Trying on')+'</p><div class="gname">'+esc(it.name)+'</div>'+
     (own || it.streak ? '' : '<div class="gprice">'+giftPrice(k)+'</div>')+btn+'</div></div>';
-  const tabs = '<div class="gtabs">'+[['hats','Hats'],['outfits','Outfits'],['pets','Pets']].map(t => '<button data-gtab="'+t[0]+'" class="'+(t[0] === shopTab ? 'on' : '')+'">'+t[1]+'</button>').join('')+'</div>';
+  const tabs = '<div class="gtabs">'+[['hats','Hats'],['outfits','Outfits'],['pets','Pupgrades 🐶']].map(t => '<button data-gtab="'+t[0]+'" class="'+(t[0] === shopTab ? 'on' : '')+'">'+t[1]+'</button>').join('')+'</div>';
   const tiles = '<div class="ggrid">'+items.map(g => {
     const x = GIFT.ITEMS[g], o = ownsGift(g);
     const tag = o ? '<span class="gown">'+(isWorn(g) ? 'Wearing ✓' : 'Owned ✓')+'</span>' : x.streak ? '<span class="gfree">Free at '+x.streak+'-day streak 🔒</span>' : '<span class="gp">'+giftPrice(g)+'</span>';
