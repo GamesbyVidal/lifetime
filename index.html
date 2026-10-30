@@ -2132,11 +2132,16 @@ function showYear(e){
     '<div class="t">'+buyLine(b)+'</div><p>−'+fmtMoney(b.cost)+' from savings'+(b.traded ? ' (after a '+fmtMoney(b.traded)+' trade-in)' : '')+(ITEM[b.key].fx ? ' · +'+ITEM[b.key].fx.j+' 😊' : '')+'</p></div>';
   if (e.ms) h += '<div class="mscard"><div class="k">Big life moment</div><div class="e">'+e.ms.emoji+'</div><div class="t">'+esc(e.ms.title)+'</div><p>'+esc(e.ms.text)+'</p></div>';
   if (S.done) h += '<div class="mscard"><div class="k">The end of an era</div><div class="e">🎂</div><div class="t">'+esc(S.name)+' turned '+SETTINGS.lifeLength+'!</div><p>Their story is complete. See how it went on the Today screen.</p></div>';
+  // The family dog shows up in the yard this year: name it on the spot.
+  const newDog = YARD.BY_EMOJI[e.emoji] === 'dog' && e.age < 18 && (e.tier === 'good' || e.tier === 'great') && !store.dogName;
+  if (newDog) h += '<div class="mscard"><div class="k">A new best friend</div><div class="gdogpic">'+giftDog()+'</div><div class="t">What\'s the family dog\'s name?</div>'+
+    '<input type="text" id="yrdog" maxlength="16" placeholder="Biscuit"></div>';
   const card = LIFE_CARD_AGES.includes(e.age);
   const moment = e.ms ? {emoji:e.ms.emoji, title:e.ms.title, text:e.ms.text} : e.buys ? {emoji:'🔑', title:plain(buyLine(e.buys[0]))} : null;
   if (moment) h += '<button class="btn sharebtn" id="mshare">📤 Share this moment</button>';
   h += card ? '<button class="btn" id="lcard">See '+esc(S.name)+'\'s life card ✨</button>' : '<button class="btn" data-close>Continue</button>';
   modal(h);
+  if (newDog) { store.dogName = 'Biscuit'; saveStore(); $('yrdog').oninput = ev => { store.dogName = ev.target.value.trim() || 'Biscuit'; saveStore(); }; }
   if (moment) $('mshare').onclick = () => shareModal(moment);
   if (card) $('lcard').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); showLifeCard(e.age); };
   if (e.buys) confetti(['🎉','💰','✨','🔑']);
