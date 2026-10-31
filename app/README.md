@@ -22,6 +22,6 @@ for testing, where "buying" is simulated). Purchases use StoreKit 2 through
 
 Product IDs in App Store Connect (all Non-Consumable):
 `blip.item.<key>` for single gifts (keys in `GIFT.ITEMS` in index.html) and
-`blip.bundle.holiday` ($2.99), `blip.bundle.founder` ($4.99).
+`blip.bundle.holiday` ($2.99), `blip.bundle.newborn` ($2.99, babies only), `blip.bundle.founder` ($4.99).
 Prices load from Apple; until products exist (and the Paid Apps agreement is active)
 the shop shows "opens soon" and lets players try things on.
