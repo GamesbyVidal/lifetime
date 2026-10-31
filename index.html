@@ -1157,7 +1157,7 @@ function charSVG(c){
     else if (dressy) b += '<path d="M86 120 L100 150 L114 120 Z" fill="#fff" stroke="'+O+'" stroke-width="2.5"/><path d="M100 126 l-5 8 5 22 5 -22z" fill="#ff4d5a" stroke="'+O+'" stroke-width="2"/>';
     if (c.girl && (st === 'kid' || st === 'middle')) b += '<path d="M'+(bodyX+2)+' 166 L'+(bodyX-6)+' 196 Q100 206 '+(bodyX+bodyW+6)+' 196 L'+(bodyX+bodyW-2)+' 166Z" fill="'+shirt+'" '+W+' stroke-linejoin="round"/>';
   } else if (st !== 'baby') b += '<ellipse cx="88" cy="160" rx="7" ry="5" fill="#7d6b55" opacity=".6"/>';
-  if (st === 'senior') b += '<circle cx="100" cy="140" r="3" fill="'+O+'"/><circle cx="100" cy="156" r="3" fill="'+O+'"/><circle cx="100" cy="172" r="3" fill="'+O+'"/>'+
+  if (st === 'senior') b += (outfit ? '' : '<circle cx="100" cy="140" r="3" fill="'+O+'"/><circle cx="100" cy="156" r="3" fill="'+O+'"/><circle cx="100" cy="172" r="3" fill="'+O+'"/>')+
     (sad ? '' : '<path d="M150 150 L156 220 M150 150 q-2 -12 -12 -8" stroke="#8a5a34" stroke-width="6" fill="none" stroke-linecap="round"/>');
 
   // head
