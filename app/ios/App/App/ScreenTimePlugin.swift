@@ -30,8 +30,10 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve(["authorized": s == .approved, "picked": defaults?.data(forKey: Self.selectionKey) != nil])
     }
 
+    // Apple's permission prompt has to be asked for on the main thread, or it never appears.
     @objc func authorize(_ call: CAPPluginCall) {
-        Task {
+        Task { @MainActor in
+            if AuthorizationCenter.shared.authorizationStatus == .approved { call.resolve(["authorized": true]); return }
             do {
                 try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
                 call.resolve(["authorized": true])

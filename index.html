@@ -600,12 +600,12 @@ function stConnect(){
   stBusy = true; stNote = ''; render();
   const fail = note => { stBusy = false; stNote = note; render(); };
   p.authorize().then(r => {
-    if (!r || !r.authorized) return fail('No problem. You can keep entering your screen time yourself, and connect any time.');
+    if (!r || !r.authorized) return fail(r && r.error ? 'Screen Time said: '+r.error+'. You can keep entering your time yourself.' : 'No problem. You can keep entering your screen time yourself, and connect any time.');
     return p.pickApps().then(x => {
       if (!x || !x.picked) return fail('Pick "All apps & categories" so Blip can count your whole day.');
       return p.start().then(() => { stBusy = false; S.auto = true; S.stUsed = true; save(); stRefresh(); render(); });
     });
-  }).catch(() => fail('Screen Time could not start. You can keep entering your time yourself.'));
+  }).catch(e => fail('Screen Time could not start'+(e && e.message ? ' ('+e.message+')' : '')+'. You can keep entering your time yourself.'));
 }
 function stCardHTML(){
   if (!IS_APP) return '';
