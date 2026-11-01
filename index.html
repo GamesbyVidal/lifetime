@@ -592,6 +592,8 @@ function stRefresh(){
     });
   }).catch(() => {});
 }
+// With automatic numbers, check-in opens at 8 PM so a low midday number can't win the day. The day still ends at 4 AM.
+function stEarly(){ const h = new Date().getHours(); return !S.testMode && h >= 4 && h < 20; }
 function stOff(note){ if (!S) return; S.auto = false; stToday = null; stNote = note || ''; save(); render(); }
 function stConnect(){
   const p = stPlugin(); if (!p || stBusy) return;
@@ -1531,10 +1533,10 @@ function homeHTML(){
     return header()+hero+
       '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one?' : 'Today\'s screen time')+'</h2>'+
       '<div class="picker"><div class="v">'+fmtTime(m)+'</div></div>'+
-      '<p class="muted small" style="text-align:center;margin:0 0 8px">From iPhone Screen Time, so far today. Best right before bed.</p>'+
+      '<p class="muted small" style="text-align:center;margin:0 0 8px">From iPhone Screen Time, so far today.</p>'+
       '<div class="goalnote"><span>Your goal: '+fmtTime(S.goal)+' or less</span><span>Best streak: '+S.best+'</span></div>'+
-      verdictHTML(m)+
-      '<button class="btn" id="goauto">Live year '+(S.age+1)+' ➜</button></div>'+
+      (stEarly() ? '<div class="verdict" style="background:#efeaff;color:#4b3a8f">🌙 Check-in opens at 8 PM, so the whole day counts.</div>' :
+        verdictHTML(m)+'<button class="btn" id="goauto">Live year '+(S.age+1)+' ➜</button>')+'</div>'+
       (S.log.length ? weekHTML() : '')+teaserHTML(S.age)+share;
   }
   if (open) {
@@ -2218,7 +2220,7 @@ function bind(){
     $('tplus').onclick = () => set(Math.floor(+$('tslide').value / 15) * 15 + 15);
   }
   if ($('go')) $('go').onclick = () => { const m = +$('tslide').value; homeMins = null; checkIn(m); };
-  if ($('goauto')) $('goauto').onclick = () => { if (stToday != null) checkIn(Math.min(960, stToday), 'st'); };
+  if ($('goauto')) $('goauto').onclick = () => { if (stToday != null && !stEarly()) checkIn(Math.min(960, stToday), 'st'); };
   if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(4,0,0,0); if (m <= n) m.setDate(m.getDate()+1); const s = Math.floor((m-n)/1000);
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
       if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
