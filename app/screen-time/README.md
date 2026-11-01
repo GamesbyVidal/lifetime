@@ -20,3 +20,11 @@ To wire up (after approval, or for a development build on Matthew's registered i
    extension target (scripts/add-screen-time-target.rb using the xcodeproj gem), with
    entitlements `com.apple.developer.family-controls` and the App Group, iOS 16+.
 3. Add the extension's bundle ID to `ios_signing` in codemagic.yaml.
+
+Must change before automatic tracking ships (legal review 2026-11-01, see
+/mnt/project-files/lifetime/legal/screen-time-compliance.md). On days whose number came from Screen Time:
+1. Analytics: don't send trophy-st*/tb* keys (send a plain "trophy" event or skip).
+2. Share text/pictures: no goal squares, streak or Time back hours.
+3. #meet= links: drop st and m, and the streak kite in the scene.
+4. Challenge stats: none.
+5. Denied or revoked authorization falls back to manual entry.
