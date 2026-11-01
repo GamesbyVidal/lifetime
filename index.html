@@ -596,7 +596,11 @@ function stRefresh(){
 function stEarly(){ const h = new Date().getHours(); return !S.testMode && h >= 4 && h < 20; }
 function stOff(note){ if (!S) return; S.auto = false; stToday = null; stNote = note || ''; save(); render(); }
 function stConnect(){
-  const p = stPlugin(); if (!p || stBusy) return;
+  const b = $('stgo'); if (b) b.textContent = 'Connecting...';
+  let p = null;
+  try { p = stPlugin(); } catch(e) { stNote = 'Screen Time is not available ('+(e && e.message || e)+').'; render(); return; }
+  if (!p) { stNote = 'Screen Time is not available in this version of Blip.'; render(); return; }
+  if (stBusy) return;
   stBusy = true; stNote = ''; render();
   const fail = note => { stBusy = false; stNote = note; render(); };
   p.authorize().then(r => {
@@ -616,7 +620,7 @@ function stCardHTML(){
     '<button class="btn alt" id="stgo"'+(stBusy ? ' disabled' : '')+'>'+(stBusy ? 'Connecting...' : 'Connect Screen Time')+'</button></div>';
 }
 function bindST(){
-  if ($('stgo')) $('stgo').onclick = stConnect;
+  if ($('stgo')) $('stgo').onclick = () => { try { stConnect(); } catch(e) { stBusy = false; stNote = 'Screen Time error: '+(e && e.message || e); render(); } };
   if ($('stoff')) $('stoff').onclick = () => stOff('');
   if ($('stpick')) $('stpick').onclick = () => { const p = stPlugin(); if (p) p.pickApps().then(x => x && x.picked ? p.start() : null).then(stRefresh).catch(() => {}); };
 }
