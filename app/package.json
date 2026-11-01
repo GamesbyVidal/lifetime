@@ -1,0 +1,19 @@
+{
+  "name": "lifetime-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lifetime iPhone/Android app shell. The game itself is ../index.html (the same file the website uses).",
+  "scripts": {
+    "copy-web": "node scripts/copy-web.js",
+    "sync": "npm run copy-web && npx cap sync"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
+    "@capacitor/preferences": "^8.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3"
+  }
+}
