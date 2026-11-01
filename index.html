@@ -1276,18 +1276,23 @@ function tapDog(){
 // share-open, share-sent, invite, friend-link-opened, raise-from-link, next-generation, opened-installed.
 // In the phone app, visits show under /lifetime-app/ and events start with "lifetime-app-".
 const onRealSite = location.hostname === 'gamesbyvidal.github.io' || IS_APP;
-if (onRealSite) {
+// The phone app runs no downloaded code (App Review 2.5.2/2.5.19): it sends GoatCounter's plain counting pixel instead of count.js.
+function gcHit(path, title, event){
+  try { new Image().src = 'https://gamesbyvidal.goatcounter.com/count?p='+encodeURIComponent(path)+'&t='+encodeURIComponent(title)+(event ? '&e=true' : '')+'&rnd='+Math.random().toString(36).slice(2); } catch(e) {}
+}
+if (onRealSite && IS_APP) gcHit('/lifetime-app/', document.title, false);
+else if (onRealSite) {
   const counter = document.createElement('script');
   counter.async = true;
   counter.src = 'https://gc.zgo.at/count.js';
   counter.dataset.goatcounter = 'https://gamesbyvidal.goatcounter.com/count';
-  if (IS_APP) counter.dataset.goatcounterSettings = JSON.stringify({allow_local:true, path:'/lifetime-app/'});
   document.head.appendChild(counter);
 }
 const trackQueue = [];
 function track(name){
   if (!onRealSite) return;
-  const send = n => { try { window.goatcounter.count({path:(IS_APP ? 'lifetime-app-' : 'lifetime-')+n, title:'Lifetime: '+n, event:true}); } catch(e) {} };
+  if (IS_APP) return gcHit('lifetime-app-'+name, 'Lifetime: '+name, true);
+  const send = n => { try { window.goatcounter.count({path:'lifetime-'+n, title:'Lifetime: '+n, event:true}); } catch(e) {} };
   if (window.goatcounter && window.goatcounter.count) send(name);
   else { trackQueue.push(name); if (trackQueue.length === 1) setTimeout(function flush(){ if (window.goatcounter && window.goatcounter.count) while (trackQueue.length) send(trackQueue.shift()); else if (trackQueue.length < 20) setTimeout(flush, 1500); }, 1500); }
 }

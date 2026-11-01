@@ -25,3 +25,9 @@ Product IDs in App Store Connect (all Non-Consumable):
 `blip.bundle.holiday` ($2.99), `blip.bundle.newborn` ($2.99, babies only), `blip.bundle.founder` ($4.99).
 Prices load from Apple; until products exist (and the Paid Apps agreement is active)
 the shop shows "opens soon" and lets players try things on.
+
+App Review notes (legal thread checklist, /mnt/project-files/lifetime/legal/screen-time-compliance.md):
+- No downloaded code in the app: analytics use GoatCounter's counting pixel, not count.js.
+- Submit the in-app purchases together with the app version that shows the shop,
+  so review never sees the "opens soon" state.
+- Each feature ships visible in the version that adds it (2.5.19): no dormant code paths.
