@@ -561,7 +561,20 @@ function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){
 // In the app, iPhone can clear website-style storage, so the save is also kept in the app's own storage.
 const IS_APP = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
 const WEB_URL = 'https://gamesbyvidal.github.io/lifetime/';
-function appPrefs(){ return IS_APP && Capacitor.Plugins && Capacitor.Plugins.Preferences; }
+// The page has no bundler, so @capacitor/core's registerPlugin isn't loaded. Talk to native plugins
+// through the bridge iOS injects (nativePromise / nativeCallback), which every Capacitor app has.
+function nativePlugin(name){
+  const C = window.Capacitor;
+  if (!IS_APP || !C) return null;
+  if (C.registerPlugin) return C.registerPlugin(name);
+  if (!C.nativePromise) return (C.Plugins && C.Plugins[name]) || null;
+  nativePlugin.cache = nativePlugin.cache || {};
+  return nativePlugin.cache[name] = nativePlugin.cache[name] || new Proxy({}, {get: (_, m) =>
+    m === 'then' ? undefined :
+    m === 'addListener' ? (ev, cb) => { C.nativeCallback(name, 'addListener', {eventName: ev}, cb); return Promise.resolve({remove(){}}); } :
+    opts => C.nativePromise(name, m, opts || {})});
+}
+function appPrefs(){ return nativePlugin('Preferences'); }
 function appBackup(){ const p = appPrefs(); if (!p) return; try { if (S) p.set({key:KEY, value:JSON.stringify(S)}); else p.remove({key:KEY}); } catch(e){} }
 function appRestore(){
   const p = appPrefs(); if (!p || S) return;
@@ -576,7 +589,7 @@ function appRestore(){
 // - once any day came from Screen Time, shares, links and analytics carry only the Blip's story
 //   (no goal squares, streaks, goal counts or time back);
 // - if permission is denied or taken away, the game goes back to entering the number by hand.
-function stPlugin(){ return IS_APP && window.Capacitor && Capacitor.registerPlugin ? (stPlugin.p = stPlugin.p || Capacitor.registerPlugin('ScreenTime')) : null; }
+function stPlugin(){ return stPlugin.p = stPlugin.p || nativePlugin('ScreenTime'); }
 function autoOn(){ return !!(IS_APP && S && S.auto); }
 // True once any of this life's numbers came from Screen Time: keeps goal results out of shares and analytics.
 function stUsed(){ return !!(S && (S.auto || S.stUsed)); }
@@ -616,7 +629,7 @@ function stCardHTML(){
   if (autoOn()) return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">On. Blip reads your day\'s total from iPhone Screen Time, rounded to 15 minutes. It never sees which apps you use, and the number never leaves your phone.</p>'+
     '<button class="btn ghost" id="stpick">Change what counts</button><button class="btn ghost" id="stoff" style="margin-top:8px">Turn off and enter it myself</button></div>';
   return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">Skip typing it in. Blip can read your day\'s total from iPhone Screen Time. It only gets one number a day, rounded to 15 minutes, never which apps, and it stays on your phone. Free, always.</p>'+
-    (stNote ? '<p class="small">'+esc(stNote)+'</p>' : '')+
+    (stNote ? '<div class="verdict" style="background:#fff3d6;color:#6b4a00">'+esc(stNote)+'</div>' : '')+
     '<button class="btn alt" id="stgo"'+(stBusy ? ' disabled' : '')+'>'+(stBusy ? 'Connecting...' : 'Connect Screen Time')+'</button></div>';
 }
 function bindST(){
@@ -782,7 +795,7 @@ function grant(ids){
 // The family dog, dressed in whatever it's wearing (swapped into home scenes and the shop).
 function dressDog(svg){ return store.wear.dog && SHOP_ON ? svg.split(ICONS.dog).join(GIFT.dog(store.wear.dog)) : svg; }
 
-function blipStore(){ return IS_APP && window.Capacitor && Capacitor.registerPlugin ? (blipStore.p = blipStore.p || Capacitor.registerPlugin('BlipStore')) : null; }
+function blipStore(){ return blipStore.p = blipStore.p || nativePlugin('BlipStore'); }
 function shopInit(){
   const p = blipStore(); if (!p) return;
   const ids = Object.keys(GIFT.ITEMS).filter(k => GIFT.ITEMS[k].price).concat(Object.keys(GIFT.BUNDLES)).map(GIFT.pid);
