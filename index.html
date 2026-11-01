@@ -278,7 +278,7 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .gtile b{font-size:13px;line-height:1.15;margin-top:2px}.gtile .gp{color:var(--accent2);font-weight:600;font-size:13px}.gtile .gown{color:var(--good);font-weight:600;font-size:13px}
 .gtile .gfree{color:#b8860b;font-weight:600;font-size:11px;line-height:1.2}.gnew{position:absolute;left:6px;top:6px;background:#ff4f7b;color:#fff;font-style:normal;font-size:10px;font-weight:700;border-radius:6px;padding:1px 5px;z-index:1}
 .gbundle{display:flex;align-items:center;gap:10px;width:100%;border:0;border-radius:20px;padding:10px 12px;margin-bottom:12px;color:#fff;text-align:left;box-shadow:0 8px 24px rgba(20,10,60,.25)}
-.gbundle.hol{background:linear-gradient(120deg,#2e9e5b,#1f6e8c)}.gbundle.nb{background:linear-gradient(120deg,#7fc8ff,#ff9fc0)}.gbundle.fdr{background:linear-gradient(120deg,#7c5cff,#ff5d8f)}.gbundle[disabled]{opacity:.75}
+.gbundle.hol{background:linear-gradient(120deg,#2e9e5b,#1f6e8c)}.gbundle.nb{background:linear-gradient(120deg,#7fc8ff,#ff9fc0)}.gbundle.fdr{background:linear-gradient(120deg,#7c5cff,#ff5d8f)}.gbundle.sty{background:linear-gradient(120deg,#ff5d8f,#ffb35c)}.gbundle[disabled]{opacity:.75}
 .gbb{width:54px;height:64px;flex:none;background:rgba(255,255,255,.85);border-radius:50%;overflow:hidden}.gbb svg{width:54px;height:64px}
 .gbt{flex:1;min-width:0}.gbt b{display:block;font-size:17px}.gbt span{font-size:13px;opacity:.9}.gbp{background:#fff;color:#c8405f;font-weight:700;border-radius:999px;padding:6px 10px;font-size:15px;flex:none}
 .gdn{border:0;background:#f1edff;color:var(--accent2);border-radius:999px;padding:3px 10px;font-weight:600;font-size:14px;margin-bottom:4px}.gdogpic svg{width:110px;height:130px}
@@ -654,6 +654,12 @@ let n=0;
 const shade=(cy,rx)=>{const id='gs'+(n++);return '<clipPath id="'+id+'"><circle cx="100" cy="82" r="48"/></clipPath><g clip-path="url(#'+id+')"><ellipse cx="100" cy="'+cy+'" rx="'+rx+'" ry="9" fill="rgba(43,29,58,.22)"/></g>';};
 const flake=(x,y,r,c)=>'<path d="M'+(x-r)+' '+y+' h'+(2*r)+' M'+(x-r*.5)+' '+(y-r*.87)+' l'+r+' '+(r*1.73)+' M'+(x+r*.5)+' '+(y-r*.87)+' l-'+r+' '+(r*1.73)+'" stroke="'+c+'" stroke-width="2" stroke-linecap="round"/>';
 const star=(x,y,r)=>{let d='';for(let i=0;i<10;i++){const a=Math.PI/5*i-Math.PI/2,q=i%2?r*.45:r;d+=(i?'L':'M')+(x+Math.cos(a)*q).toFixed(1)+' '+(y+Math.sin(a)*q).toFixed(1);}return d+'Z';};
+const flower=(x,y,r,c)=>{let s='';for(let a=0;a<5;a++){const t=a*72*Math.PI/180;s+='<circle cx="'+(x+Math.cos(t)*r).toFixed(1)+'" cy="'+(y+Math.sin(t)*r).toFixed(1)+'" r="'+(r*.9).toFixed(1)+'" fill="'+c+'" '+W(1.5)+'/>';}return s+'<circle cx="'+x+'" cy="'+y+'" r="'+(r*.6)+'" fill="#ffc83d" '+W(1.2)+'/>';};
+// A skirt that flares out from the bottom of the shirt, over the tops of the legs.
+const skirt=(x,y,w,h,c,trim,frill)=>{const t=y+h-24,b=y+h+16,L=x-12,R=x+w+12;
+  let bottom='';const k=8;for(let i=0;i<=k;i++){const px=R-(R-L)*i/k;bottom+=(frill?' Q'+(px+(R-L)/k/2).toFixed(1)+' '+(b+7)+' '+px.toFixed(1)+' '+b:' L'+px.toFixed(1)+' '+b);}
+  return '<path d="M'+(x+4)+' '+t+' L'+(x+w-4)+' '+t+' L'+R+' '+b+bottom+' Z" fill="'+c+'" '+W()+'/>'+(trim?'<path d="M'+(L+4)+' '+(b-5)+' L'+(R-4)+' '+(b-5)+'" stroke="'+trim+'" stroke-width="3" stroke-dasharray="2 5" stroke-linecap="round"/>':'');};
+const clip=(x,y,w,h,inner)=>{const id='gg'+(n++);return '<clipPath id="'+id+'"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="24"/></clipPath><g clip-path="url(#'+id+')">'+inner+'</g>';};
 // Things worn on the Blip. slot: head, face, neck or outfit (one of each at a time).
 const WEAR={
  beanie:{slot:'head', svg:()=>shade(62,46)+
@@ -713,6 +719,30 @@ const WEAR={
  dinosuit:{slot:'outfit', baby:true, color:'#5cc26b', body:(x,y,w,h)=>'<ellipse cx="100" cy="'+(y+h*.55)+'" rx="'+(w*.28)+'" ry="'+(h*.3)+'" fill="#c8f0b4"/>'+
    '<path d="M'+(100-w*.2)+' '+(y+h*.42)+' h'+(w*.4)+' M'+(100-w*.22)+' '+(y+h*.58)+' h'+(w*.44)+' M'+(100-w*.2)+' '+(y+h*.72)+' h'+(w*.4)+'" stroke="#8fd27f" stroke-width="2.5"/>'+
    [[.16,.25],[.84,.3],[.12,.62],[.88,.66]].map(([a,b]) => '<circle cx="'+(x+w*a)+'" cy="'+(y+h*b)+'" r="3.5" fill="#2f9a4a"/>').join('')},
+ // Girls' style line (girl:true): only sold while the Blip is a girl (not a baby), and only drawn on girls.
+ bigbow:{slot:'head', girl:true, svg:()=>'<g transform="rotate(14 132 40)"><path d="M132 40 Q112 16 104 30 Q100 46 132 40 Z M132 40 Q152 16 160 30 Q164 46 132 40 Z" fill="#ff5d8f" '+W()+'/>'+
+   '<path d="M126 44 L118 64 L128 60 L132 66 Z M138 44 L146 64 L136 60 L132 66 Z" fill="#ff5d8f" '+W(2.5)+'/><ellipse cx="132" cy="40" rx="7" ry="6" fill="#ff8fb0" '+W(2.5)+'/>'+
+   '<path d="M110 30 Q114 24 120 26 M144 26 Q150 24 154 30" stroke="#ffc2d6" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>'},
+ tiara:{slot:'head', girl:true, svg:()=>'<path d="M64 52 Q100 34 136 52" stroke="'+O+'" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M64 52 Q100 34 136 52" stroke="#dfe3f0" stroke-width="4" fill="none" stroke-linecap="round"/>'+
+   '<path d="M84 44 L88 30 L94 40 L100 22 L106 40 L112 30 L116 44" fill="#eef0fa" '+W(2.5)+'/><circle cx="100" cy="36" r="4.5" fill="#7fd1ff" '+W(2)+'/><circle cx="88" cy="40" r="2.8" fill="#ff8fb0" '+W(1.5)+'/><circle cx="112" cy="40" r="2.8" fill="#ff8fb0" '+W(1.5)+'/>'},
+ beret:{slot:'head', girl:true, svg:()=>'<g transform="rotate(-10 100 40)"><ellipse cx="102" cy="40" rx="50" ry="17" fill="#e63946" '+W()+'/><path d="M60 44 Q100 58 146 44" stroke="#c22f3b" stroke-width="3" fill="none"/>'+
+   '<path d="M100 24 q2 -8 7 -9" stroke="'+O+'" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M72 34 Q86 26 102 26" stroke="#ff8a8a" stroke-width="3" fill="none" stroke-linecap="round"/></g>'},
+ flowerclip:{slot:'head', girl:true, svg:()=>flower(136,52,5,'#fff')+flower(146,66,4.2,'#ff8fb0')+flower(128,40,3.8,'#b78cff')+'<path d="M140 44 q6 -2 8 4 M150 56 q4 2 3 7" stroke="#4cae5c" stroke-width="3" fill="none" stroke-linecap="round"/>'},
+ heartshades:{slot:'face', girl:true, svg:()=>{const h=(x)=>'<path d="M'+x+' 104 C'+(x-18)+' 92 '+(x-16)+' 80 '+(x-8)+' 80 C'+(x-3)+' 80 '+x+' 84 '+x+' 86 C'+x+' 84 '+(x+3)+' 80 '+(x+8)+' 80 C'+(x+16)+' 80 '+(x+18)+' 92 '+x+' 104 Z" fill="#ff5d8f" '+W(3)+'/>';
+   return h(82)+h(118)+'<path d="M90 86 Q100 82 110 86" stroke="'+O+'" stroke-width="3.5" fill="none"/><path d="M66 86 L54 80 M134 86 L146 80" stroke="'+O+'" stroke-width="3.5"/><path d="M74 86 q3 -3 6 -2 M110 86 q3 -3 6 -2" stroke="#ffd0e0" stroke-width="2.5" fill="none" stroke-linecap="round"/>';}},
+ pearls:{slot:'neck', girl:true, svg:()=>{let s='';for(let i=0;i<=12;i++){const t=i/12,x=70+60*t,y=124+Math.sin(t*Math.PI)*14;s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="3.6" fill="#fffaf0" '+W(1.5)+'/>';}return s;}},
+ locket:{slot:'neck', girl:true, svg:()=>'<path d="M74 124 Q100 146 126 124" stroke="#e0a92a" stroke-width="2.5" fill="none"/><path d="M100 152 C88 144 90 134 96 134 C98 134 100 136 100 138 C100 136 102 134 104 134 C110 134 112 144 100 152 Z" fill="#ffc83d" '+W(2)+'/>'},
+ sundress:{slot:'outfit', girl:true, color:'#ffd166', body:(x,y,w,h)=>clip(x,y,w,h,[[.25,.3],[.7,.2],[.5,.55],[.2,.7],[.8,.62]].map(([a,b])=>flower(x+w*a,y+h*b,3,'#fff')).join(''))+
+   '<path d="M'+(x+16)+' '+y+' v10 M'+(x+w-16)+' '+y+' v10" stroke="#fff" stroke-width="4" stroke-linecap="round"/>'+skirt(x,y,w,h,'#ffd166','#fff',false)},
+ floraldress:{slot:'outfit', girl:true, color:'#ff8fb0', body:(x,y,w,h)=>clip(x,y,w,h,[[.3,.25],[.72,.35],[.45,.6],[.75,.75]].map(([a,b])=>flower(x+w*a,y+h*b,3.2,'#fff3f7')).join(''))+
+   '<path d="M'+(x+6)+' '+(y+h*.45)+' H'+(x+w-6)+'" stroke="#e05582" stroke-width="5"/><circle cx="100" cy="'+(y+h*.45)+'" r="4" fill="#fff" '+W(1.5)+'/>'+skirt(x,y,w,h,'#ff8fb0','#fff3f7',true)},
+ tutu:{slot:'outfit', girl:true, color:'#ffc2dc', body:(x,y,w,h)=>'<path d="M'+(x+10)+' '+(y+4)+' Q100 '+(y+16)+' '+(x+w-10)+' '+(y+4)+'" stroke="#fff" stroke-width="3" fill="none"/>'+
+   skirt(x,y+4,w,h-10,'#ffe3ef',null,true)+skirt(x+4,y,w-8,h-14,'#ffc2dc',null,true)+'<path d="'+star(100,y+h*.3,5)+'" fill="#fff"/>'},
+ cardigan:{slot:'outfit', girl:true, color:'#c9a7ff', body:(x,y,w,h)=>'<path d="M100 '+(y+2)+' V'+(y+h-2)+'" stroke="'+O+'" stroke-width="2.5"/>'+[.25,.45,.65].map(b=>'<circle cx="94" cy="'+(y+h*b)+'" r="3" fill="#fff6c9" '+W(1.5)+'/>').join('')+
+   '<rect x="'+(x+8)+'" y="'+(y+h*.58)+'" width="18" height="14" rx="3" fill="#b38cf5" '+W(2)+'/><rect x="'+(x+w-26)+'" y="'+(y+h*.58)+'" width="18" height="14" rx="3" fill="#b38cf5" '+W(2)+'/>'+
+   '<path d="M'+(x+6)+' '+(y+h-7)+' H'+(x+w-6)+'" stroke="#a37ae8" stroke-width="5"/>'},
+ partydress:{slot:'outfit', girl:true, color:'#7c5cff', body:(x,y,w,h)=>clip(x,y,w,h,[[.25,.25],[.7,.35],[.4,.6],[.8,.7],[.2,.8]].map(([a,b])=>'<path d="'+star(x+w*a,y+h*b,3.5)+'" fill="#ffe26b"/>').join(''))+
+   skirt(x,y,w,h,'#6a4be6','#ffe26b',false)+'<path d="'+star(x-2,y+h+4,3)+' '+star(x+w+2,y+h+8,3)+'" fill="#ffe26b"/>'},
  // Outfits recolor the Blip's own shirt and sleeves, then add the pattern on the body (see charSVG).
  starsweater:{slot:'outfit', color:'#2e7d4f', body:(x,y,w,h)=>{const id='gs'+(n++), by=y+h*.62;
    return '<clipPath id="'+id+'"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="24"/></clipPath><g clip-path="url(#'+id+')">'+
@@ -757,6 +787,18 @@ const ITEMS = {
   duckie:{name:'Duckie onesie', tab:'baby', price:'$0.99'},
   starjammies:{name:'Starry pajamas', tab:'baby', price:'$0.99'},
   dinosuit:{name:'Dino onesie', tab:'baby', price:'$0.99'},
+  bigbow:{name:'Big hair bow', tab:'style', price:'$0.99', isNew:true},
+  tiara:{name:'Sparkle tiara', tab:'style', price:'$0.99'},
+  beret:{name:'Paris beret', tab:'style', price:'$0.99'},
+  flowerclip:{name:'Flower clips', tab:'style', price:'$0.99'},
+  heartshades:{name:'Heart sunglasses', tab:'style', price:'$0.99', isNew:true},
+  pearls:{name:'Pearl necklace', tab:'style', price:'$0.99'},
+  locket:{name:'Heart locket', tab:'style', price:'$0.99'},
+  sundress:{name:'Sunny sundress', tab:'style', price:'$1.99', isNew:true},
+  floraldress:{name:'Garden dress', tab:'style', price:'$1.99'},
+  tutu:{name:'Ballet tutu', tab:'style', price:'$1.99'},
+  cardigan:{name:'Cozy cardigan', tab:'style', price:'$1.99'},
+  partydress:{name:'Sparkle party dress', tab:'style', price:'$1.99'},
   collar:{name:'Collar + name tag', tab:'pets', price:'$0.99', pet:true},
   bandana:{name:'Bandana', tab:'pets', price:'$0.99', pet:true},
   sweater:{name:'Cozy dog sweater', tab:'pets', price:'$0.99', pet:true},
@@ -765,6 +807,7 @@ const ITEMS = {
 const BUNDLES = {
   holiday:{name:'Holiday drop', price:'$2.99', items:['snowbeanie','starsweater','scarf','sweater'], cls:'hol'},
   newborn:{name:'Newborn set', price:'$2.99', items:['bearhat','bunnyhood','sunbonnet','bib','pacifier','duckie','starjammies','dinosuit'], cls:'nb', baby:true, desc:'All 8 baby clothes. Theirs to keep for every baby in the family.'},
+  style:{name:'Style starter', price:'$3.99', items:['bigbow','heartshades','locket','sundress'], cls:'sty', girl:true, desc:'Big hair bow, heart sunglasses, heart locket and the sunny sundress.'},
   founder:{name:'Founder\'s pack', price:'$4.99', items:['crown','shades','collar'], cls:'fdr', note:'Launch only'}
 };
 const pid = k => 'blip.' + (BUNDLES[k] ? 'bundle.' : 'item.') + k;
@@ -782,6 +825,10 @@ function giftPrice(k){ return shopPrices[GIFT.pid(k)] || (GIFT.ITEMS[k] || GIFT.
 function wearItem(k){ const it = GIFT.ITEMS[k]; if (it.pet) store.wear.dog = k; else store.wear[GIFT.WEAR[k].slot] = k; saveStore(); }
 function isBabyGift(k){ return !!(GIFT.WEAR[k] && GIFT.WEAR[k].baby); }
 function outgrown(k){ return isBabyGift(k) && stage(S.age) !== 'baby'; }
+// The Style tab is for girl Blips (Matthew's call: the shop fits the Blip). Anything bought stays in the closet and any grown Blip can wear it.
+function isGirlGift(k){ return !!(GIFT.WEAR[k] && GIFT.WEAR[k].girl); }
+function styleOn(){ return !!S.girl && stage(S.age) !== 'baby'; }
+function tooYoung(k){ return isGirlGift(k) && stage(S.age) === 'baby'; }
 function isWorn(k){ return GIFT.ITEMS[k].pet ? store.wear.dog === k : store.wear[GIFT.WEAR[k].slot] === k; }
 function takeOff(k){ if (GIFT.ITEMS[k].pet) delete store.wear.dog; else delete store.wear[GIFT.WEAR[k].slot]; saveStore(); }
 function grant(ids){
@@ -813,6 +860,7 @@ function wearing(k){
 function giftBlip(k, crop){
   const who = Object.assign({}, S, {wear: wearing(k)});
   if (outgrown(k)) { who.age = 2; who.wear = {[GIFT.WEAR[k].slot]: k}; } // show baby clothes on a baby, even in a grown-up's closet
+  else if (tooYoung(k)) { who.age = 8; who.wear = {[GIFT.WEAR[k].slot]: k}; } // and style clothes on a kid, even in a baby's closet
   const svg = charSVG(who);
   if (!crop) return svg;
   const sc = {baby:.62, kid:.8, middle:.86, teen:.92, young:.97, adult:1, senior:.95}[stage(who.age)];
@@ -823,7 +871,7 @@ function giftBlip(k, crop){
 function giftDog(k){ return '<svg viewBox="2 -14 96 116" class="gdog">'+GIFT.dog(k || store.wear.dog)+'</svg>'; }
 
 function shopHTML(){
-  if (!shopTab || (shopTab === 'baby' && stage(S.age) !== 'baby')) shopTab = stage(S.age) === 'baby' ? 'baby' : 'hats';
+  if (!shopTab || (shopTab === 'baby' && stage(S.age) !== 'baby') || (shopTab === 'style' && !styleOn())) shopTab = stage(S.age) === 'baby' ? 'baby' : styleOn() ? 'style' : 'hats';
   const closet = shopTab === 'closet';
   const items = Object.keys(GIFT.ITEMS).filter(k => closet ? ownsGift(k) : GIFT.ITEMS[k].tab === shopTab);
   if (!shopPick || !GIFT.ITEMS[shopPick]) shopPick = items.find(k => isWorn(k)) || items[0];
@@ -838,6 +886,7 @@ function shopHTML(){
   const k = shopPick, it = GIFT.ITEMS[k], own = ownsGift(k);
   let btn;
   if (own && outgrown(k)) btn = '<div class="glock">🍼 Saved for the next baby</div>';
+  else if (own && tooYoung(k)) btn = '<div class="glock">🎀 Saved for when '+name+' grows up</div>';
   else if (own) btn = '<button class="btn alt" id="gwear">'+(isWorn(k) ? 'Take it off' : (it.pet ? 'Put it on the dog' : 'Wear it'))+'</button>';
   else if (it.streak) btn = '<div class="glock">🔒 Free when you reach a '+it.streak+' day streak<br><small>Best so far: '+S.best+'</small></div>';
   else if (it.pet && !store.dogName) btn = '<button class="btn alt" id="gdogname">Name your dog</button>';
@@ -850,11 +899,11 @@ function shopHTML(){
   const tabs = shopTabs();
   const tiles = '<div class="ggrid">'+items.map(g => {
     const x = GIFT.ITEMS[g], o = ownsGift(g);
-    const tag = o && outgrown(g) ? '<span class="gfree">Saved for the next baby</span>' : o ? '<span class="gown">'+(isWorn(g) ? 'Wearing ✓' : 'Owned ✓')+'</span>' : x.streak ? '<span class="gfree">Free at '+x.streak+'-day streak 🔒</span>' : '<span class="gp">'+giftPrice(g)+'</span>';
+    const tag = o && outgrown(g) ? '<span class="gfree">Saved for the next baby</span>' : o && tooYoung(g) ? '<span class="gfree">Saved for later</span>' : o ? '<span class="gown">'+(isWorn(g) ? 'Wearing ✓' : 'Owned ✓')+'</span>' : x.streak ? '<span class="gfree">Free at '+x.streak+'-day streak 🔒</span>' : '<span class="gp">'+giftPrice(g)+'</span>';
     return '<button class="gtile'+(g === k ? ' on' : '')+'" data-gift="'+g+'">'+(x.isNew && !o ? '<i class="gnew">NEW</i>' : '')+
       (x.pet ? giftDog(g) : giftBlip(g, true))+'<b>'+esc(x.name)+'</b>'+tag+'</button>';
   }).join('')+'</div>';
-  const bundles = Object.keys(GIFT.BUNDLES).filter(b => !GIFT.BUNDLES[b].baby || stage(S.age) === 'baby').map(b => {
+  const bundles = Object.keys(GIFT.BUNDLES).filter(b => (!GIFT.BUNDLES[b].baby || stage(S.age) === 'baby') && (!GIFT.BUNDLES[b].girl || styleOn())).map(b => {
     const B = GIFT.BUNDLES[b], all = B.items.every(ownsGift), blipItems = B.items.filter(g => !GIFT.ITEMS[g].pet);
     const w = Object.assign({}, store.wear); for (const g of blipItems) w[GIFT.WEAR[g].slot] = g;
     return '<button class="gbundle '+B.cls+'" data-bundle="'+b+'"'+(all ? ' disabled' : '')+'><span class="gbb">'+charSVG(Object.assign({}, S, {wear: w}))+'</span>'+
@@ -873,7 +922,7 @@ function shopTop(name){
 }
 function shopTabs(){
   const baby = stage(S.age) === 'baby';
-  return '<div class="gtabs">'+(baby ? [['baby','Baby 🍼']] : []).concat([['hats','Hats'],['outfits','Outfits'],['pets','Pupgrades 🐶'],['closet','👕 Closet']]).map(t => '<button data-gtab="'+t[0]+'" class="'+(t[0] === shopTab ? 'on' : '')+'">'+t[1]+'</button>').join('')+'</div>';
+  return '<div class="gtabs">'+(baby ? [['baby','Baby 🍼']] : styleOn() ? [['style','Style 🎀']] : []).concat([['hats','Hats'],['outfits','Outfits'],['pets','Pupgrades 🐶'],['closet','👕 Closet']]).map(t => '<button data-gtab="'+t[0]+'" class="'+(t[0] === shopTab ? 'on' : '')+'">'+t[1]+'</button>').join('')+'</div>';
 }
 function openCloset(){ tab = 'shop'; shopTab = 'closet'; shopPick = null; render(); window.scrollTo(0,0); }
 function bindShop(){
@@ -1188,7 +1237,7 @@ function charSVG(c){
   const hair = st === 'senior' ? '#e9e7ef' : c.hair;
   const dressy = (st === 'adult' && c.job && c.pay >= 60);
   const wear = Object.assign({}, c === S ? myWear() : (c.wear || {}));
-  for (const k in wear) if (GIFT.WEAR[wear[k]] && GIFT.WEAR[wear[k]].baby && st !== 'baby') delete wear[k]; // outgrown baby clothes stay in the closet
+  for (const k in wear) { const g = GIFT.WEAR[wear[k]]; if (g && ((g.baby && st !== 'baby') || (g.girl && st === 'baby'))) delete wear[k]; } // outgrown baby clothes (and style clothes on a baby) stay in the closet
   const outfit = wear.outfit && GIFT.WEAR[wear.outfit];
   let shirt = {baby:'#ffd36e', kid:'#ffb627', middle:'#00bbf9', teen:'#7b61ff', young:'#f15bb5', adult: dressy ? '#2f3e6e' : '#2a9d8f', senior:'#e07a5f'}[st];
   if (outfit) shirt = outfit.color;

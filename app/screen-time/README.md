@@ -46,3 +46,7 @@ Connect Screen Time. Uses Family Controls individual authorization and a DeviceA
 (15-minute thresholds). No app blocking. Data stays on device. Manual entry works if permission is
 declined."; store description and What's New lead with managing your own screen time.
 Never make an analytics event depend on the day's verdict.
+
+Shop review note (add to the App Review note): "Style items (bow, tiara, dresses, Style starter set)
+appear in Shop > Style when the Blip is a girl (choose Girl at setup). Baby clothes appear in Shop >
+Baby while the Blip is a baby (ages 0-4). Owned items stay in the Closet and any grown Blip can wear them."
