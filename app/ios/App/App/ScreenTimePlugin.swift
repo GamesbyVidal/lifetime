@@ -3,6 +3,7 @@ import Capacitor
 import SwiftUI
 import FamilyControls
 import DeviceActivity
+import UserNotifications
 
 // Bridge between the game (index.html) and Apple's Screen Time API.
 // Only "the day's total passed N minutes" comes back; never which apps were used.
@@ -15,7 +16,9 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "authorize", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "pickApps", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "start", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "minutesFor", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "minutesFor", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "remindOn", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "remindOff", returnType: CAPPluginReturnPromise)
     ]
 
     static let group = "group.io.github.gamesbyvidal.lifetime"
@@ -26,6 +29,7 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
     private var defaults: UserDefaults? { UserDefaults(suiteName: Self.group) }
 
     @objc func status(_ call: CAPPluginCall) {
+        Self.purgeOld(defaults)
         let s = AuthorizationCenter.shared.authorizationStatus
         call.resolve(["authorized": s == .approved, "picked": defaults?.data(forKey: Self.selectionKey) != nil])
     }
@@ -66,7 +70,7 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         }
         let schedule = DeviceActivitySchedule(
             intervalStart: DateComponents(hour: 0, minute: 0),
-            intervalEnd: DateComponents(hour: 23, minute: 59),
+            intervalEnd: DateComponents(hour: 23, minute: 59, second: 59),
             repeats: true)
         var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
         for m in stride(from: Self.stepMinutes, through: Self.maxMinutes, by: Self.stepMinutes) {
@@ -91,6 +95,45 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         let day = call.getString("day") ?? ""
         if let m = defaults?.object(forKey: "minutes-" + day) as? Int { call.resolve(["minutes": m]) }
         else { call.resolve(["minutes": NSNull()]) }
+    }
+
+    // Daily totals are only kept for about a week (privacy policy). Keys look like "minutes-YYYY-MM-DD".
+    static let keepDays = 8
+    static func purgeOld(_ d: UserDefaults?) {
+        guard let d = d else { return }
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd"
+        guard let cutoff = Calendar.current.date(byAdding: .day, value: -keepDays, to: Date()) else { return }
+        let oldest = f.string(from: cutoff)
+        for key in d.dictionaryRepresentation().keys where key.hasPrefix("minutes-") {
+            if String(key.dropFirst(8)) < oldest { d.removeObject(forKey: key) }
+        }
+    }
+
+    // Optional morning reminder, off until the player turns it on in Settings (the permission prompt shows only then).
+    // One a day, and it only says the next year is ready: never results, minutes, streaks or the shop.
+    static let reminderID = "blip-morning"
+    @objc func remindOn(_ call: CAPPluginCall) {
+        let name = call.getString("name") ?? "Your Blip"
+        let hour = call.getInt("hour") ?? 8, minute = call.getInt("minute") ?? 0
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+            guard granted else { call.resolve(["granted": false]); return }
+            let content = UNMutableNotificationContent()
+            content.body = "\(name)'s next year is ready"
+            content.sound = .default
+            let trigger = UNCalendarNotificationTrigger(dateMatching: DateComponents(hour: hour, minute: minute), repeats: true)
+            center.removePendingNotificationRequests(withIdentifiers: [Self.reminderID])
+            center.add(UNNotificationRequest(identifier: Self.reminderID, content: content, trigger: trigger)) { err in
+                call.resolve(["granted": err == nil])
+            }
+        }
+    }
+    @objc func remindOff(_ call: CAPPluginCall) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [Self.reminderID])
+        call.resolve()
     }
 }
 

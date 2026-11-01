@@ -19,6 +19,20 @@ class MonitorExtension: DeviceActivityMonitor {
         super.intervalDidStart(for: activity)
         let key = "minutes-" + today()
         if defaults?.object(forKey: key) == nil { defaults?.set(0, forKey: key) }
+        purgeOld()
+    }
+
+    // Keep about a week of daily totals (same rule as ScreenTimePlugin.purgeOld).
+    private func purgeOld() {
+        guard let d = defaults, let cutoff = Calendar.current.date(byAdding: .day, value: -8, to: Date()) else { return }
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd"
+        let oldest = f.string(from: cutoff)
+        for key in d.dictionaryRepresentation().keys where key.hasPrefix("minutes-") {
+            if String(key.dropFirst(8)) < oldest { d.removeObject(forKey: key) }
+        }
     }
 
     override func eventDidReachThreshold(_ event: DeviceActivityEvent.Name, activity: DeviceActivityName) {

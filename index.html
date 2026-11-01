@@ -593,21 +593,25 @@ function stPlugin(){ return stPlugin.p = stPlugin.p || nativePlugin('ScreenTime'
 function autoOn(){ return !!(IS_APP && S && S.auto); }
 // True once any of this life's numbers came from Screen Time: keeps goal results out of shares and analytics.
 function stUsed(){ return !!(S && (S.auto || S.stUsed)); }
-let stToday = null, stBusy = false, stNote = '';
-function stDayKey(){ const [y, m, d] = today().split('-'); return y+'-'+m.padStart(2, '0')+'-'+d.padStart(2, '0'); }
+let stToday = null, stYest = null, stBusy = false, stNote = '';
+// In the app, each check-in lives the year for YESTERDAY's whole calendar day (the morning reveal).
+// The year is ready at the 4 AM rollover, so late-night use always counts. The web version keeps same-day check-ins.
+const MORNING = IS_APP;
+function stKey(n){ const [y, m, d] = dayKey(n).split('-'); return y+'-'+m.padStart(2, '0')+'-'+d.padStart(2, '0'); }
+function stDayKey(){ return stKey(dayNum(today())); }
+function stYestKey(){ return stKey(dayNum(today()) - 1); }
 function stRefresh(){
   const p = stPlugin(); if (!p || !autoOn()) return;
   p.status().then(r => {
     if (!r || !r.authorized) { stOff('Screen Time permission was turned off, so you can enter your time yourself again.'); return; }
-    return p.minutesFor({day: stDayKey()}).then(x => {
-      const m = x && typeof x.minutes === 'number' ? x.minutes : null;
-      if (m !== stToday) { stToday = m; if (tab === 'home') render(); }
+    const num = x => x && typeof x.minutes === 'number' ? x.minutes : null;
+    return Promise.all([p.minutesFor({day: stDayKey()}), p.minutesFor({day: stYestKey()})]).then(([a, b]) => {
+      const t = num(a), y = num(b);
+      if (t !== stToday || y !== stYest) { stToday = t; stYest = y; if (tab === 'home') render(); }
     });
   }).catch(() => {});
 }
-// With automatic numbers, check-in opens at 8 PM so a low midday number can't win the day. The day still ends at 4 AM.
-function stEarly(){ const h = new Date().getHours(); return !S.testMode && h >= 4 && h < 20; }
-function stOff(note){ if (!S) return; S.auto = false; stToday = null; stNote = note || ''; save(); render(); }
+function stOff(note){ if (!S) return; S.auto = false; stToday = null; stYest = null; stNote = note || ''; save(); render(); }
 function stConnect(){
   const b = $('stgo'); if (b) b.textContent = 'Connecting...';
   let p = null;
@@ -631,6 +635,30 @@ function stCardHTML(){
   return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">Skip typing it in. Blip can read your day\'s total from iPhone Screen Time. It only gets one number a day, rounded to 15 minutes, never which apps, and it stays on your phone. Free, always.</p>'+
     (stNote ? '<div class="verdict" style="background:#fff3d6;color:#6b4a00">'+esc(stNote)+'</div>' : '')+
     '<button class="btn alt" id="stgo"'+(stBusy ? ' disabled' : '')+'>'+(stBusy ? 'Connecting...' : 'Connect Screen Time')+'</button></div>';
+}
+// Optional morning reminder (app only). Off until the player turns it on here; the iOS permission prompt shows only then.
+let remind = (function(){ try { return JSON.parse(localStorage.getItem('blip-remind')) || {}; } catch(e){ return {}; } })();
+let remindNote = '';
+function remindTime(){ return String(remind.h == null ? 8 : remind.h).padStart(2, '0')+':'+String(remind.m || 0).padStart(2, '0'); }
+function remindSave(){ try { localStorage.setItem('blip-remind', JSON.stringify(remind)); } catch(e){} }
+function remindSync(){
+  const p = MORNING ? stPlugin() : null; if (!p) return Promise.resolve(true);
+  if (!remind.on || !S || S.done) return p.remindOff().then(() => true).catch(() => true);
+  return p.remindOn({name: S.name, hour: remind.h == null ? 8 : remind.h, minute: remind.m || 0}).then(r => !!(r && r.granted)).catch(() => false);
+}
+function remindCardHTML(){
+  if (!MORNING) return '';
+  return '<div class="card"><h2>⏰ Morning reminder</h2><div class="switch"><span>Remind me when '+esc(S.name)+'\'s next year is ready</span><input type="checkbox" id="rmon" '+(remind.on ? 'checked' : '')+'></div>'+
+    (remind.on ? '<div class="switch"><span>Time</span><input type="time" id="rmtime" value="'+remindTime()+'"></div>' : '')+
+    '<p class="muted small" style="margin:6px 0 0">One a day. It never shows your screen time or results.</p>'+
+    (remindNote ? '<div class="verdict" style="background:#fff3d6;color:#6b4a00">'+esc(remindNote)+'</div>' : '')+'</div>';
+}
+function bindRemind(){
+  if ($('rmon')) $('rmon').onchange = e => {
+    remind.on = e.target.checked; remindNote = ''; remindSave(); render();
+    remindSync().then(ok => { if (!ok && remind.on) { remind.on = false; remindSave(); remindNote = 'Notifications are off for Blip. You can turn them on in iPhone Settings > Notifications > Blip.'; render(); } });
+  };
+  if ($('rmtime')) $('rmtime').onchange = e => { const [h, m] = e.target.value.split(':').map(Number); if (isNaN(h)) return; remind.h = h; remind.m = m || 0; remindSave(); remindSync(); };
 }
 function bindST(){
   if ($('stgo')) $('stgo').onclick = () => { try { stConnect(); } catch(e) { stBusy = false; stNote = 'Screen Time error: '+(e && e.message || e); render(); } };
@@ -1091,17 +1119,39 @@ const SKIP_LINES = [
   '👻 {name} waited for you all year. You never came.'
 ];
 // Each full day without a check-in is a rough year lived without you (at most a few per break).
+// With automatic Screen Time in the app, missed days from the last week play out from each day's real number instead.
+const CATCHUP_DAYS = 7;
+let catchingUp = false;
 function catchUp(){
-  if (!S || S.done || S.testMode || !S.lastDate) return;
-  const missed = dayNum(today()) - dayNum(S.lastDate) - 1;
+  if (!S || S.done || S.testMode || !S.lastDate || catchingUp) return;
+  const t = dayNum(today()), last = S.lastDate, missed = t - dayNum(last) - 1;
   if (missed < 1) return;
-  const years = Math.min(missed, SETTINGS.maxSkippedYears);
-  const entries = [];
-  for (let i = 0; i < years && !S.done; i++) entries.push(liveYear(null, 'skipped'));
+  // The calendar days nobody lived (in the app, the last check-in covered the day before it, and today's covers yesterday).
+  const days = []; for (let d = dayNum(last); d < t - 1; d++) days.push(d);
+  const p = MORNING && autoOn() ? stPlugin() : null, near = days.filter(d => d >= t - CATCHUP_DAYS);
+  if (!p || !near.length) return playMissed(days, {});
+  catchingUp = true;
+  Promise.all(near.map(d => p.minutesFor({day: stKey(d)}).then(x => [d, x && typeof x.minutes === 'number' ? x.minutes : null]).catch(() => [d, null])))
+    .then(r => { catchingUp = false; if (S.lastDate !== last) return; const got = {}; for (const [d, m] of r) if (m != null) got[d] = m; playMissed(days, got); });
+}
+function playMissed(days, got){
+  const missed = days.length, entries = [];
+  let rough = 0;
+  for (const d of days) {
+    if (S.done) break;
+    if (got[d] != null) { const m = Math.min(960, got[d]), e = liveYear(m, tierFor(m)); e.src = 'st'; S.stUsed = true; entries.push(e); }
+    else if (rough < SETTINGS.maxSkippedYears) { entries.push(liveYear(null, 'skipped')); rough++; }
+  }
+  const years = SETTINGS.maxSkippedYears, real = entries.length - rough;
   S.lastDate = dayKey(dayNum(today()) - 1);   // today's check-in is still open
   save();
+  if (real) checkTrophies();
   render();
-  let h = '<div class="banner" style="background:var(--meh)">👻 You were away</div>'+
+  if (!entries.length) return;
+  let h = real ? '<div class="banner" style="background:var(--good)">📱 Welcome back</div>'+
+      '<h2>'+esc(S.name)+' lived '+entries.length+' year'+(entries.length > 1 ? 's' : '')+' while you were away</h2>'+
+      '<p>'+(rough ? real+' of them used that day\'s Screen Time. Older days were rough years.' : 'Each one used that day\'s Screen Time, so your time off your phone still counted.')+'</p>' :
+    '<div class="banner" style="background:var(--meh)">👻 You were away</div>'+
     '<h2>You missed '+missed+' day'+(missed > 1 ? 's' : '')+'</h2>'+
     '<p>'+esc(S.name)+' lived '+entries.length+' year'+(entries.length > 1 ? 's' : '')+' without you'+(missed > years ? ' (never more than '+years+' per break)' : '')+'.</p>';
   for (const e of entries) {
@@ -1109,7 +1159,7 @@ function catchUp(){
       '<div class="fx" style="justify-content:flex-start">'+fxHTML(e.fx, e.earned)+'</div>'+
       (e.ms ? '<div class="ms"><b>'+e.ms.emoji+' '+esc(e.ms.title)+'</b><br><span class="muted">'+esc(e.ms.text)+'</span></div>' : '')+'</div></div>';
   }
-  h += '<p class="muted">Check in every day so you don\'t miss their life.</p><button class="btn" data-close>'+(S.done ? 'See how their life went' : 'Check in for today')+'</button>';
+  h += '<p class="muted">Check in every day so you don\'t miss their life.</p><button class="btn" data-close>'+(S.done ? 'See how their life went' : MORNING ? 'Live yesterday\'s year' : 'Check in for today')+'</button>';
   modal(h);
 }
 
@@ -1562,7 +1612,7 @@ function teaserHTML(after){
   if (!nb) return '';
   if (!canCheckIn()) {
     const turning = S.age + 1, big = nb[0] === turning;
-    return '<div class="tease"><div class="e">🎂</div><div><b>Tomorrow '+esc(S.name)+' turns '+turning+'</b><span>'+(big ? nb[2]+'! '+nb[1] : 'Coming up at '+nb[0]+': '+nb[2]+' '+nb[1])+'</span></div></div>';
+    return '<div class="tease"><div class="e">🎂</div><div><b>Tomorrow'+(MORNING ? ' morning' : '')+' '+esc(S.name)+' turns '+turning+'</b><span>'+(big ? nb[2]+'! '+nb[1] : 'Coming up at '+nb[0]+': '+nb[2]+' '+nb[1])+'</span></div></div>';
   }
   const soon = nb[0] === S.age + 1;
   return '<div class="tease"><div class="e">'+nb[1]+'</div><div><b>'+(soon ? 'This year: ' : 'Coming up at '+nb[0]+': ')+nb[2]+'</b><span>'+(soon ? 'Hit your goal today so it goes well!' : 'Hit your goal that day so it goes well!')+'</span></div></div>';
@@ -1594,30 +1644,31 @@ function homeHTML(){
       '<p>'+esc(S.name)+' has passed the torch. Keep going as their kid, who gets a head start from the life you built.</p>'+
       '<button class="btn alt" id="nextGen">Play as '+esc(S.name)+'\'s kid</button>'+share+'</div>';
   }
-  if (open && autoOn() && stToday != null) {
-    const m = Math.min(960, stToday);
+  if (open && autoOn() && stYest != null) {
+    const m = Math.min(960, stYest);
     return header()+hero+
-      '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one?' : 'Today\'s screen time')+'</h2>'+
+      '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one?' : 'Yesterday\'s screen time')+'</h2>'+
       '<div class="picker"><div class="v">'+fmtTime(m)+'</div></div>'+
-      '<p class="muted small" style="text-align:center;margin:0 0 8px">From iPhone Screen Time, so far today.</p>'+
+      '<p class="muted small" style="text-align:center;margin:0 0 8px">Yesterday: '+fmtTime(m)+', the whole day, from iPhone Screen Time.</p>'+
       '<div class="goalnote"><span>Your goal: '+fmtTime(S.goal)+' or less</span><span>Best streak: '+S.best+'</span></div>'+
-      (stEarly() ? '<div class="verdict" style="background:#efeaff;color:#4b3a8f">🌙 Check-in opens at 8 PM, so the whole day counts.</div>' :
-        verdictHTML(m)+'<button class="btn" id="goauto">Live year '+(S.age+1)+' ➜</button>')+'</div>'+
+      verdictHTML(m)+'<button class="btn" id="goauto">Live year '+(S.age+1)+' ➜</button></div>'+
       (S.log.length ? weekHTML() : '')+teaserHTML(S.age)+share;
   }
   if (open) {
     const start = Math.min(960, Math.max(0, homeMins == null ? S.goal : homeMins));
-    return header()+hero+(autoOn() ? '<div class="card"><p class="muted small" style="margin:0">Screen Time hasn\'t sent today\'s number yet. Enter it yourself for now.</p></div>' : '')+
-      '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one? How much screen time today?' : 'How much screen time today?')+'</h2>'+
+    const when = MORNING ? 'yesterday' : 'today';
+    return header()+hero+(autoOn() ? '<div class="card"><p class="muted small" style="margin:0">'+(MORNING ? 'Blip doesn\'t have yesterday\'s Screen Time yet (it starts counting the day you connect). Enter it yourself this time.' : 'Screen Time hasn\'t sent today\'s number yet. Enter it yourself for now.')+'</p></div>' : '')+
+      '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one? How much screen time '+when+'?' : 'How much screen time '+when+'?')+'</h2>'+
       '<div class="picker"><button id="tminus" aria-label="Less">–</button><div class="v" id="tval">'+fmtTime(start)+'</div><button id="tplus" aria-label="More">+</button></div>'+
       '<input type="range" id="tslide" min="0" max="960" step="5" value="'+start+'">'+
       '<div class="goalnote"><span>Your goal: '+fmtTime(S.goal)+' or less</span><span>Best streak: '+S.best+'</span></div>'+
       verdictHTML(start)+
       '<button class="btn" id="go">Live year '+(S.age+1)+' ➜</button>'+
       '<details><summary>Where do I find my screen time?</summary><ul>'+
+      (MORNING ? '<li><b>iPhone:</b> Settings → Screen Time → See All App &amp; Website Activity → Day. Tap back one day for yesterday\'s total.</li></ul>Check in each morning for yesterday, so every minute counts.</details></div>' :
       '<li><b>iPhone:</b> Settings → Screen Time → See All App &amp; Website Activity. Use the number for Today.</li>'+
       '<li><b>Android:</b> Settings → Digital Wellbeing &amp; parental controls. The number in the circle is today.</li>'+
-      '</ul>Best time to check in is right before bed.</details></div>'+
+      '</ul>Best time to check in is right before bed.</details></div>')+
       (S.log.length ? weekHTML() : '')+teaserHTML(S.age)+share;
   }
   const t = last ? TIER[last.tier] : null;
@@ -1625,10 +1676,19 @@ function homeHTML(){
       '<p><b>'+esc(last.text)+'</b></p>'+(last.mins != null ? '<p class="muted">'+fmtTime(last.mins)+' vs. your '+fmtTime(last.goal)+' goal</p>' : '')+
       '<div class="fx">'+fxHTML(last.fx, last.earned)+'</div>'+
       (last.ms ? '<div class="msline">'+last.ms.emoji+' <b>'+esc(last.ms.title)+'</b></div>' : '')+share+'</div>' : '';
-  return header()+hero+result+weekHTML()+
+  return header()+hero+result+todayMeterHTML()+weekHTML()+
     '<div class="card waiting">'+teaserHTML(S.age)+'<div class="muted" style="margin-top:12px">Next check-in opens in</div><div class="countdown" id="cd"></div></div>';
 }
 let homeMins = null; // what the player has dialed in so far today
+// Live "today so far" meter (app + automatic Screen Time only). Home screen only: never in shares, links or the friend page.
+function todayMeterHTML(){
+  if (!MORNING || !autoOn() || stToday == null) return '';
+  const m = Math.min(960, stToday), pct = Math.min(100, Math.round(m / Math.max(1, S.goal) * 100)), over = m > S.goal;
+  return '<div class="card"><h2 style="margin:0 0 6px">📱 Today so far</h2>'+
+    '<div class="goalnote"><span><b>'+fmtTime(m)+'</b> of your '+fmtTime(S.goal)+' goal</span><span>'+(over ? 'Over' : fmtTime(S.goal - m)+' left')+'</span></div>'+
+    '<i class="nbar"><u style="width:'+pct+'%'+(over ? ';background:var(--bad)' : '')+'"></u></i>'+
+    '<p class="muted small" style="margin:8px 0 0">Nothing is decided until the day ends. Every minute until midnight counts.</p></div>';
+}
 
 function opts(a,b,step,sel){ let o=''; for (let i=a;i<=b;i+=step) o+='<option value="'+i+'">'+i+'</option>'; return o; }
 function esc(t){ return String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -2159,7 +2219,7 @@ function settingsHTML(){
   return header()+
     '<div class="card"><h2>Daily goal</h2><p class="muted">Stay at or under this much phone time each day.</p>'+
     '<div class="goalval" id="gv">'+fmtTime(S.goal)+'</div><input type="range" id="goal" min="15" max="720" step="15" value="'+S.goal+'"></div>'+
-    stCardHTML()+
+    stCardHTML()+remindCardHTML()+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
     '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>'+
     (isInstalled() ? '' : '<div class="card"><h2>📲 Put Blip on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
@@ -2260,7 +2320,7 @@ function bindSetup(){
     save(); tab = 'home'; render(); updateIcon();
     modal('<div class="birth">'+charSVG(S)+'</div><h2>'+esc(name)+' is born!</h2>'+
       '<div class="firstword">"'+esc(pick(LINES.baby.up))+'"</div>'+
-      '<p>Every day you hit your goal, '+esc(name)+' has a great year. Check in tonight to start year one.</p>'+
+      '<p>Every day you hit your goal, '+esc(name)+' has a great year. '+(MORNING ? 'Check in now with yesterday\'s screen time to start year one.' : 'Check in tonight to start year one.')+'</p>'+
       (SHOP_ON && store.owned.some(isBabyGift) ? '<p class="muted">🍼 There are baby clothes waiting in the closet.</p>' : '')+'<button class="btn" data-close>Let\'s go</button>');
     confetti(['👶','🎉','✨','🍼','💖']);
   };
@@ -2286,11 +2346,11 @@ function bind(){
     $('tplus').onclick = () => set(Math.floor(+$('tslide').value / 15) * 15 + 15);
   }
   if ($('go')) $('go').onclick = () => { const m = +$('tslide').value; homeMins = null; checkIn(m); };
-  if ($('goauto')) $('goauto').onclick = () => { if (stToday != null && !stEarly()) checkIn(Math.min(960, stToday), 'st'); };
+  if ($('goauto')) $('goauto').onclick = () => { if (stYest != null) checkIn(Math.min(960, stYest), 'st'); };
   if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(4,0,0,0); if (m <= n) m.setDate(m.getDate()+1); const s = Math.floor((m-n)/1000);
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
       if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
-  bindST();
+  bindST(); bindRemind();
   if ($('goal')) $('goal').oninput = e => { S.goal = +e.target.value; $('gv').textContent = fmtTime(S.goal); save(); };
   if ($('nm')) $('nm').onchange = e => { const v = e.target.value.trim(); if (v) { S.name = v; save(); } };
   if ($('tm')) $('tm').onchange = e => { S.testMode = e.target.checked; save(); };
@@ -2503,7 +2563,7 @@ function timeHTML(){
     const year = perDay * 365, yearIdeas = TIME_IDEAS.filter(x => x[0] <= year);
     h += '<div class="card tbig"><div class="k">Your clock starts with your first check-in</div><div class="n">'+bigHM(0)+'</div>'+
       '<div class="eq">'+(perDay ? 'Hit your '+fmtTime(S.goal)+' goal and you get back <b>'+fmtHM(perDay)+' a day</b>. That\'s <b>'+Math.round(year / 1440)+' full days</b> in your first year.' :
-        'Every minute under your old '+fmtTime(oldAvg())+' a day counts. Check in tonight to start your clock.')+'</div></div>';
+        'Every minute under your old '+fmtTime(oldAvg())+' a day counts. '+(MORNING ? 'Check in with yesterday\'s screen time to start your clock.' : 'Check in tonight to start your clock.')+'')+'</div></div>';
     h += '<div class="card"><h2 class="earnh">🎁 Waiting for you<small>at your goal</small></h2>'+
       (yearIdeas.length > 6 ? yearIdeas.slice(0, 2).concat(yearIdeas.slice(-4)) : yearIdeas.length ? yearIdeas : TIME_IDEAS.slice(0, 3)).map(x => ideaRow(x, false, perDay ? '<small class="when"> · day '+Math.ceil(x[0] / perDay)+'</small>' : '')).join('')+
       '<p class="muted small" style="margin:10px 0 0">All in your first year. Your Blip gets a great life, and you get your time back.</p></div>';
@@ -2734,6 +2794,7 @@ else if (S && isInstalled()) track('opened-installed');
 window.addEventListener('hashchange', render);
 // If the app sat open overnight, catch up when it comes back on screen.
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { catchUp(); render(); stRefresh(); } });
+if (remind.on) remindSync(); // keeps the reminder's Blip name current (new generation, renamed)
 stRefresh();
 </script>
 </body>
