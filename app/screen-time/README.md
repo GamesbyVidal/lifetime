@@ -39,3 +39,10 @@ done in index.html via `stUsed()`, which is true once any day in this life came 
 4. Challenge a friend: no time-back numbers in the invite text.
 5. Denied or revoked permission switches back to entering the number by hand.
 Tracking is free and never changes what the shop sells or when it's shown.
+
+Legal review of e85c8b1 (2026-11-01): OK for TestFlight. Privacy label unchanged; policy docx updated.
+Before the App Store: live privacy.html URL; App Review note: "Settings > Automatic screen time >
+Connect Screen Time. Uses Family Controls individual authorization and a DeviceActivity monitor only
+(15-minute thresholds). No app blocking. Data stays on device. Manual entry works if permission is
+declined."; store description and What's New lead with managing your own screen time.
+Never make an analytics event depend on the day's verdict.
