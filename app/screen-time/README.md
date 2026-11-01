@@ -1,30 +1,41 @@
-# Automatic Screen Time (work in progress, not in the build yet)
+# Automatic Screen Time
 
-Planned for the January update. Needs Apple's Family Controls (Distribution) approval
-before it can ship in TestFlight/App Store builds, so these files are NOT added to the
-Xcode project yet (the TestFlight build keeps working without them).
+Apple approved the Family Controls (Distribution) entitlement on 2026-10-31 (request 4H32ZLL24N),
+so automatic tracking can ship in TestFlight and App Store builds.
 
 How it works
-- `plugin/ScreenTimePlugin.swift`: Capacitor plugin the game calls from index.html
-  (`Capacitor.Plugins.ScreenTime`): `status`, `authorize` (Face ID prompt, individual
-  authorization), `pickApps` (Apple's picker; player chooses "All apps"), `start`, `minutesFor(day)`.
-- `monitor/MonitorExtension.swift`: Device Activity Monitor extension
-  (bundle ID `io.github.gamesbyvidal.lifetime.monitor`). iOS calls it each time the day's
-  total passes another 15 minutes; it saves the highest step reached for that day in the
+- `app/ios/App/App/ScreenTimePlugin.swift`: Capacitor plugin the game calls from index.html
+  (`Capacitor.registerPlugin('ScreenTime')`, registered in MainViewController): `status`, `authorize`
+  (individual authorization), `pickApps` (Apple's picker; the player chooses "All apps & categories"),
+  `start`, `minutesFor(day)`.
+- `app/ios/App/BlipMonitor/MonitorExtension.swift`: Device Activity Monitor extension (target
+  `BlipMonitor`, bundle ID `io.github.gamesbyvidal.lifetime.monitor`). iOS calls it each time the
+  day's total passes another 15 minutes; it saves the highest step reached for that day in the
   shared App Group `group.io.github.gamesbyvidal.lifetime`.
 - We never see which apps were used, and nothing leaves the phone.
+- In the game: Settings > "Automatic screen time" > Connect Screen Time. Check-in then shows
+  the day's number from Screen Time instead of the slider. If Screen Time hasn't sent a number
+  yet, the slider comes back with a note.
+- Minimum iOS is now 16 (needed for individual authorization).
 
-To wire up (after approval, or for a development build on Matthew's registered iPhone)
-1. Developer portal: App Group above; App IDs for app + `.monitor` with Family Controls + App Groups.
-2. Add `plugin/` to the App target and `monitor/` as a new Device Activity Monitor
-   extension target (scripts/add-screen-time-target.rb using the xcodeproj gem), with
-   entitlements `com.apple.developer.family-controls` and the App Group, iOS 16+.
-3. Add the extension's bundle ID to `ios_signing` in codemagic.yaml.
+One-time Apple setup (developer.apple.com > Certificates, Identifiers & Profiles)
+1. Identifiers > App Groups: register `group.io.github.gamesbyvidal.lifetime`.
+2. App ID `io.github.gamesbyvidal.lifetime`: turn on Family Controls (Distribution) and App Groups
+   (choose the group above).
+3. Register App ID `io.github.gamesbyvidal.lifetime.monitor` (name "Blip Monitor") with the same
+   two capabilities.
+4. Profiles: regenerate the App Store profile for the app (its old one is invalid after step 2) and
+   create an App Store profile for `.monitor`, both with the `lifetime_distribution` certificate.
+5. Codemagic > Team settings > Code signing identities > iOS provisioning profiles: fetch both
+   profiles from the Developer Portal. `ios_signing` in codemagic.yaml picks up profiles for the
+   app's bundle ID and the extension (same prefix).
 
-Must change before automatic tracking ships (legal review 2026-11-01, see
-/mnt/project-files/lifetime/legal/screen-time-compliance.md). On days whose number came from Screen Time:
-1. Analytics: don't send trophy-st*/tb* keys (send a plain "trophy" event or skip).
-2. Share text/pictures: no goal squares, streak or Time back hours.
-3. #meet= links: drop st and m, and the streak kite in the scene.
-4. Challenge stats: none.
-5. Denied or revoked authorization falls back to manual entry.
+Compliance (legal review 2026-11-01, /mnt/project-files/lifetime/legal/screen-time-compliance.md),
+done in index.html via `stUsed()`, which is true once any day in this life came from Screen Time:
+1. Analytics: trophy-st*/tb* events are sent as a plain "trophy" event.
+2. Share text and pictures: no goal squares, streak, kite or Time back hours. Trophy shares for
+   streak and time-back trophies share the Blip instead. No "Post my time back" button.
+3. #meet= links: no `st` (streak) or `m` (goal met count).
+4. Challenge a friend: no time-back numbers in the invite text.
+5. Denied or revoked permission switches back to entering the number by hand.
+Tracking is free and never changes what the shop sells or when it's shown.

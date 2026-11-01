@@ -568,6 +568,57 @@ function appRestore(){
   p.get({key:KEY}).then(r => { if (r && r.value && !localStorage.getItem(KEY)) { localStorage.setItem(KEY, r.value); location.reload(); } }).catch(() => {});
 }
 
+// ============ AUTOMATIC SCREEN TIME (phone app only) ============
+// iPhone's Screen Time tells the app one number per day: the highest 15-minute step the day's total
+// has passed (app/ios/App/App/ScreenTimePlugin.swift + BlipMonitor). It never says which apps, and it
+// never leaves this phone. Apple's rules for this (see app/screen-time/README.md):
+// - tracking is always free and never decides what the shop shows;
+// - once any day came from Screen Time, shares, links and analytics carry only the Blip's story
+//   (no goal squares, streaks, goal counts or time back);
+// - if permission is denied or taken away, the game goes back to entering the number by hand.
+function stPlugin(){ return IS_APP && window.Capacitor && Capacitor.registerPlugin ? (stPlugin.p = stPlugin.p || Capacitor.registerPlugin('ScreenTime')) : null; }
+function autoOn(){ return !!(IS_APP && S && S.auto); }
+// True once any of this life's numbers came from Screen Time: keeps goal results out of shares and analytics.
+function stUsed(){ return !!(S && (S.auto || S.stUsed)); }
+let stToday = null, stBusy = false, stNote = '';
+function stDayKey(){ const [y, m, d] = today().split('-'); return y+'-'+m.padStart(2, '0')+'-'+d.padStart(2, '0'); }
+function stRefresh(){
+  const p = stPlugin(); if (!p || !autoOn()) return;
+  p.status().then(r => {
+    if (!r || !r.authorized) { stOff('Screen Time permission was turned off, so you can enter your time yourself again.'); return; }
+    return p.minutesFor({day: stDayKey()}).then(x => {
+      const m = x && typeof x.minutes === 'number' ? x.minutes : null;
+      if (m !== stToday) { stToday = m; if (tab === 'home') render(); }
+    });
+  }).catch(() => {});
+}
+function stOff(note){ if (!S) return; S.auto = false; stToday = null; stNote = note || ''; save(); render(); }
+function stConnect(){
+  const p = stPlugin(); if (!p || stBusy) return;
+  stBusy = true; stNote = ''; render();
+  const fail = note => { stBusy = false; stNote = note; render(); };
+  p.authorize().then(r => {
+    if (!r || !r.authorized) return fail('No problem. You can keep entering your screen time yourself, and connect any time.');
+    return p.pickApps().then(x => {
+      if (!x || !x.picked) return fail('Pick "All apps & categories" so Blip can count your whole day.');
+      return p.start().then(() => { stBusy = false; S.auto = true; S.stUsed = true; save(); stRefresh(); render(); });
+    });
+  }).catch(() => fail('Screen Time could not start. You can keep entering your time yourself.'));
+}
+function stCardHTML(){
+  if (!IS_APP) return '';
+  if (autoOn()) return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">On. Blip reads your day\'s total from iPhone Screen Time, rounded to 15 minutes. It never sees which apps you use, and the number never leaves your phone.</p>'+
+    '<button class="btn ghost" id="stpick">Change what counts</button><button class="btn ghost" id="stoff" style="margin-top:8px">Turn off and enter it myself</button></div>';
+  return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">Skip typing it in. Blip can read your day\'s total from iPhone Screen Time. It only gets one number a day, rounded to 15 minutes, never which apps, and it stays on your phone. Free, always.</p>'+
+    (stNote ? '<p class="small">'+esc(stNote)+'</p>' : '')+
+    '<button class="btn alt" id="stgo"'+(stBusy ? ' disabled' : '')+'>'+(stBusy ? 'Connecting...' : 'Connect Screen Time')+'</button></div>';
+}
+function bindST(){
+  if ($('stgo')) $('stgo').onclick = stConnect;
+  if ($('stoff')) $('stoff').onclick = () => stOff('');
+  if ($('stpick')) $('stpick').onclick = () => { const p = stPlugin(); if (p) p.pickApps().then(x => x && x.picked ? p.start() : null).then(stRefresh).catch(() => {}); };
+}
+
 // ============ GIFT SHOP (phone app only) ============
 // Cosmetics only: gifts never change stats, events or screen-time features (those stay free).
 // Items are drawn inside the Blip's own head group (head circle 100,82 r48) or the dog icon (head 50,48 r28,
@@ -878,9 +929,10 @@ function tierFor(mins){
   if (mins <= g * SETTINGS.awfulIfOver) return 'bad';
   return 'awful';
 }
-function checkIn(mins){
+function checkIn(mins, src){
   const tier = tierFor(mins);
   const entry = liveYear(mins, tier);
+  if (src === 'st') { entry.src = 'st'; S.stUsed = true; }
   S.lastDate = today();
   save();
   track('checkin');
@@ -1474,9 +1526,20 @@ function homeHTML(){
       '<p>'+esc(S.name)+' has passed the torch. Keep going as their kid, who gets a head start from the life you built.</p>'+
       '<button class="btn alt" id="nextGen">Play as '+esc(S.name)+'\'s kid</button>'+share+'</div>';
   }
+  if (open && autoOn() && stToday != null) {
+    const m = Math.min(960, stToday);
+    return header()+hero+
+      '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one?' : 'Today\'s screen time')+'</h2>'+
+      '<div class="picker"><div class="v">'+fmtTime(m)+'</div></div>'+
+      '<p class="muted small" style="text-align:center;margin:0 0 8px">From iPhone Screen Time, so far today. Best right before bed.</p>'+
+      '<div class="goalnote"><span>Your goal: '+fmtTime(S.goal)+' or less</span><span>Best streak: '+S.best+'</span></div>'+
+      verdictHTML(m)+
+      '<button class="btn" id="goauto">Live year '+(S.age+1)+' ➜</button></div>'+
+      (S.log.length ? weekHTML() : '')+teaserHTML(S.age)+share;
+  }
   if (open) {
     const start = Math.min(960, Math.max(0, homeMins == null ? S.goal : homeMins));
-    return header()+hero+
+    return header()+hero+(autoOn() ? '<div class="card"><p class="muted small" style="margin:0">Screen Time hasn\'t sent today\'s number yet. Enter it yourself for now.</p></div>' : '')+
       '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one? How much screen time today?' : 'How much screen time today?')+'</h2>'+
       '<div class="picker"><button id="tminus" aria-label="Less">–</button><div class="v" id="tval">'+fmtTime(start)+'</div><button id="tplus" aria-label="More">+</button></div>'+
       '<input type="range" id="tslide" min="0" max="960" step="5" value="'+start+'">'+
@@ -1940,7 +2003,7 @@ let trophyQueue = [];
 // Adds any newly earned trophies to the case. Returns them so the caller can celebrate.
 function checkTrophies(){
   const got = trophyCase(), fresh = [];
-  TROPHIES.forEach(t => { if (got[t.k]) return; const p = t.have(); if (p[0] >= p[1]) { got[t.k] = {name:S.name, age:S.age, date:today()}; fresh.push(t); track('trophy-'+t.k); } });
+  TROPHIES.forEach(t => { if (got[t.k]) return; const p = t.have(); if (p[0] >= p[1]) { got[t.k] = {name:S.name, age:S.age, date:today()}; fresh.push(t); track(stUsed() && /^(st|tb)/.test(t.k) ? 'trophy' : 'trophy-'+t.k); } });
   if (fresh.length) { save(); trophyQueue = trophyQueue.concat(fresh); }
   return fresh;
 }
@@ -1962,7 +2025,7 @@ function trophyBrag(t){
   if (t.invite) return 'Thanks for inviting '+(t.k === 'fr1' ? 'a friend' : t.have()[1]+' friends')+' to raise their own Blip!';
   return t.how.replace('Your Blip', S.name).replace(' after the first one turns '+SETTINGS.lifeLength, '');
 }
-function shareTrophy(t){ shareModal({emoji:'🏆', title:'Trophy: '+t.name, text:trophyBrag(t)}); }
+function shareTrophy(t){ if (stUsed() && /^(st|tb)/.test(t.k)) return shareModal(null); shareModal({emoji:'🏆', title:'Trophy: '+t.name, text:trophyBrag(t)}); }
 
 function trophyCaseHTML(){
   const got = trophyCase(), n = TROPHIES.filter(t => got[t.k]).length;
@@ -2028,6 +2091,7 @@ function settingsHTML(){
   return header()+
     '<div class="card"><h2>Daily goal</h2><p class="muted">Stay at or under this much phone time each day.</p>'+
     '<div class="goalval" id="gv">'+fmtTime(S.goal)+'</div><input type="range" id="goal" min="15" max="720" step="15" value="'+S.goal+'"></div>'+
+    stCardHTML()+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
     '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>'+
     (isInstalled() ? '' : '<div class="card"><h2>📲 Put Blip on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
@@ -2154,9 +2218,11 @@ function bind(){
     $('tplus').onclick = () => set(Math.floor(+$('tslide').value / 15) * 15 + 15);
   }
   if ($('go')) $('go').onclick = () => { const m = +$('tslide').value; homeMins = null; checkIn(m); };
+  if ($('goauto')) $('goauto').onclick = () => { if (stToday != null) checkIn(Math.min(960, stToday), 'st'); };
   if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(4,0,0,0); if (m <= n) m.setDate(m.getDate()+1); const s = Math.floor((m-n)/1000);
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
       if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
+  bindST();
   if ($('goal')) $('goal').oninput = e => { S.goal = +e.target.value; $('gv').textContent = fmtTime(S.goal); save(); };
   if ($('nm')) $('nm').onchange = e => { const v = e.target.value.trim(); if (v) { S.name = v; save(); } };
   if ($('tm')) $('tm').onchange = e => { S.testMode = e.target.checked; save(); };
@@ -2298,6 +2364,7 @@ function meetLink(){
   const m = {n:S.name, a:S.age, g:S.girl ? 1 : 0, k:Math.max(0, SKINS.indexOf(S.skin)), r:Math.max(0, HAIRS.indexOf(S.hair)),
     h:S.h, s:S.s, j:S.j, jb:S.job || '', st:S.streak, m:met, t:S.log.length, p:S.pay || 0,
     b:bestMoments(S.age).map(momentRef)};
+  if (stUsed()) { delete m.st; delete m.m; }
   const sc = sceneOpts();
   m.o = sc.key; m.w = sc.art; if (sc.car) m.c = sc.car; if (sc.yard.length) m.y = sc.yard.join('.');
   return appURL() + '#meet=' + b64url(JSON.stringify(m));
@@ -2323,6 +2390,7 @@ function readMeet(){
 }
 function weekText(){
   const last = S.log.slice(-7), met = last.filter(isMet).length;
+  if (stUsed()) return 'My Blip '+S.name+' is '+S.age+' 🌱\nMeet '+S.name+': '+meetLink();
   return 'My Blip '+S.name+' is '+S.age+' 🌱\n'+last.map(e => SQUARE[e.tier] || '⬜').join('')+'\n'+
     met+' of '+last.length+' days on goal'+(S.streak >= 2 ? ' · 🔥 '+S.streak : '')+'\nMeet '+S.name+': '+meetLink();
 }
@@ -2384,7 +2452,7 @@ function timeHTML(){
       (next ? ideaRow(next, false, '<i class="nbar"><u style="width:'+Math.round(total / next[0] * 100)+'%"></u></i>') : '')+'</div>';
   }
   h += '<div class="card tshare"><h2>Better with friends</h2><p class="muted small">Time back is easier when someone\'s doing it with you.</p>'+
-    '<button class="btn sharebtn" id="tbpost">📸 Post my time back</button><button class="btn alt" id="tbinvite" style="margin-top:8px">🤝 Challenge a friend</button></div>';
+    (stUsed() ? '' : '<button class="btn sharebtn" id="tbpost">📸 Post my time back</button>')+'<button class="btn alt" id="tbinvite"'+(stUsed() ? '' : ' style="margin-top:8px"')+'>🤝 Challenge a friend</button></div>';
   return h;
 }
 function fmtHrs(m){ return m < 60 ? m+' minutes' : (m / 60)+' hour'+(m === 60 ? '' : 's'); }
@@ -2392,7 +2460,7 @@ function inviteFriend(){
   track('invite');
   S.invites = (S.invites || 0) + 1; save(); checkTrophies();
   const btn = this && this.id ? this : $('tbinvite');
-  const total = timeBack();
+  const total = stUsed() ? 0 : timeBack();
   const text = (total ? 'I\'ve gotten '+fmtHM(total)+' of my life back from my phone with Blip, a screen time game. ' : 'I\'m cutting my screen time with Blip, a screen time game. ')+
     'Every day you hit your goal, your little Blip has a great year. Want to try it with me? '+appURL();
   const done = () => { if ($('tbinvite') || document.querySelector('[data-trophy]')) render(); document.querySelectorAll('.modal').forEach(m => m.remove()); showTrophies(); };
@@ -2437,18 +2505,18 @@ function shareArt(m){
   for (const l of title) { texts.push([l, y, 50, 700, 1]); y += 62; }
   for (const l of sub) { texts.push([l, y, 34, 500, .92]); y += 46; }
   texts.push(['@logo', 120, 124, 700, 1]);
-  const tb = timeBack(), foot = (S.streak >= 2 ? ['🔥 '+S.streak+' day streak'] : []).concat(tb >= 60 ? ['⏳ '+Math.floor(tb / 60)+'h of my life back'] : []);
+  const tb = stUsed() ? 0 : timeBack(), foot = (!stUsed() && S.streak >= 2 ? ['🔥 '+S.streak+' day streak'] : []).concat(tb >= 60 ? ['⏳ '+Math.floor(tb / 60)+'h of my life back'] : []);
   if (foot.length) texts.push([foot.join('  ·  '), 1236, 32, 500, 1]);
   texts.push(['One day for you. One year for them.', 1290, 30, 500, .95]);
   texts.push([appURL().replace(/^https?:\/\//, '').replace(/\/(index\.html)?$/, ''), 1330, 30, 700, 1]);
-  const days = S.log.slice(-7);
+  const days = stUsed() ? [] : S.log.slice(-7);
   const x0 = 540 - (days.length * 70 - 14) / 2;
   const sq = days.map((e, i) => '<rect x="'+(x0 + i*70)+'" y="1130" width="56" height="56" rx="12" fill="'+(SQ_COLOR[e.tier] || '#e6e1f5')+'" stroke="#3b2a4a" stroke-width="4"/>').join('');
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">'+
     '<defs><linearGradient id="shbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#ff5a8a"/></linearGradient>'+
     '<clipPath id="shclip"><rect x="60" y="150" width="960" height="587" rx="36"/></clipPath></defs>'+
     '<rect width="1080" height="1350" fill="url(#shbg)"/>'+
-    '<g clip-path="url(#shclip)">'+sceneSVG(sceneOpts(), S).replace('<svg ', '<svg x="60" y="150" width="960" height="587" ')+'</g>'+
+    '<g clip-path="url(#shclip)">'+sceneSVG(Object.assign(sceneOpts(), stUsed() ? {streak: 0} : {}), S).replace('<svg ', '<svg x="60" y="150" width="960" height="587" ')+'</g>'+
     '<rect x="60" y="150" width="960" height="587" rx="36" fill="none" stroke="#fff" stroke-width="10"/>'+sq+'</svg>';
   return {svg, texts};
 }
@@ -2597,7 +2665,8 @@ if (readMeet()) track('friend-link-opened');
 else if (S && isInstalled()) track('opened-installed');
 window.addEventListener('hashchange', render);
 // If the app sat open overnight, catch up when it comes back on screen.
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { catchUp(); render(); } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { catchUp(); render(); stRefresh(); } });
+stRefresh();
 </script>
 </body>
 </html>
