@@ -1,0 +1,226 @@
+{
+ "appId": "6828258627",
+ "issuer": "9fb799df-a363-49a0-858f-bd4730a129b8",
+ "keyId": "QQV4MF4KGV",
+ "items": [
+  {
+   "productId": "blip.item.bigbow",
+   "name": "Big hair bow",
+   "price": "0.99",
+   "description": "A big pink bow for your Blip's hair.",
+   "screenshot": "item-bigbow.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.tiara",
+   "name": "Sparkle tiara",
+   "price": "0.99",
+   "description": "A sparkly tiara for your Blip.",
+   "screenshot": "item-tiara.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.beret",
+   "name": "Paris beret",
+   "price": "0.99",
+   "description": "A red Paris beret for your Blip.",
+   "screenshot": "item-beret.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.flowerclip",
+   "name": "Flower clips",
+   "price": "0.99",
+   "description": "Little flower clips for your Blip's hair.",
+   "screenshot": "item-flowerclip.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.heartshades",
+   "name": "Heart sunglasses",
+   "price": "0.99",
+   "description": "Heart-shaped sunglasses for your Blip.",
+   "screenshot": "item-heartshades.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.pearls",
+   "name": "Pearl necklace",
+   "price": "0.99",
+   "description": "A classic pearl necklace for your Blip.",
+   "screenshot": "item-pearls.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.locket",
+   "name": "Heart locket",
+   "price": "0.99",
+   "description": "A golden heart locket for your Blip.",
+   "screenshot": "item-locket.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.sundress",
+   "name": "Sunny sundress",
+   "price": "1.99",
+   "description": "A sunny yellow sundress for your Blip.",
+   "screenshot": "item-sundress.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.floraldress",
+   "name": "Garden dress",
+   "price": "1.99",
+   "description": "A pink garden dress with flowers.",
+   "screenshot": "item-floraldress.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.tutu",
+   "name": "Ballet tutu",
+   "price": "1.99",
+   "description": "A pink ballet tutu for your Blip.",
+   "screenshot": "item-tutu.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.cardigan",
+   "name": "Cozy cardigan",
+   "price": "1.99",
+   "description": "A cozy purple cardigan for your Blip.",
+   "screenshot": "item-cardigan.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.partydress",
+   "name": "Sparkle party dress",
+   "price": "1.99",
+   "description": "A sparkly purple party dress.",
+   "screenshot": "item-partydress.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.bundle.style",
+   "name": "Style starter",
+   "price": "3.99",
+   "description": "Hair bow, heart shades, locket and sundress.",
+   "screenshot": "bundle-style.jpg",
+   "create": true
+  },
+  {
+   "productId": "blip.item.beanie",
+   "screenshot": "item-beanie.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.crown",
+   "screenshot": "item-crown.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.flowers",
+   "screenshot": "item-flowers.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.phones",
+   "screenshot": "item-phones.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.shades",
+   "screenshot": "item-shades.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.snowbeanie",
+   "screenshot": "item-snowbeanie.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.scarf",
+   "screenshot": "item-scarf.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.starsweater",
+   "screenshot": "item-starsweater.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.bearhat",
+   "screenshot": "item-bearhat.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.bunnyhood",
+   "screenshot": "item-bunnyhood.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.sunbonnet",
+   "screenshot": "item-sunbonnet.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.bib",
+   "screenshot": "item-bib.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.pacifier",
+   "screenshot": "item-pacifier.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.duckie",
+   "screenshot": "item-duckie.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.starjammies",
+   "screenshot": "item-starjammies.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.dinosuit",
+   "screenshot": "item-dinosuit.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.collar",
+   "screenshot": "item-collar.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.bandana",
+   "screenshot": "item-bandana.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.sweater",
+   "screenshot": "item-sweater.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.item.partyhat",
+   "screenshot": "item-partyhat.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.bundle.holiday",
+   "screenshot": "bundle-holiday.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.bundle.newborn",
+   "screenshot": "bundle-newborn.jpg",
+   "create": false
+  },
+  {
+   "productId": "blip.bundle.founder",
+   "screenshot": "bundle-founder.jpg",
+   "create": false
+  }
+ ]
+}
