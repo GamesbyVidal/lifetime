@@ -86,7 +86,7 @@ select:focus,input:focus{outline:none;border-color:var(--accent2)}
 .btn:active{transform:translateY(3px);box-shadow:0 3px 0 #c8405f}
 .btn.alt{background:linear-gradient(135deg,var(--accent2),#5b3fe0);box-shadow:0 6px 0 #4127b0}
 .btn.ghost{background:#f1edff;color:var(--accent2);box-shadow:none}
-.btn.danger{background:#fff0f0;color:var(--awful);box-shadow:none}
+.plinks{text-align:center;font-size:14px;margin:14px 0 6px;color:rgba(255,255,255,.75)}.plink{color:inherit;text-decoration:underline}.card .plink{color:var(--accent2)}.btn.danger{background:#fff0f0;color:var(--awful);box-shadow:none}
 details{margin-top:10px;font-size:14px;color:var(--soft)}
 summary{cursor:pointer;font-weight:500;color:var(--accent2)}
 details ul{padding-left:18px;margin:6px 0}
@@ -597,6 +597,9 @@ let stToday = null, stYest = null, stBusy = false, stNote = '';
 // In the app, each check-in lives the year for YESTERDAY's whole calendar day (the morning reveal).
 // The year is ready at the 4 AM rollover, so late-night use always counts. The web version keeps same-day check-ins.
 const MORNING = IS_APP;
+const PRIVACY_URL = WEB_URL + 'privacy.html', SUPPORT_URL = WEB_URL + 'support.html';
+// Links to our own web pages. In the app, Capacitor hands non-app URLs to Safari.
+function linkTo(url, text){ return '<a class="plink" href="'+url+'" target="_blank" rel="noopener">'+text+'</a>'; }
 let TESTFLIGHT = false; // set from the native side: the Testing card only shows in TestFlight builds (and on the web)
 function stKey(n){ const [y, m, d] = dayKey(n).split('-'); return y+'-'+m.padStart(2, '0')+'-'+d.padStart(2, '0'); }
 function stDayKey(){ return stKey(dayNum(today())); }
@@ -632,9 +635,9 @@ function stConnect(){
 }
 function stCardHTML(){
   if (!IS_APP) return '';
-  if (autoOn()) return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">On. Blip reads your day\'s total from iPhone Screen Time, rounded to 15 minutes. It never sees which apps you use, and the number never leaves your phone.</p>'+
+  if (autoOn()) return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">On. Blip reads your day\'s total from iPhone Screen Time, rounded to 15 minutes. It never sees which apps you use, and the number never leaves your phone.</p><p class="small">'+linkTo(PRIVACY_URL, 'How Blip handles Screen Time')+'</p>'+
     '<button class="btn ghost" id="stpick">Change what counts</button><button class="btn ghost" id="stoff" style="margin-top:8px">Turn off and enter it myself</button></div>';
-  return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">Skip typing it in. Blip can read your day\'s total from iPhone Screen Time. It only gets one number a day, rounded to 15 minutes, never which apps, and it stays on your phone. Free, always.</p>'+
+  return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">Skip typing it in. Blip can read your day\'s total from iPhone Screen Time. It only gets one number a day, rounded to 15 minutes, never which apps, and it stays on your phone. Free, always.</p><p class="small">'+linkTo(PRIVACY_URL, 'How Blip handles Screen Time')+'</p>'+
     (stNote ? '<div class="verdict" style="background:#fff3d6;color:#6b4a00">'+esc(stNote)+'</div>' : '')+
     '<button class="btn alt" id="stgo"'+(stBusy ? ' disabled' : '')+'>'+(stBusy ? 'Connecting...' : 'Connect Screen Time')+'</button></div>';
 }
@@ -943,7 +946,7 @@ function shopHTML(){
   const note = !shopReady ? '<p class="gnote">The shop opens soon. You can try everything on now.</p>' : '';
   return shopTop(name)+note+tryon+tabs+tiles+(closet ? '' : bundles)+
     '<p class="gfoot">Gifts are just for looks. They never change '+name+'\'s life or your screen time.</p>'+
-    (IS_APP ? '<button class="linkbtn gfoot" id="grestore">Restore purchases</button>' : '');
+    (IS_APP ? '<button class="linkbtn gfoot" id="grestore">Restore purchases</button><p class="gfoot plinks">'+linkTo(PRIVACY_URL, 'Privacy policy')+' · '+linkTo(SUPPORT_URL, 'Help')+'</p>' : '');
 }
 
 function shopTop(name){
@@ -2235,7 +2238,8 @@ function settingsHTML(){
       esc(S.name)+' only lives in this browser. Clearing your history, or not opening the app for a few weeks on iPhone, can erase them. Copy this backup code somewhere safe, like your Notes app or an email to yourself.')+'</p>'+
       '<button class="btn alt" id="bkcopy">Copy backup code</button>'+(S.backedUp ? '<p class="muted small">Last backup: '+esc(S.backedUp)+'</p>' : '')+
       '<button class="btn ghost" id="restore" style="margin-top:10px">Restore from a backup</button></div>'+
-    '<div class="card"><h2>Start over</h2><p class="muted">Erases '+esc(S.name)+' and their whole life story.</p><button class="btn danger" id="reset">Start a brand new life</button></div>';
+    '<div class="card"><h2>Start over</h2><p class="muted">Erases '+esc(S.name)+' and their whole life story.</p><button class="btn danger" id="reset">Start a brand new life</button></div>'+
+    '<p class="plinks">'+linkTo(PRIVACY_URL, 'Privacy policy')+' · '+linkTo(SUPPORT_URL, 'Help')+'</p>';
 }
 
 // ============ SETUP (one step at a time) ============
