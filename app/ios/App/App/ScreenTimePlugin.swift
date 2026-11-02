@@ -30,8 +30,19 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func status(_ call: CAPPluginCall) {
         Self.purgeOld(defaults)
-        let s = AuthorizationCenter.shared.authorizationStatus
-        call.resolve(["authorized": s == .approved, "picked": defaults?.data(forKey: Self.selectionKey) != nil])
+        let picked = defaults?.data(forKey: Self.selectionKey) != nil
+        // authorizationStatus reads "not determined" for a moment after launch, then loads the real value. Wait up to 3 seconds for it.
+        Task { @MainActor in
+            var s = AuthorizationCenter.shared.authorizationStatus
+            var tries = 0
+            while s == .notDetermined && tries < 15 {
+                try? await Task.sleep(nanoseconds: 200_000_000)
+                s = AuthorizationCenter.shared.authorizationStatus
+                tries += 1
+            }
+            let state = s == .approved ? "approved" : s == .denied ? "denied" : "notDetermined"
+            call.resolve(["authorized": s == .approved, "state": state, "picked": picked])
+        }
     }
 
     // Apple's permission prompt has to be asked for on the main thread, or it never appears.
