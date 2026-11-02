@@ -597,6 +597,7 @@ let stToday = null, stYest = null, stBusy = false, stNote = '';
 // In the app, each check-in lives the year for YESTERDAY's whole calendar day (the morning reveal).
 // The year is ready at the 4 AM rollover, so late-night use always counts. The web version keeps same-day check-ins.
 const MORNING = IS_APP;
+let TESTFLIGHT = false; // set from the native side: the Testing card only shows in TestFlight builds (and on the web)
 function stKey(n){ const [y, m, d] = dayKey(n).split('-'); return y+'-'+m.padStart(2, '0')+'-'+d.padStart(2, '0'); }
 function stDayKey(){ return stKey(dayNum(today())); }
 function stYestKey(){ return stKey(dayNum(today()) - 1); }
@@ -2223,7 +2224,7 @@ function settingsHTML(){
     '<div class="goalval" id="gv">'+fmtTime(S.goal)+'</div><input type="range" id="goal" min="15" max="720" step="15" value="'+S.goal+'"></div>'+
     stCardHTML()+remindCardHTML()+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
-    '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>'+
+    (!IS_APP || TESTFLIGHT ? '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>' : '')+
     (isInstalled() ? '' : '<div class="card"><h2>📲 Put Blip on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
       '<p class="muted">Get '+esc(S.name)+' as an app icon that opens full screen. It also keeps their save safer on iPhone.</p></div></div>'+
       '<p class="small"><b>iPhone:</b> tap the Share button <span class="kbd">⬆︎</span> in Safari, then <b>Add to Home Screen</b>.<br><b>Android:</b> tap the <span class="kbd">⋮</span> menu in Chrome, then <b>Add to Home screen</b> or <b>Install app</b>.</p></div>')+
@@ -2817,6 +2818,8 @@ window.addEventListener('hashchange', render);
 // If the app sat open overnight, catch up when it comes back on screen.
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { catchUp(); render(); stRefresh(); } });
 if (remind.on) remindSync(); // keeps the reminder's Blip name current (new generation, renamed)
+// App Store builds never keep testing mode (a save carried over from TestFlight could have it on).
+if (MORNING && stPlugin()) stPlugin().env().then(r => { if (r && r.testflight) { TESTFLIGHT = true; if (tab === 'settings') render(); } else if (S && S.testMode) { S.testMode = false; save(); render(); } }).catch(() => {});
 stRefresh();
 </script>
 </body>

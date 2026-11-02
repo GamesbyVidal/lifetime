@@ -18,7 +18,8 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "start", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "minutesFor", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remindOn", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "remindOff", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "remindOff", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "env", returnType: CAPPluginReturnPromise)
     ]
 
     static let group = "group.io.github.gamesbyvidal.lifetime"
@@ -141,6 +142,10 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
                 call.resolve(["granted": err == nil])
             }
         }
+    }
+    // TestFlight builds have a sandbox receipt; App Store builds don't. Testing tools only show in TestFlight.
+    @objc func env(_ call: CAPPluginCall) {
+        call.resolve(["testflight": Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"])
     }
     @objc func remindOff(_ call: CAPPluginCall) {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [Self.reminderID])
