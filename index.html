@@ -210,7 +210,7 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .verdict{border-radius:12px;padding:9px 10px;font-size:15px;text-align:center;margin:4px 0 12px;font-weight:600;min-height:42px}
 .week{display:flex;justify-content:space-between;gap:4px;margin:2px 0 8px}.week div{text-align:center;font-size:11px;color:var(--soft);flex:1}
 .week span{display:block;height:34px;max-width:40px;margin:0 auto 3px;border-radius:10px;background:#eee}
-.week .great,.week .good{background:var(--good)}.week .meh{background:#ffd34d}.week .bad,.week .awful{background:var(--bad)}.week .skipped{background:#d9d5e6}
+.week .great,.week .good{background:var(--good)}.week .meh{background:#ffd34d}.week .bad,.week .awful{background:var(--bad)}.week .skipped{background:#d9d5e6}.week .restored{background:#cfc6ea}
 .week .next span{background:#fff;border:3px dashed #cfc6f5}
 .nudge{font-size:14px;text-align:center}.nudge b{color:var(--accent)}
 .tease{display:flex;gap:12px;align-items:center;background:linear-gradient(90deg,#fff6e6,#ffeef3);border-radius:16px;padding:12px;text-align:left;margin-bottom:14px}
@@ -268,7 +268,7 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .gnote{background:rgba(255,255,255,.14);color:#fff;border-radius:14px;padding:8px 12px;text-align:center;font-size:14px;margin:0 0 12px}
 .gtry{display:flex;align-items:center;gap:10px;padding:12px}.gduo{flex:1.1;display:flex;align-items:flex-end;justify-content:center;min-width:0}
 .gduo .gfull svg{width:132px;height:158px;display:block}.gduo .gdog{width:64px;height:78px;margin-left:-14px}.gduo .gdog:only-child{width:130px;height:156px;margin:0}
-.ginfo{flex:1;min-width:0}.ginfo .muted{margin:0}.gname{font-size:21px;font-weight:700;line-height:1.15}.gprice{font-size:22px;font-weight:700;color:var(--accent2);margin-top:2px}
+.ginfo{flex:1;min-width:0}.ginfo .muted{margin:0}.ginfo p.small{margin-top:10px;line-height:1.35}.gname{font-size:21px;font-weight:700;line-height:1.15}.gprice{font-size:22px;font-weight:700;color:var(--accent2);margin-top:2px}
 .ginfo .btn{padding:11px;font-size:16px;margin-top:10px}.ginfo .btn[disabled]{opacity:.7}.glock{margin-top:10px;font-weight:600;color:#b8860b;font-size:14px}.glock small{color:var(--soft);font-weight:400}
 .gtabs{display:flex;gap:6px;margin:0 -16px 12px;padding:0 16px;overflow-x:auto;scrollbar-width:none}.gtabs::-webkit-scrollbar{display:none}.gtabs button{flex:1 0 auto;white-space:nowrap;border:0;border-radius:999px;padding:9px 8px;font-size:14px;font-weight:600;background:rgba(255,255,255,.14);color:#fff}
 .gtabs button.on{background:#fff;color:var(--accent2)}
@@ -1282,7 +1282,7 @@ function lifeTitle(score){
 function charSVG(c){
   const st = stage(c.age);
   const last = c.log && c.log.length ? c.log[c.log.length-1] : null;
-  const sad = (last && !(last.tier === 'good' || last.tier === 'great')) || c.j < 30;
+  const sad = (last && !(last.tier === 'good' || last.tier === 'great' || last.tier === 'restored')) || c.j < 30;
   const O = '#3b2a4a', W = 'stroke="'+O+'" stroke-width="3.5"';
   const sc = {baby:.62, kid:.8, middle:.86, teen:.92, young:.97, adult:1, senior:.95}[st];
   const hair = st === 'senior' ? '#e9e7ef' : c.hair;
@@ -1413,7 +1413,7 @@ function tapCharacter(wrapId, bubId){
   taps = taps.filter(t => now - t < 3000); taps.push(now);
   const st = stage(S.age);
   const last = S.log.length ? S.log[S.log.length-1] : null;
-  const up = !(last && !(last.tier === 'good' || last.tier === 'great')) && S.j >= 30;
+  const up = !(last && !(last.tier === 'good' || last.tier === 'great' || last.tier === 'restored')) && S.j >= 30;
   let line;
   if (taps.length >= 5) line = pick(TICKLE_LINES);
   else if (up && S.streak >= 3 && Math.random() < 0.3) line = pick(STREAK_LINES).replace('{n}', S.streak);
@@ -1697,6 +1697,7 @@ function esc(t){ return String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt
 const TIER = {
   great:{label:'🌟 Amazing year!', color:'var(--great)'},
   skipped:{label:'👻 Skipped year', color:'#6d6787'},
+  restored:{label:'📖 Year from a backup', color:'#a99fc4'},
   good:{label:'✅ Good year', color:'var(--good)'},
   meh:{label:'😐 So-so year', color:'var(--meh)'},
   bad:{label:'⚠️ Rough year', color:'var(--bad)'},
@@ -2205,7 +2206,7 @@ function storyHTML(inLife){
     const e = S.log[i], t = TIER[e.tier];
     rows += '<div class="year"><div class="age"><b>'+e.age+'</b>age</div><div class="what">'+
       '<div class="t">'+e.emoji+' '+esc(e.text)+'</div>'+
-      '<div class="m"><span class="pill" style="background:'+t.color+'">'+e.tier+'</span>'+(e.mins == null ? 'No check-in' : fmtTime(e.mins)+' on phone')+'</div>'+
+      '<div class="m"><span class="pill" style="background:'+t.color+'">'+(e.tier === 'restored' ? 'from backup' : e.tier)+'</span>'+(e.tier === 'restored' ? '' : e.mins == null ? 'No check-in' : fmtTime(e.mins)+' on phone')+'</div>'+
       (e.ms ? '<div class="ms"><b>'+e.ms.emoji+' '+esc(e.ms.title)+'</b><br><span class="muted">'+esc(e.ms.text)+'</span></div>' : '')+
       (e.buys ? e.buys.map(b => '<div class="ms">🎉 <b>Bought a '+esc(ITEM[b.key].name)+'</b> <span class="muted">−'+fmtMoney(b.cost)+'</span></div>').join('') : '')+
       '</div></div>';
@@ -2229,7 +2230,8 @@ function settingsHTML(){
     (IS_APP ? '' : '<div class="card"><h2>⏰ Daily reminder</h2><p class="muted">Add a daily "Check in on '+esc(S.name)+'" reminder to your phone\'s calendar.</p>'+
       '<div class="switch"><span>Remind me at</span><input type="time" id="rtime" value="21:00"></div>'+
       '<div class="row"><button class="btn ghost" id="ics">📅 Phone calendar</button><button class="btn ghost" id="gcal">Google Calendar</button></div></div>')+
-    '<div class="card"><h2>💾 Backup</h2><p class="muted">'+esc(S.name)+' only lives in this browser. Clearing your history, or not opening the app for a few weeks on iPhone, can erase them. Copy this backup code somewhere safe, like your Notes app or an email to yourself.</p>'+
+    '<div class="card"><h2>💾 Backup</h2><p class="muted">'+(IS_APP ? 'Copy a backup of '+esc(S.name)+'\'s life story, in case you ever delete the app. '+(stUsed() ? 'Your Screen Time numbers stay on this phone, so streaks and time saved start fresh after a restore. ' : '')+'Moving to a new iPhone? An iPhone backup brings everything.' :
+      esc(S.name)+' only lives in this browser. Clearing your history, or not opening the app for a few weeks on iPhone, can erase them. Copy this backup code somewhere safe, like your Notes app or an email to yourself.')+'</p>'+
       '<button class="btn alt" id="bkcopy">Copy backup code</button>'+(S.backedUp ? '<p class="muted small">Last backup: '+esc(S.backedUp)+'</p>' : '')+
       '<button class="btn ghost" id="restore" style="margin-top:10px">Restore from a backup</button></div>'+
     '<div class="card"><h2>Start over</h2><p class="muted">Erases '+esc(S.name)+' and their whole life story.</p><button class="btn danger" id="reset">Start a brand new life</button></div>';
@@ -2368,11 +2370,18 @@ function bind(){
   if ($('ics')) $('ics').onclick = () => addReminder('ics');
   if ($('gcal')) $('gcal').onclick = () => addReminder('google');
   if ($('reset')) $('reset').onclick = () => {
-    if (!confirm('Erase '+S.name+' and start a new life?')) return;
+    const n = esc(S.name);
+    modal('<div class="birth">'+charSVG(Object.assign({}, S, {log: [{tier:'bad'}]}))+'</div><h2>Erase '+n+'?</h2>'+
+      '<p>'+n+'\'s whole life story, age '+S.age+', will be gone for good. This can\'t be undone.</p>'+
+      (SHOP_ON && store.owned.length ? '<p class="muted">Gifts in the closet stay yours for the next Blip.</p>' : '')+
+      '<button class="btn" data-close>Keep '+n+'</button><button class="btn danger" id="resetyes" style="margin-top:10px">Yes, start a brand new life</button>');
+    $('resetyes').onclick = () => { document.querySelector('.modal').remove(); startOver(); };
+  };
+  function startOver(){
     draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, step:0, testMode:S.testMode, auto:S.auto};
     S = null; save(); try { localStorage.removeItem(KEY); } catch(e){}
     render();
-  };
+  }
   if ($('nextGen')) $('nextGen').onclick = () => {
     const bonus = Math.min(15, Math.round(lifeScore()/10));
     draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, inherit:inheritance(), tbPrev:timeBack(), trophies:S.trophies, invites:S.invites, step:0, testMode:S.testMode, auto:S.auto};
@@ -2716,7 +2725,18 @@ function meetHTML(m){
 }
 
 // ============ BACKUP & REMINDER ============
-function backupCode(){ return 'LIFETIME-' + btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
+// Once Screen Time numbers were used, the code carries only the Blip's story (same line as shares, see stUsed()):
+// no daily minutes, goal results, streaks or Time back. Restoring keeps the Blip; streaks and time saved start fresh.
+function backupData(){
+  if (!stUsed()) return S;
+  const d = JSON.parse(JSON.stringify(S));
+  d.log = d.log.map(e => { const x = Object.assign({}, e); delete x.mins; delete x.goal; delete x.avg; delete x.src;
+    x.tier = 'restored'; x.notes = (x.notes || []).filter(n => !/streak/i.test(n)); return x; });
+  d.streak = 0; d.best = 0; delete d.tbPrev;
+  if (d.trophies) for (const k in d.trophies) if (/^(st|tb)/.test(k)) delete d.trophies[k];
+  return d;
+}
+function backupCode(){ return 'LIFETIME-' + btoa(unescape(encodeURIComponent(JSON.stringify(backupData())))); }
 function readBackup(code){
   try {
     code = (code || '').replace(/\s+/g, '');
