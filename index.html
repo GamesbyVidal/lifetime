@@ -210,7 +210,7 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .verdict{border-radius:12px;padding:9px 10px;font-size:15px;text-align:center;margin:4px 0 12px;font-weight:600;min-height:42px}
 .week{display:flex;justify-content:space-between;gap:4px;margin:2px 0 8px}.week div{text-align:center;font-size:11px;color:var(--soft);flex:1}
 .week span{display:block;height:34px;max-width:40px;margin:0 auto 3px;border-radius:10px;background:#eee}
-.week .great,.week .good{background:var(--good)}.week .meh{background:#ffd34d}.week .bad,.week .awful{background:var(--bad)}.week .skipped{background:#d9d5e6}.week .restored{background:#cfc6ea}
+.week .great,.week .good{background:var(--good)}.week .meh{background:#ffd34d}.week .bad,.week .awful{background:var(--bad)}.week .skipped{background:#d9d5e6}.week .restored{background:#cfc6ea}.week .quiet{background:#c9d4ea}
 .week .next span{background:#fff;border:3px dashed #cfc6f5}
 .nudge{font-size:14px;text-align:center}.nudge b{color:var(--accent)}
 .tease{display:flex;gap:12px;align-items:center;background:linear-gradient(90deg,#fff6e6,#ffeef3);border-radius:16px;padding:12px;text-align:left;margin-bottom:14px}
@@ -604,6 +604,10 @@ let TESTFLIGHT = false; // set from the native side: the Testing card only shows
 function stKey(n){ const [y, m, d] = dayKey(n).split('-'); return y+'-'+m.padStart(2, '0')+'-'+d.padStart(2, '0'); }
 function stDayKey(){ return stKey(dayNum(today())); }
 function stYestKey(){ return stKey(dayNum(today()) - 1); }
+// The day the player connected only counts from that moment, so that first year can come out good or so-so, never worse.
+function calKey(t){ const d = new Date(t); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2, '0')+'-'+String(d.getDate()).padStart(2, '0'); }
+function joinedNote(key){ return S && S.stJoined && calKey(S.stJoined) === key ? 'Counted since you joined at '+new Date(S.stJoined).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})+'.' : ''; }
+function joinedTier(mins){ const t = tierFor(mins); return joinedNote(stYestKey()) && (t === 'bad' || t === 'awful') ? 'meh' : t; }
 function stRefresh(){
   const p = stPlugin(); if (!p || !autoOn()) return;
   p.status().then(r => {
@@ -1030,8 +1034,8 @@ function tierFor(mins){
   if (mins <= g * SETTINGS.awfulIfOver) return 'bad';
   return 'awful';
 }
-function checkIn(mins, src){
-  const tier = tierFor(mins);
+function checkIn(mins, src, tierOverride){
+  const tier = tierOverride || tierFor(mins);
   const entry = liveYear(mins, tier);
   if (src === 'st') { entry.src = 'st'; S.stUsed = true; }
   S.lastDate = today();
@@ -1043,30 +1047,36 @@ function checkIn(mins, src){
   showYear(entry);
 }
 
-// One year of the character's life. tier 'skipped' means a day you didn't check in.
+// One year of the character's life. tier 'skipped' means a day you didn't check in (manual players).
+// tier 'quiet' (app, automatic Screen Time) is a missed day with no stored number: neutral, no stat loss, streak untouched.
 function liveYear(mins, tier){
   const g = S.goal;
-  const met = tier === 'great' || tier === 'good';
+  const met = tier === 'great' || tier === 'good', quiet = tier === 'quiet';
 
   S.age++;
   const st = stage(S.age);
-  const pool = EVENTS[st][met ? 'good' : 'bad'];
-  let fresh = pool.filter(e => !S.used.includes(e[1]));
-  // Every stage has at least one event per year it lasts, so nothing repeats in a lifetime.
-  // (Safety net only: if a pool ever runs dry, allow repeats from it.)
-  if (!fresh.length) { S.used = S.used.filter(t => !pool.some(e => e[1] === t)); fresh = pool; }
-  const ev = pick(fresh);
-  S.used.push(ev[1]);
+  let ev;
+  if (quiet) ev = ['🌙', pick(QUIET_LINES).replace('{name}', S.name), {}];
+  else {
+    const pool = EVENTS[st][met ? 'good' : 'bad'];
+    let fresh = pool.filter(e => !S.used.includes(e[1]));
+    // Every stage has at least one event per year it lasts, so nothing repeats in a lifetime.
+    // (Safety net only: if a pool ever runs dry, allow repeats from it.)
+    if (!fresh.length) { S.used = S.used.filter(t => !pool.some(e => e[1] === t)); fresh = pool; }
+    ev = pick(fresh);
+    S.used.push(ev[1]);
+  }
 
-  const mult = {great:1.5, good:1, meh:0.75, bad:1.5, skipped:1.5, awful:2}[tier];
+  const mult = {great:1.5, good:1, meh:0.75, bad:1.5, skipped:1.5, awful:2, quiet:0}[tier];
   const fx = {};
   for (const k in ev[2]) fx[k] = Math.round(ev[2][k] * mult);
-  if (S.age > 60) fx.h = (fx.h || 0) - 1; // getting older
+  if (S.age > 60 && !quiet) fx.h = (fx.h || 0) - 1; // getting older
 
   const notes = [];
   if (tier === 'skipped') notes.push(pick(SKIP_LINES).replace('{name}', S.name));
   let streakBonus = 0;
-  if (met) {
+  if (quiet) {}
+  else if (met) {
     S.streak++;
     S.best = Math.max(S.best, S.streak);
     const bonus = SETTINGS.streakBonuses[S.streak];
@@ -1091,7 +1101,8 @@ function liveYear(mins, tier){
 
   let earned = 0;
   // Good years add to savings. Bad years eat into them (impulse buys, missed work, late fees).
-  if (met) { if (S.pay > 0) earned = Math.round(S.pay * 0.3); }
+  if (quiet) {}
+  else if (met) { if (S.pay > 0) earned = Math.round(S.pay * 0.3); }
   else earned = -Math.min(Math.max(0, S.money), Math.round(Math.max(S.pay * 0.2, S.money * 0.03)));
   const wasInDebt = S.money < 0;
   S.money += earned;
@@ -1102,8 +1113,9 @@ function liveYear(mins, tier){
   }
   const buys = buyThings();
 
-  const ms = milestone(S.age, met);
-  if (ms && ms.fx) applyFx(ms.fx);
+  // A quiet year's milestone goes by how the Blip is doing, and never costs stats.
+  const ms = milestone(S.age, quiet ? (S.h + S.s + S.j) / 3 >= 50 : met);
+  if (ms && ms.fx) { const f = {}; for (const k in ms.fx) if (!quiet || ms.fx[k] > 0) f[k] = ms.fx[k]; applyFx(f); }
   if (S.age === 22 && LOANS[S.eduTier]) {
     S.money -= LOANS[S.eduTier];
     notes.push('🎓 Graduated with '+fmtMoney(LOANS[S.eduTier])+' in student loans. Good years pay them off.');
@@ -1117,6 +1129,12 @@ function liveYear(mins, tier){
 }
 
 // ============ SKIPPED DAYS ============
+const QUIET_LINES = [
+  '{name} missed you. A quiet year.',
+  '{name} missed you. A quiet, ordinary year.',
+  'A quiet year. {name} kept your spot warm.',
+  '{name} had a calm year and wondered where you went.'
+];
 const SKIP_LINES = [
   '👻 You weren\'t around. {name} spent the year glued to the couch.',
   '👻 No check-in. {name} wandered through the year on autopilot.',
@@ -1140,12 +1158,12 @@ function catchUp(){
     .then(r => { catchingUp = false; if (S.lastDate !== last) return; const got = {}; for (const [d, m] of r) if (m != null) got[d] = m; playMissed(days, got); });
 }
 function playMissed(days, got){
-  const missed = days.length, entries = [];
+  const missed = days.length, entries = [], auto = MORNING && autoOn();
   let rough = 0;
   for (const d of days) {
     if (S.done) break;
     if (got[d] != null) { const m = Math.min(960, got[d]), e = liveYear(m, tierFor(m)); e.src = 'st'; S.stUsed = true; entries.push(e); }
-    else if (rough < SETTINGS.maxSkippedYears) { entries.push(liveYear(null, 'skipped')); rough++; }
+    else if (rough < SETTINGS.maxSkippedYears) { entries.push(liveYear(null, auto ? 'quiet' : 'skipped')); rough++; }
   }
   const years = SETTINGS.maxSkippedYears, real = entries.length - rough;
   S.lastDate = dayKey(dayNum(today()) - 1);   // today's check-in is still open
@@ -1155,7 +1173,10 @@ function playMissed(days, got){
   if (!entries.length) return;
   let h = real ? '<div class="banner" style="background:var(--good)">📱 Welcome back</div>'+
       '<h2>'+esc(S.name)+' lived '+entries.length+' year'+(entries.length > 1 ? 's' : '')+' while you were away</h2>'+
-      '<p>'+(rough ? real+' of them used that day\'s Screen Time. Older days were rough years.' : 'Each one used that day\'s Screen Time, so your time off your phone still counted.')+'</p>' :
+      '<p>'+(rough ? real+' of them used that day\'s Screen Time. The rest were quiet years.' : 'Each one used that day\'s Screen Time, so your time off your phone still counted.')+'</p>' :
+    auto ? '<div class="banner" style="background:#8fa3c8">🌙 Welcome back</div>'+
+      '<h2>'+esc(S.name)+' had '+entries.length+' quiet year'+(entries.length > 1 ? 's' : '')+'</h2>'+
+      '<p>Screen Time had no numbers for those days, so nothing was lost. '+esc(S.name)+' just missed you.</p>' :
     '<div class="banner" style="background:var(--meh)">👻 You were away</div>'+
     '<h2>You missed '+missed+' day'+(missed > 1 ? 's' : '')+'</h2>'+
     '<p>'+esc(S.name)+' lived '+entries.length+' year'+(entries.length > 1 ? 's' : '')+' without you'+(missed > years ? ' (never more than '+years+' per break)' : '')+'.</p>';
@@ -1286,7 +1307,7 @@ function lifeTitle(score){
 function charSVG(c){
   const st = stage(c.age);
   const last = c.log && c.log.length ? c.log[c.log.length-1] : null;
-  const sad = (last && !(last.tier === 'good' || last.tier === 'great' || last.tier === 'restored')) || c.j < 30;
+  const sad = (last && !(last.tier === 'good' || last.tier === 'great' || last.tier === 'restored' || last.tier === 'quiet')) || c.j < 30;
   const O = '#3b2a4a', W = 'stroke="'+O+'" stroke-width="3.5"';
   const sc = {baby:.62, kid:.8, middle:.86, teen:.92, young:.97, adult:1, senior:.95}[st];
   const hair = st === 'senior' ? '#e9e7ef' : c.hair;
@@ -1417,7 +1438,7 @@ function tapCharacter(wrapId, bubId){
   taps = taps.filter(t => now - t < 3000); taps.push(now);
   const st = stage(S.age);
   const last = S.log.length ? S.log[S.log.length-1] : null;
-  const up = !(last && !(last.tier === 'good' || last.tier === 'great' || last.tier === 'restored')) && S.j >= 30;
+  const up = !(last && !(last.tier === 'good' || last.tier === 'great' || last.tier === 'restored' || last.tier === 'quiet')) && S.j >= 30;
   let line;
   if (taps.length >= 5) line = pick(TICKLE_LINES);
   else if (up && S.streak >= 3 && Math.random() < 0.3) line = pick(STREAK_LINES).replace('{n}', S.streak);
@@ -1596,8 +1617,8 @@ const VERDICT = {
   bad:   ['⚠️', 'Over your goal. Rough year ahead.', '#fff0f0', '#c23c3c'],
   awful: ['💥', 'Way over your goal. Disaster year.', '#ffe6ec', '#a01d3e']
 };
-function verdictHTML(mins){
-  const v = VERDICT[tierFor(mins)];
+function verdictHTML(mins, tier){
+  const v = VERDICT[tier || tierFor(mins)];
   return '<div class="verdict" id="verdict" style="background:'+v[2]+';color:'+v[3]+'">'+v[0]+' '+v[1].replace('{name}', esc(S.name))+'</div>';
 }
 function weekHTML(){
@@ -1654,9 +1675,9 @@ function homeHTML(){
     return header()+hero+
       '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one?' : 'Yesterday\'s screen time')+'</h2>'+
       '<div class="picker"><div class="v">'+fmtTime(m)+'</div></div>'+
-      '<p class="muted small" style="text-align:center;margin:0 0 8px">Yesterday: '+fmtTime(m)+', the whole day, from iPhone Screen Time.</p>'+
+      '<p class="muted small" style="text-align:center;margin:0 0 8px">'+(joinedNote(stYestKey()) ? 'Yesterday: '+fmtTime(m)+'. '+joinedNote(stYestKey()) : 'Yesterday: '+fmtTime(m)+', the whole day, from iPhone Screen Time.')+'</p>'+
       '<div class="goalnote"><span>Your goal: '+fmtTime(S.goal)+' or less</span><span>Best streak: '+S.best+'</span></div>'+
-      verdictHTML(m)+'<button class="btn" id="goauto">Live year '+(S.age+1)+' ➜</button></div>'+
+      verdictHTML(m, joinedTier(m))+'<button class="btn" id="goauto">Live year '+(S.age+1)+' ➜</button></div>'+
       (S.log.length ? weekHTML() : '')+teaserHTML(S.age)+share;
   }
   if (open) {
@@ -1676,6 +1697,13 @@ function homeHTML(){
       '</ul>Best time to check in is right before bed.</details></div>')+
       (S.log.length ? weekHTML() : '')+teaserHTML(S.age)+share;
   }
+  if (!last && MORNING && autoOn()) {
+    const n = esc(S.name);
+    return header()+hero+'<div class="card center"><h2>🌱 '+n+'\'s first year is happening right now</h2>'+
+      '<p class="muted">Blip is counting your screen time today. Tomorrow morning, '+n+' turns 1 and you\'ll see how the year went.</p>'+
+      (remind.on ? '' : '<button class="btn alt" id="firstremind">⏰ Remind me in the morning</button>')+'</div>'+todayMeterHTML()+
+      '<div class="card waiting"><div class="muted">'+n+'\'s first birthday is in</div><div class="countdown" id="cd"></div></div>';
+  }
   const t = last ? TIER[last.tier] : null;
   const result = last ? '<div class="card result"><span class="ban" style="background:'+t.color+'">'+t.label+'</span><div class="ev">'+last.emoji+'</div>'+
       '<p><b>'+esc(last.text)+'</b></p>'+(last.mins != null ? '<p class="muted">'+fmtTime(last.mins)+' vs. your '+fmtTime(last.goal)+' goal</p>' : '')+
@@ -1692,7 +1720,7 @@ function todayMeterHTML(){
   return '<div class="card"><h2 style="margin:0 0 6px">📱 Today so far</h2>'+
     '<div class="goalnote"><span><b>'+fmtTime(m)+'</b> of your '+fmtTime(S.goal)+' goal</span><span>'+(over ? 'Over' : fmtTime(S.goal - m)+' left')+'</span></div>'+
     '<i class="nbar"><u style="width:'+pct+'%'+(over ? ';background:var(--bad)' : '')+'"></u></i>'+
-    '<p class="muted small" style="margin:8px 0 0">Nothing is decided until the day ends. Every minute until midnight counts.</p></div>';
+    '<p class="muted small" style="margin:8px 0 0">'+(joinedNote(stDayKey()) ? joinedNote(stDayKey())+' ' : '')+'Nothing is decided until the day ends. Every minute until midnight counts.</p></div>';
 }
 
 function opts(a,b,step,sel){ let o=''; for (let i=a;i<=b;i+=step) o+='<option value="'+i+'">'+i+'</option>'; return o; }
@@ -1702,6 +1730,7 @@ const TIER = {
   great:{label:'🌟 Amazing year!', color:'var(--great)'},
   skipped:{label:'👻 Skipped year', color:'#6d6787'},
   restored:{label:'📖 Year from a backup', color:'#a99fc4'},
+  quiet:{label:'🌙 Quiet year', color:'#8fa3c8'},
   good:{label:'✅ Good year', color:'var(--good)'},
   meh:{label:'😐 So-so year', color:'var(--meh)'},
   bad:{label:'⚠️ Rough year', color:'var(--bad)'},
@@ -2243,8 +2272,8 @@ function settingsHTML(){
 }
 
 // ============ SETUP (one step at a time) ============
-// Steps: 0 two futures, 1 boy or girl, 2 name, 3 look, 4 goal, 5 promise
-const SETUP_STEPS = 6;
+// Steps: 0 two futures, 1 boy or girl, 2 name, 3 look, 4 goal, (app: 5 Screen Time), last promise
+const SETUP_STEPS = IS_APP ? 7 : 6, ST_STEP = IS_APP ? 5 : -1;
 function previewSVG(age, extra){
   return charSVG(Object.assign({name: draft.name || 'them', age, log: [], h: 60, s: 50, j: 70, skin: draft.skin, hair: draft.hair, girl: !!draft.girl}, extra || {}));
 }
@@ -2277,8 +2306,13 @@ function setupHTML(){
       '<div class="goalbox"><div class="muted">Your daily goal</div><div class="stepper"><button id="minus">–</button><div class="goalval" id="gv">'+fmtTime(draft.goal)+'</div><button id="plus">+</button></div>'+
       '<div id="saved" class="saved">'+savedLine()+'</div></div>'+
       '<button class="btn alt" id="next">Next →</button></div>';
+  if (step === ST_STEP) return top+'<div class="card center"><div class="bigprev">'+previewSVG(0)+'</div><h2 class="big">Let Blip count your screen time?</h2>'+
+      '<p class="muted">Blip can read your day\'s total from iPhone Screen Time, so you never type it in. It only gets one number a day, rounded to 15 minutes, never which apps, and it stays on your phone. Free, always.</p>'+
+      '<button class="btn alt" id="stsetup"'+(draft.stBusy ? ' disabled' : '')+'>'+(draft.stBusy ? 'Connecting...' : 'Connect Screen Time')+'</button>'+
+      '<button class="btn ghost" id="stskip" style="margin-top:10px">Not now</button></div>';
   return top+'<div class="card center"><div class="bigprev">'+previewSVG(0)+'</div><h2 class="big">Ready to bring '+name+' to life?</h2>'+
-      '<p class="muted">Check in every night with your screen time. Stay at '+fmtTime(draft.goal)+' or less and '+name+' gets a great year.</p>'+
+      (draft.stNote ? '<p class="muted small">'+esc(draft.stNote)+'</p>' : '')+
+      '<p class="muted">'+(MORNING ? 'Every morning, yesterday\'s screen time decides '+name+'\'s next year.' : 'Check in every night with your screen time.')+' Stay at '+fmtTime(draft.goal)+' or less and '+name+' gets a great year.</p>'+
       '<button class="btn promise" id="start">I promise to give '+name+' a good life 🤞</button></div>';
 }
 function savedLine(){
@@ -2287,7 +2321,25 @@ function savedLine(){
   const hrs = Math.round(diff * 365 / 60);
   return 'That\'s <b>'+hrs+' hours a year</b> back, about <b>'+Math.round(hrs/24)+' full days</b>.';
 }
-function goStep(n){ draft.step = Math.max(0, Math.min(SETUP_STEPS - 1, n)); render(); window.scrollTo(0, 0); }
+function goStep(n){
+  // Already connected (next generation): skip the Screen Time step.
+  if (n === ST_STEP && draft.auto) n += n > (draft.step || 0) ? 1 : -1;
+  draft.step = Math.max(0, Math.min(SETUP_STEPS - 1, n)); render(); window.scrollTo(0, 0);
+}
+// Setup's Screen Time step: one explainer, then Apple's prompt. Any "no" goes straight on to manual setup.
+function setupConnect(){
+  let p = null; try { p = stPlugin(); } catch(e) {}
+  const manual = note => { draft.stBusy = false; draft.auto = false; draft.stNote = note || ''; goStep(ST_STEP + 1); };
+  if (!p) return manual('Screen Time isn\'t available, so you\'ll type in your screen time each morning.');
+  draft.stBusy = true; render();
+  p.authorize().then(r => {
+    if (!r || !r.authorized) return manual('No problem. You\'ll type in yesterday\'s screen time each morning, and you can connect any time in Settings.');
+    return p.pickApps().then(x => {
+      if (!x || !x.picked) return manual('No problem. You can connect Screen Time any time in Settings.');
+      return p.start().then(() => { draft.stBusy = false; draft.auto = true; draft.stJoined = Date.now(); draft.stNote = ''; goStep(ST_STEP + 1); });
+    });
+  }).catch(() => manual('Screen Time could not start. You can connect it any time in Settings.'));
+}
 
 function bindSetup(){
   const step = draft.step || 0;
@@ -2314,6 +2366,8 @@ function bindSetup(){
     goStep(step + 1);
   };
   if ($('restore')) $('restore').onclick = restoreModal;
+  if ($('stsetup')) $('stsetup').onclick = () => { if (!draft.stBusy) setupConnect(); };
+  if ($('stskip')) $('stskip').onclick = () => { draft.stNote = ''; goStep(ST_STEP + 1); };
   if ($('start')) $('start').onclick = () => {
     const name = draft.name.trim();
     const keepTest = draft.testMode || false;
@@ -2326,10 +2380,12 @@ function bindSetup(){
     if (draft.invites) S.invites = draft.invites;
     S.testMode = keepTest;
     if (draft.auto && IS_APP) { S.auto = true; S.stUsed = true; } // Screen Time stays connected for the next life
+    // Automatic players type nothing: the first year plays tomorrow morning from today's Screen Time.
+    if (S.auto && MORNING) { S.lastDate = today(); if (draft.stJoined) S.stJoined = draft.stJoined; }
     save(); tab = 'home'; render(); updateIcon();
     modal('<div class="birth">'+charSVG(S)+'</div><h2>'+esc(name)+' is born!</h2>'+
       '<div class="firstword">"'+esc(pick(LINES.baby.up))+'"</div>'+
-      '<p>Every day you hit your goal, '+esc(name)+' has a great year. '+(MORNING ? 'Check in now with yesterday\'s screen time to start year one.' : 'Check in tonight to start year one.')+'</p>'+
+      '<p>Every day you hit your goal, '+esc(name)+' has a great year. '+(S.auto && MORNING ? esc(name)+'\'s first year is happening right now. Tomorrow morning, see how it went.' : MORNING ? 'Check in now with yesterday\'s screen time to start year one.' : 'Check in tonight to start year one.')+'</p>'+
       (SHOP_ON && store.owned.some(isBabyGift) ? '<p class="muted">🍼 There are baby clothes waiting in the closet.</p>' : '')+'<button class="btn" data-close>Let\'s go</button>');
     confetti(['👶','🎉','✨','🍼','💖']);
   };
@@ -2355,11 +2411,12 @@ function bind(){
     $('tplus').onclick = () => set(Math.floor(+$('tslide').value / 15) * 15 + 15);
   }
   if ($('go')) $('go').onclick = () => { const m = +$('tslide').value; homeMins = null; checkIn(m); };
-  if ($('goauto')) $('goauto').onclick = () => { if (stYest != null) checkIn(Math.min(960, stYest), 'st'); };
+  if ($('goauto')) $('goauto').onclick = () => { if (stYest != null) { const m = Math.min(960, stYest); checkIn(m, 'st', joinedTier(m)); } };
   if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(4,0,0,0); if (m <= n) m.setDate(m.getDate()+1); const s = Math.floor((m-n)/1000);
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
       if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
   bindST(); bindRemind();
+  if ($('firstremind')) $('firstremind').onclick = () => { remind.on = true; remindSave(); remindSync().then(ok => { if (!ok) { remind.on = false; remindSave(); } render(); }); };
   if ($('goal')) $('goal').oninput = e => { S.goal = +e.target.value; $('gv').textContent = fmtTime(S.goal); save(); };
   if ($('nm')) $('nm').onchange = e => { const v = e.target.value.trim(); if (v) { S.name = v; save(); } };
   if ($('tm')) $('tm').onchange = e => { S.testMode = e.target.checked; save(); };
