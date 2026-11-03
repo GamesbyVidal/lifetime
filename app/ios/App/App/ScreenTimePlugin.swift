@@ -24,7 +24,7 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
 
     static let group = "group.io.github.gamesbyvidal.lifetime"
     static let selectionKey = "selection"
-    static let stepMinutes = 15
+    static let stepMinutes = 5
     static let maxMinutes = 16 * 60
 
     private var defaults: UserDefaults? { UserDefaults(suiteName: Self.group) }
@@ -74,7 +74,7 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    // Watches the whole day (midnight to midnight, repeating) with one event per 15 minutes.
+    // Watches the whole day (midnight to midnight, repeating) with one event per 5 minutes (192 events, up to 16 hours).
     @objc func start(_ call: CAPPluginCall) {
         guard let data = defaults?.data(forKey: Self.selectionKey),
               let selection = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) else {
@@ -102,7 +102,7 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    // day: "YYYY-MM-DD" in the phone's time zone. Returns the highest 15-minute step reached, or null.
+    // day: "YYYY-MM-DD" in the phone's time zone. Returns the highest 5-minute step reached, or null.
     @objc func minutesFor(_ call: CAPPluginCall) {
         let day = call.getString("day") ?? ""
         if let m = defaults?.object(forKey: "minutes-" + day) as? Int { call.resolve(["minutes": m]) }

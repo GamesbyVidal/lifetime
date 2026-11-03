@@ -2,7 +2,7 @@ import DeviceActivity
 import Foundation
 
 // Runs in the background, separately from the app. iOS calls eventDidReachThreshold each
-// time the day's total screen time passes another 15 minutes ("m15", "m30", ...).
+// time the day's total screen time passes another 5 minutes ("m5", "m10", ...).
 // We keep only the highest step for the day, in the shared App Group, on this phone.
 class MonitorExtension: DeviceActivityMonitor {
     let defaults = UserDefaults(suiteName: "group.io.github.gamesbyvidal.lifetime")

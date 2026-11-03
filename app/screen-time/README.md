@@ -10,7 +10,7 @@ How it works
   `start`, `minutesFor(day)`.
 - `app/ios/App/BlipMonitor/MonitorExtension.swift`: Device Activity Monitor extension (target
   `BlipMonitor`, bundle ID `io.github.gamesbyvidal.lifetime.monitor`). iOS calls it each time the
-  day's total passes another 15 minutes; it saves the highest step reached for that day in the
+  day's total passes another 5 minutes; it saves the highest step reached for that day in the
   shared App Group `group.io.github.gamesbyvidal.lifetime`.
 - We never see which apps were used, and nothing leaves the phone.
 - In the game: Settings > "Automatic screen time" > Connect Screen Time. Check-in then shows
@@ -43,7 +43,7 @@ Tracking is free and never changes what the shop sells or when it's shown.
 Legal review of e85c8b1 (2026-11-01): OK for TestFlight. Privacy label unchanged; policy docx updated.
 Before the App Store: live privacy.html URL; App Review note: "Settings > Automatic screen time >
 Connect Screen Time. Uses Family Controls individual authorization and a DeviceActivity monitor only
-(15-minute thresholds). No app blocking. Data stays on device. Manual entry works if permission is
+(5-minute thresholds). No app blocking. Data stays on device. Manual entry works if permission is
 declined."; store description and What's New lead with managing your own screen time.
 Never make an analytics event depend on the day's verdict.
 
