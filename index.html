@@ -293,6 +293,18 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .polaroid .cap{font-size:16px;font-weight:600;margin-top:10px;line-height:1.3}
 .soon{display:flex;gap:10px;align-items:center;text-align:left;background:#fff6d6;border:2.5px solid #3b2a4a;border-radius:14px;padding:8px 12px;margin:8px 0 4px}.soon span{font-size:28px}.soon small{display:block;font-size:11px;font-weight:700;color:#b26b00;text-transform:uppercase;letter-spacing:.6px}.soon b{font-size:16px}
 .ysmall{font-size:12px;color:var(--soft);margin-top:6px}
+.tchip{border:0;text-align:left;font-family:inherit;color:inherit;cursor:pointer;position:relative}.tchip .chev{position:absolute;right:7px;top:5px;color:var(--soft);font-size:14px}
+.shint{margin-top:8px;background:#f1edff;color:#7c5cff;border-radius:10px;padding:5px 8px;font-size:13px;font-weight:600;text-align:center}
+.stk[data-stat]{cursor:pointer}
+.statpop .card{background:linear-gradient(180deg,#fff3c4,#ffd6e4 60%,#f4efff);padding:14px 14px 10px;text-align:center}
+.sart{aspect-ratio:300/190;border:3px solid #3b2a4a;border-radius:16px;overflow:hidden;background:#fff}
+.sttl{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}.sttl span{font-size:30px}.sttl b{font-size:26px}.sttl em{font-style:normal;font-size:34px;font-weight:700;-webkit-text-stroke:2px #3b2a4a;paint-order:stroke}
+.sbar{height:12px;border-radius:9px;background:#fff;border:2px solid #3b2a4a;overflow:hidden}.sbar u{display:block;height:100%}.sbar.wide{max-width:260px;margin:4px auto 0}
+.sline{margin:8px 0 10px;font-size:16px}
+.sbox{background:#fff;border:2.5px solid #3b2a4a;border-radius:16px;padding:10px 12px;text-align:left}.rh{font-size:12px;font-weight:700;color:#b26b00;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.nw{display:flex;gap:8px;align-items:flex-start;font-size:15px;padding:3px 0}.nw span:first-child{width:22px;flex:none;text-align:center}
+.nx{background:#fff6d6;border:2.5px solid #3b2a4a;border-radius:16px;padding:10px 12px;margin:10px 0 4px;text-align:left}.nxh{display:flex;gap:10px;align-items:center}.nxe{font-size:30px}.nx small{display:block;font-size:11px;font-weight:700;color:#b26b00;text-transform:uppercase;letter-spacing:.6px}.nx b{font-size:16px}
+.nx .sbar{margin-top:8px}.days{text-align:right;font-size:13px;font-weight:600;margin-top:4px}
 .confetti{position:fixed;top:-20px;font-size:22px;pointer-events:none;z-index:30;animation:drop linear forwards}
 @keyframes drop{to{transform:translateY(110vh) rotate(540deg)}}
 .hide{display:none!important}
@@ -1571,6 +1583,7 @@ function render(){
   else app.innerHTML = settingsHTML();
   bind();
   if ($('closet')) $('closet').onclick = openCloset;
+  document.querySelectorAll('[data-stat]').forEach(b => b.onclick = ev => { ev.stopPropagation(); showStat(b.dataset.stat); });
 }
 
 // ============ THE BLIP LOGO ============
@@ -1717,12 +1730,13 @@ function homeHTML(){
   const last = S.log.length ? S.log[S.log.length - 1] : null;
   const share = S.log.length ? '<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '';
 
-  const chip = (e, v, c) => '<div class="chip">'+e+' '+v+'<i><u style="width:'+v+'%;background:'+c+'"></u></i></div>';
+  const chip = (e, v, c, k) => '<button class="chip tchip" data-stat="'+k+'">'+e+' '+v+'<span class="chev">›</span><i><u style="width:'+v+'%;background:'+c+'"></u></i></button>';
   const hero = '<div class="card hero2"><div class="hrow"><div class="buddy" id="buddy"><div class="bubble" id="bubble"></div>'+charSVG(S)+
       (S.tapped ? '' : '<div class="taphint" id="taphint">👆 Tap me!</div>')+'</div>'+
     '<div class="who">'+(SHOP_ON ? '<button class="closetbtn" id="closet">👕 Closet</button>' : '')+'<div class="name">'+esc(S.name)+'</div><div class="sub">Age '+S.age+' · '+STAGE_NAMES[st]+'</div>'+(tags ? '<div class="tags">'+tags+'</div>' : '')+heroGoalHTML()+
     (open && last ? '<div class="last"><b>Last year</b>'+last.emoji+' '+esc(last.text)+'</div>' : '')+'</div></div>'+
-    '<div class="chips">'+chip('💪', S.h, 'var(--h)')+chip('🧠', S.s, 'var(--s)')+chip('😊', S.j, 'var(--j)')+'</div></div>';
+    '<div class="chips">'+chip('💪', S.h, 'var(--h)', 'h')+chip('🧠', S.s, 'var(--s)', 's')+chip('😊', S.j, 'var(--j)', 'j')+'</div>'+
+    (S.statTapped || !S.log.length ? '' : '<div class="shint">👆 Tap a stat to see what it does</div>')+'</div>';
 
   if (S.done) {
     const sc = lifeScore(), t = lifeTitle(sc);
@@ -2560,6 +2574,88 @@ function bind(){
   };
 }
 
+// ============ TAP A STAT ============
+// What Muscle, Brains and Joy do for the Blip: a picture of the Blip doing it, what it means right now, and the next moment it decides.
+// Game facts only, never real-world health claims.
+const STAT_INFO = {
+  h:{e:'💪', n:'Muscle', c:'#ff6b8b', line:'A strong body for a long, active life'},
+  s:{e:'🧠', n:'Brains', c:'#4da3ff', line:'Smart choices and a growing bank account'},
+  j:{e:'😊', n:'Joy', c:'#ffc23d', line:'Friends, love and family'}
+};
+// [age, the stat it needs, emoji, what it decides]. Ages and numbers match milestone().
+const STAT_NEXT = {
+  h:[[10,0,'⭐','A hidden talent (your best stat picks it)'],[16,50,'🚗','Passing the driving test'],[22,60,'💼','A better first job'],[45,60,'🏅','Fit enough to run a marathon at 45']],
+  s:[[16,50,'🚗','Passing the driving test'],[18,35,'📘','Getting into college'],[18,55,'🎓','State University'],[18,75,'🎓','Starfield University, the dream school'],[22,70,'💼','A great first job'],[35,65,'🚀','A big promotion at 35']],
+  j:[[5,50,'🎒','A great first day of school'],[22,60,'💼','A better first job'],[28,60,'💞','Meeting someone special at 28'],[35,65,'🚀','A big promotion at 35']]
+};
+function statNow(k){
+  const v = S[k], n = esc(S.name), out = [];
+  const lvl = {h:[[75,'⚡','Full of energy, the sporty one'],[50,'🙂','Healthy and active'],[30,'🛋️','A bit of a couch potato lately'],[0,'😴','Tired a lot. Good days help.']],
+    s:[[75,'🌟', S.age < 18 ? 'Top of the class' : 'Sharp and quick to learn'],[50,'📚', S.age < 18 ? 'Doing well in school' : 'Makes smart choices'],[30,'🤔','Could use some study time'],[0,'🫠','Struggling to keep up']],
+    j:[[75,'🌈','Lights up every room'],[50,'🙂','Happy most days'],[30,'🌧️','A little down lately'],[0,'🫂','Really needs some good days']]}[k].find(x => v >= x[0]);
+  out.push([lvl[1], lvl[2]]);
+  if (k === 'h' && S.talent === 'athlete') out.push(['⚡','Talent: sports']);
+  if (k === 's' && S.talent === 'scientist') out.push(['🤖','Talent: science']);
+  if (k === 'j' && S.talent === 'performer') out.push(['🎤','Talent: performing']);
+  if (k === 's' && S.edu) out.push(['🎓', S.age < 23 ? 'Studying at '+esc(S.edu) : 'Went to '+esc(S.edu)]);
+  if (k === 's' && S.job) out.push(['💼','Works as a '+esc(S.job.toLowerCase())]);
+  if (k === 'j' && S.partner) out.push(['💞','With '+esc(S.partner)]);
+  if (k === 'j' && store.dogName && S.age < 18) out.push(['🐶','Best friends with '+esc(store.dogName)]);
+  return out;
+}
+function statNextHTML(k){
+  const v = S[k], up = STAT_NEXT[k].filter(x => x[0] > S.age);
+  const nx = up.find(x => v < x[1]) || up[0];
+  if (!nx) return '<div class="nx"><div class="nxh"><span class="nxe">🌟</span><div><small>Keep it up</small><b>Every good day still adds to '+esc(S.name)+'\'s story</b></div></div></div>';
+  const need = Math.max(0, nx[1] - v), days = Math.ceil(need / 4), pct = nx[1] ? Math.min(100, Math.round(v / nx[1] * 100)) : 100;
+  return '<div class="nx"><div class="nxh"><span class="nxe">'+nx[2]+'</span><div><small>Coming up at '+nx[0]+'</small><b>'+nx[3]+'</b></div></div>'+
+    (nx[1] ? '<div class="sbar"><u style="width:'+pct+'%;background:'+STAT_INFO[k].c+'"></u></div><div class="days">'+(need ? 'About '+days+' more good day'+(days > 1 ? 's' : '') : 'On track! Hit your goal that day.')+'</div>' : '<div class="days">Hit your goal that day.</div>')+'</div>';
+}
+function statScene(k){
+  const O = '#3b2a4a', W = w => 'stroke="'+O+'" stroke-width="'+(w||3.5)+'" stroke-linejoin="round" stroke-linecap="round"', F = 160;
+  const me = Object.assign({}, S, {log:[{tier:'good'}], wear:myWear()}), kid = S.age < 18;
+  const nest = (prop, y) => charSVG(me).replace('<g class="bob">', (prop||'')+'<g class="bob">').replace('<svg ', '<svg x="80" y="'+y+'" width="140" height="168" ');
+  const floor = (c, l) => '<rect x="0" y="'+F+'" width="300" height="40" fill="'+c+'"/><path d="M0 '+F+' H300" '+W(3)+'/><path d="M30 '+(F+20)+' h40 M150 '+(F+28)+' h46 M236 '+(F+14)+' h36" stroke="'+l+'" stroke-width="3" stroke-linecap="round"/>';
+  let s = '<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMax slice" width="100%" height="100%" style="display:block">';
+  if (k === 'h') {
+    const kettle = (x, col) => '<path d="M'+(x-9)+' 186 V176 Q'+(x-9)+' 163 '+x+' 163 Q'+(x+9)+' 163 '+(x+9)+' 176 V186" fill="none" stroke="'+O+'" stroke-width="9"/><path d="M'+(x-9)+' 186 V176 Q'+(x-9)+' 163 '+x+' 163 Q'+(x+9)+' 163 '+(x+9)+' 176 V186" fill="none" stroke="#8d86a8" stroke-width="3.5"/>'+
+      '<path d="M'+(x-15)+' 186 Q'+(x-20)+' 210 '+(x-10)+' 212 H'+(x+10)+' Q'+(x+20)+' 210 '+(x+15)+' 186Z" fill="'+col+'" '+W(3.5)+'/>';
+    s += '<rect width="300" height="200" fill="#ffe9ee"/><circle cx="48" cy="52" r="24" fill="#fff" '+W(3.5)+'/><path d="M48 52 V38 M48 52 L58 58" stroke="'+O+'" stroke-width="3.5" stroke-linecap="round"/><circle cx="48" cy="52" r="3" fill="'+O+'"/>'+
+      floor('#ffd9a8','#e8b986')+'<path d="M74 '+(F+2)+' H226 L234 '+(F+18)+' H66Z" fill="#7c5cff" '+W(3)+'/>'+
+      '<g transform="translate(250 '+(F-34)+')"><rect x="0" y="6" width="20" height="34" rx="6" fill="#bfe8ff" '+W(3)+'/><rect x="4" y="0" width="12" height="8" rx="2" fill="#4da3ff" '+W(2.5)+'/></g>'+
+      nest(kid ? '' : kettle(54,'#ff8fa8')+kettle(146,'#ff8fa8'), F-144);
+  } else if (k === 's') {
+    s += '<rect width="300" height="200" fill="#e6f1ff"/><rect x="14" y="30" width="62" height="96" rx="5" fill="#c98c55" '+W(3.5)+'/><path d="M14 62 H76 M14 94 H76" stroke="'+O+'" stroke-width="3"/>'+
+      ['#ff5a8a','#ffc23d','#7c5cff','#5cc26b','#4da3ff'].map((c, i) => '<rect x="'+(20+i*10)+'" y="'+(40+(i%2)*3)+'" width="8" height="'+(20-(i%2)*3)+'" fill="'+c+'" stroke="'+O+'" stroke-width="2"/><rect x="'+(22+i*10)+'" y="'+(73+(i%3)*2)+'" width="8" height="'+(19-(i%3)*2)+'" fill="'+['#5cc26b','#ff5a8a','#4da3ff','#ffc23d','#7c5cff'][i]+'" stroke="'+O+'" stroke-width="2"/>').join('')+
+      floor('#e8d6c6','#d6bfa9')+
+      '<g transform="translate(222 '+F+')"><rect x="-4" y="-14" width="58" height="14" rx="3" fill="#7c5cff" '+W(3)+'/><rect x="2" y="-27" width="48" height="13" rx="3" fill="#5cc26b" '+W(3)+'/><rect x="-2" y="-40" width="52" height="13" rx="3" fill="#ff5a8a" '+W(3)+'/>'+
+      '<g transform="translate(24 -40)"><ellipse cx="0" cy="-16" rx="22" ry="17" fill="#ffb3c8" '+W(3.5)+'/><ellipse cx="21" cy="-17" rx="6" ry="7" fill="#ffb3c8" '+W(3)+'/><circle cx="20" cy="-18" r="1.4" fill="'+O+'"/><circle cx="23" cy="-15" r="1.4" fill="'+O+'"/>'+
+      '<path d="M6 -31 l5 -9 5 8" fill="#ffb3c8" '+W(3)+'/><circle cx="10" cy="-20" r="2.6" fill="#2b1d3a"/><path d="M-10 -1 v5 M8 -1 v5" stroke="'+O+'" stroke-width="5" stroke-linecap="round"/><circle cx="-1" cy="-46" r="7" fill="#ffc23d" '+W(3)+'/></g></g>'+
+      nest('<g transform="rotate(8 54 168)"><rect x="40" y="166" width="28" height="36" rx="3" fill="#4da3ff" '+W(3.5)+'/><path d="M45 166 V202" stroke="'+O+'" stroke-width="2.5"/><rect x="50" y="176" width="13" height="7" rx="2" fill="#fff" stroke="'+O+'" stroke-width="2"/></g>', F-152);
+  } else {
+    s += '<rect width="300" height="200" fill="#fff4d6"/><path d="M-10 18 Q75 52 150 22 Q225 52 310 18" stroke="'+O+'" stroke-width="2.5" fill="none"/>';
+    const cols = ['#ff5a8a','#7c5cff','#5cc26b','#4da3ff']; let n = 0;
+    [[-10,18,75,52,150,22],[150,22,225,52,310,18]].forEach(q => { for (let t = .2; t < 1; t += .3) { const x = (1-t)*(1-t)*q[0]+2*(1-t)*t*q[2]+t*t*q[4], y = (1-t)*(1-t)*q[1]+2*(1-t)*t*q[3]+t*t*q[5];
+      s += '<ellipse cx="'+x.toFixed(1)+'" cy="'+(y+9).toFixed(1)+'" rx="5" ry="6.5" fill="'+cols[n++%4]+'" '+W(2.5)+'/>'; } });
+    s += floor('#cfeccc','#a9d8a5')+'<g transform="translate(6 70)"><path d="M0 0 H62 Q72 0 72 10 V30 Q72 40 62 40 H26 L14 50 L16 40 H0Z" fill="#fff" '+W(3)+'/><text x="36" y="26" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="15" fill="'+O+'">Ha ha!</text></g>'+
+      '<ellipse cx="236" cy="'+(F+4)+'" rx="24" ry="4" fill="rgba(0,0,0,.12)"/><svg x="204" y="'+(F-56)+'" width="64" height="64" viewBox="0 0 100 100">'+ICONS.dog+'</svg>'+
+      nest('<path d="M150 172 Q166 140 168 88" fill="none" stroke="'+O+'" stroke-width="2.5"/><ellipse cx="172" cy="62" rx="20" ry="25" fill="#ffc23d" '+W(3.5)+'/><path d="M168 87 l4 -2 4 2 -4 4z" fill="#ffc23d" '+W(2.5)+'/>', F-152);
+  }
+  return s+'</svg>';
+}
+function showStat(k){
+  const d = STAT_INFO[k], v = S[k];
+  if (!S.statTapped) { S.statTapped = true; save(); if (tab === 'home') render(); }
+  track('stat-'+k);
+  const g = k === 's' ? goalState() : null;
+  modal('<div class="sart">'+statScene(k)+'</div>'+
+    '<div class="sttl"><span>'+d.e+'</span><b>'+d.n+'</b><em style="color:'+d.c+'">'+v+'</em></div><div class="sbar wide"><u style="width:'+v+'%;background:'+d.c+'"></u></div>'+
+    '<p class="sline">'+d.line+'</p>'+
+    '<div class="sbox"><div class="rh">Right now</div>'+statNow(k).map(x => '<div class="nw"><span>'+x[0]+'</span><span>'+x[1]+'</span></div>').join('')+
+      (g ? '<div class="nw"><span>'+g.icon+'</span><span>'+g.label+'</span></div>'+goalBar(g.pct) : '')+'</div>'+
+    statNextHTML(k)+'<button class="btn" data-close>Got it</button><div class="ysmall">Grows every day you hit your screen time goal.</div>', 'statpop');
+}
+
 // ============ LIVING THE YEAR (app + automatic Screen Time) ============
 // Each morning a full-screen birthday cake waits with yesterday's number. One button: blow out the candles,
 // then the year arrives as a Polaroid. Screen Time numbers appear only here and on Today, never in shares.
@@ -2665,7 +2761,7 @@ function showYear(e, next){
   const names = {h:'💪', s:'🧠', j:'😊'}, spots = [['l',22],['r',30],['l',68]];
   let i = 0, stickers = '';
   for (const k of ['h','s','j']) if (e.fx && e.fx[k] && i < 3) { const [side, top] = spots[i++];
-    stickers += '<span class="stk '+side+(e.fx[k] < 0 ? ' neg' : '')+'" style="top:'+top+'%">'+(e.fx[k] > 0 ? '+' : '−')+Math.abs(e.fx[k])+' '+names[k]+'</span>'; }
+    stickers += '<span class="stk '+side+(e.fx[k] < 0 ? ' neg' : '')+'" data-stat="'+k+'" style="top:'+top+'%">'+(e.fx[k] > 0 ? '+' : '−')+Math.abs(e.fx[k])+' '+names[k]+'</span>'; }
   const art = e.buys ? itemArt(e.buys[0].key, CAR_KEY[e.buys[0].key] ? 'pbuy car' : 'pbuy') : '';
   const scene = good || e.tier === 'quiet' || e.tier === 'restored'
     ? '<svg class="pbg" viewBox="0 0 200 150" preserveAspectRatio="none"><rect width="200" height="150" fill="#fff6e0"/><rect y="112" width="200" height="38" fill="#f3d9b5"/><path d="M0 18 Q50 40 100 22 T200 20" stroke="#3b2a4a" stroke-width="2" fill="none"/>'+
@@ -2703,6 +2799,7 @@ function showYear(e, next){
   h += card ? '<button class="btn" id="lcard">See '+esc(S.name)+'\'s life card ✨</button>' : next ? '<button class="btn" id="ynext">Next year ➜</button>' : '<button class="btn" data-close>Done</button>';
   if (e.mins != null) h += '<div class="ysmall">'+(e.src === 'st' ? 'Yesterday ' : '')+fmtTime(e.mins)+' · goal '+fmtTime(e.goal)+'</div>';
   modal(h, 'yearpol');
+  document.querySelectorAll('.yearpol [data-stat]').forEach(b => b.onclick = ev => { ev.stopPropagation(); showStat(b.dataset.stat); });
   if (next) $('ynext').onclick = () => { document.querySelectorAll('.modal.yearpol').forEach(m => m.remove()); next(); };
   if (newDog) { store.dogName = 'Biscuit'; saveStore(); $('yrdog').oninput = ev => { store.dogName = ev.target.value.trim() || 'Biscuit'; saveStore(); }; }
   if (moment) $('mshare').onclick = () => shareModal(moment);
