@@ -368,7 +368,7 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .gbb{width:54px;height:64px;flex:none;background:rgba(255,255,255,.85);border-radius:50%;overflow:hidden}.gbb svg{width:54px;height:64px}
 .gbt{flex:1;min-width:0}.gbt b{display:block;font-size:17px}.gbt span{font-size:13px;opacity:.9}.gbp{background:#fff;color:#c8405f;font-weight:700;border-radius:999px;padding:6px 10px;font-size:15px;flex:none}
 .gdn{border:0;background:#f1edff;color:var(--accent2);border-radius:999px;padding:3px 10px;font-weight:600;font-size:14px;margin-bottom:4px}.gdogpic svg{width:110px;height:130px}
-[data-tap]{cursor:pointer;-webkit-tap-highlight-color:transparent}[data-tap]:active{transform:scale(.97)}.tbig{font-size:54px;line-height:1.1}.tgift{display:flex;justify-content:center}
+[data-tap]{cursor:pointer;-webkit-tap-highlight-color:transparent}[data-tap]:active{transform:scale(.97)}.mbig{font-size:54px;line-height:1.1}.tgift{display:flex;justify-content:center}
 .closetbtn{float:right;border:0;background:#f1edff;color:var(--accent2);border-radius:999px;padding:5px 11px;font-weight:600;font-size:13px}
 .gempty{text-align:center}.gsoon{display:flex;gap:12px;align-items:center}.gsoon svg{width:96px;height:96px;flex:none;filter:grayscale(.5);opacity:.85}.gsoon>div{flex:1;min-width:0}.gsoon .gname{font-size:19px}.gsoon p{margin:2px 0}.gempty .big{font-size:44px}
 .gfoot{color:#fff;opacity:.75;text-align:center;font-size:13px;margin:4px 0}.linkbtn.gfoot{display:block;margin:6px auto;background:none;border:0;text-decoration:underline}
@@ -1811,7 +1811,7 @@ function todayTap(k, el){
 function showStreakCard(){
   const keys = Object.keys(SETTINGS.streakBonuses).map(Number).sort((a, b) => a - b), next = keys.find(k => k > S.streak), n = esc(S.name);
   const pct = next ? Math.round(S.streak / next * 100) : 100;
-  modal('<div class="tbig">🔥</div><h2 style="margin:4px 0">'+(S.streak ? S.streak+' day streak' : 'No streak yet')+'</h2>'+
+  modal('<div class="mbig">🔥</div><h2 style="margin:4px 0">'+(S.streak ? S.streak+' day streak' : 'No streak yet')+'</h2>'+
     '<p class="muted">'+(S.streak ? 'You\'ve hit your goal '+S.streak+' day'+(S.streak > 1 ? 's' : '')+' in a row.' : 'Hit your goal today to start one.')+' Best ever: '+S.best+'.</p>'+
     (next ? '<div class="sbox"><div class="rh">Next streak bonus</div><b>'+(next - S.streak)+' more day'+(next - S.streak > 1 ? 's' : '')+'</b> for +'+SETTINGS.streakBonuses[next]+' to all of '+n+'\'s stats<i class="nbar" style="margin-top:8px"><u style="width:'+pct+'%"></u></i></div>' : '<div class="sbox"><b>Legendary!</b> You\'ve earned every streak bonus.</div>')+
     '<button class="btn" data-close style="margin-top:12px">Got it</button>');
@@ -1832,7 +1832,7 @@ function showGoalCard(){
   const recent = S.log.slice(-7).filter(e => e.mins != null), avg = recent.length ? Math.round(recent.reduce((a, e) => a + e.mins, 0) / recent.length / 5) * 5 : null;
   const cur = S.goal; let v = S.goalNext != null ? S.goalNext : cur;
   const comfy = recent.length >= 5 && avg != null && avg <= cur - 30 && cur > 30;
-  const body = () => '<div class="tbig">🎯</div><h2 style="margin:4px 0">Your daily goal</h2>'+
+  const body = () => '<div class="mbig">🎯</div><h2 style="margin:4px 0">Your daily goal</h2>'+
     '<p class="muted">'+fmtTime(cur)+' or less a day'+(avg != null ? '. Last '+recent.length+' day'+(recent.length > 1 ? 's' : '')+': about '+fmtTime(avg)+' a day on average.' : '.')+'</p>'+
     (comfy && v === cur ? '<div class="sbox">You\'ve been comfortably under. Try 15 minutes less? <button class="linkbtn" id="gtrim">Try '+fmtTime(cur - 15)+'</button></div>' : '')+
     '<div class="picker"><button id="gminus" aria-label="Less">–</button><div class="v">'+fmtTime(v)+'</div><button id="gplus" aria-label="More">+</button></div>'+
