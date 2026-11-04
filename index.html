@@ -122,6 +122,11 @@ details ul{padding-left:18px;margin:6px 0}
 .evt{font-size:52px;margin:6px 0 0}
 .evtxt{font-size:19px;font-weight:500;margin:6px 0 10px}
 .fx{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:6px 0}
+.ygoal{background:#f6f3ff;border-radius:14px;padding:8px 10px 10px;margin:8px 0 4px;text-align:left}.ygoal.flat{background:rgba(255,255,255,.6);margin-top:10px}
+.gl{display:flex;justify-content:space-between;align-items:baseline;gap:6px;font-size:13.5px;font-weight:600;color:var(--ink)}.gl span{min-width:0}.gl b{font-size:12px;white-space:nowrap}.gl b.up{color:#2fae5b}.gl b.dn{color:#d64545}
+.gb{display:flex;height:10px;border-radius:9px;background:#e6e1f3;margin-top:5px;overflow:hidden}.gb u{display:block;height:100%;background:#7c5cff}.gb s{display:block;height:100%;background:#ffc23d;text-decoration:none}
+.gb s.lost{background:repeating-linear-gradient(135deg,#ffb3b3 0 4px,#ffe0e0 4px 8px)}
+.hgoal{margin-top:6px}.hgoal .gl{font-size:12px;color:var(--soft)}.hgoal .gb{height:8px;margin-top:3px}
 .fx span{font-size:14px;font-weight:600;border-radius:99px;padding:4px 10px;background:#f1f9f4;color:var(--good)}
 .fx span.neg{background:#fff1f1;color:var(--bad)}
 .mscard{background:linear-gradient(135deg,#fff4cc,#ffe3ec);border-radius:16px;padding:12px;margin-top:12px}
@@ -553,7 +558,15 @@ let S = load();
 let tab = 'home';
 let draft = {name:'', skin:SKINS[1], hair:HAIRS[0], avg:240, goal:210, step:0};
 
-function load(){ try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch(e){ return null; } }
+function load(){ try { const raw = localStorage.getItem(KEY); return raw ? migrate(JSON.parse(raw)) : null; } catch(e){ return null; } }
+// Renames that older saves need. Age-22 "Video game designer" became "Toy designer" (Blips don't use screens in good scenes).
+function migrate(o){
+  if (!o) return o;
+  const toy = t => String(t).replace(/Video game designer/g, 'Toy designer').replace(/video game designer/g, 'toy designer');
+  if (o.job) o.job = toy(o.job);
+  if (o.log) for (const e of o.log) { if (e.text) e.text = toy(e.text); if (e.ms && e.ms.text) e.ms.text = toy(e.ms.text); }
+  return o;
+}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} appBackup(); }
 
 // ============ PHONE APP (App Store / Google Play version) ============
@@ -1109,7 +1122,7 @@ function liveYear(mins, tier){
   if (wasInDebt && S.money >= 0) notes.push('🎉 Student loans paid off!');
   if (S.age === 18 && S.inherit && S.inherit.fund > 0) {
     S.money += S.inherit.fund;
-    notes.push('🎁 '+S.inherit.from+' left a college fund: '+fmtMoney(S.inherit.fund)+'.');
+    notes.push('🎁 '+S.inherit.from+'\'s college fund arrived!');
   }
   const buys = buyThings();
 
@@ -1118,7 +1131,7 @@ function liveYear(mins, tier){
   if (ms && ms.fx) { const f = {}; for (const k in ms.fx) if (!quiet || ms.fx[k] > 0) f[k] = ms.fx[k]; applyFx(f); }
   if (S.age === 22 && LOANS[S.eduTier]) {
     S.money -= LOANS[S.eduTier];
-    notes.push('🎓 Graduated with '+fmtMoney(LOANS[S.eduTier])+' in student loans. Good years pay them off.');
+    notes.push('🎓 Graduated! Good years pay off the student loans.');
   }
 
   const entry = {age:S.age, date:today(), mins, goal:g, tier, emoji:ev[0], text:ev[1], fx: shown, shrunk, earned, notes, ms: ms ? {emoji:ms.emoji, title:ms.title, text:ms.text} : null};
@@ -1253,7 +1266,7 @@ function milestone(age, met){
     else if (met && S.talent === 'scientist' && S.s >= 85 && S.eduTier >= 2) { job='Rocket scientist'; pay=250; text='Hired by a space company to build rockets. Literally rocket science.'; }
     else if (met && S.talent === 'performer' && S.j >= 85) { job='Movie star'; pay=1000; text='Discovered at a coffee shop. Now starring in a superhero movie.'; }
     else if (score >= 80) { [job,pay] = pick([['Doctor',220],['Software engineer',180],['Airline pilot',200]]); text='Landed a dream job as a '+job.toLowerCase()+'.'; }
-    else if (score >= 65) { [job,pay] = pick([['Architect',110],['Video game designer',120],['Nurse',95]]); text='Got a great job as a '+job.toLowerCase()+'.'; }
+    else if (score >= 65) { [job,pay] = pick([['Architect',110],['Toy designer',120],['Nurse',95]]); text='Got a great job as a '+job.toLowerCase()+'.'; }
     else if (score >= 50) { [job,pay] = pick([['Electrician',80],['Teacher',65],['Chef',60]]); text=why+'Found a job as a '+job.toLowerCase()+'.'; }
     else if (score >= 35) { [job,pay] = pick([['Delivery driver',45],['Call center agent',38]]); text=why+'Took a job as a '+job.toLowerCase()+'. It pays the bills. Mostly.'; }
     else { job='Seasonal mall Santa'; pay=20; text=why+'The only job they could get: mall Santa. It\'s July.'; }
@@ -1651,7 +1664,6 @@ function homeHTML(){
   if (S.edu && S.age < 23) tags += '<span class="tag">🎓 '+S.edu+'</span>';
   if (S.job) tags += '<span class="tag">💼 '+S.job+'</span>';
   if (S.partner) tags += '<span class="tag">💞 '+S.partner+'</span>';
-  if (S.money > 0) tags += '<span class="tag">💰 '+fmtMoney(S.money)+'</span>';
   const open = canCheckIn() && !S.done;
   const last = S.log.length ? S.log[S.log.length - 1] : null;
   const share = S.log.length ? '<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '';
@@ -1659,7 +1671,7 @@ function homeHTML(){
   const chip = (e, v, c) => '<div class="chip">'+e+' '+v+'<i><u style="width:'+v+'%;background:'+c+'"></u></i></div>';
   const hero = '<div class="card hero2"><div class="hrow"><div class="buddy" id="buddy"><div class="bubble" id="bubble"></div>'+charSVG(S)+
       (S.tapped ? '' : '<div class="taphint" id="taphint">👆 Tap me!</div>')+'</div>'+
-    '<div class="who">'+(SHOP_ON ? '<button class="closetbtn" id="closet">👕 Closet</button>' : '')+'<div class="name">'+esc(S.name)+'</div><div class="sub">Age '+S.age+' · '+STAGE_NAMES[st]+'</div>'+(tags ? '<div class="tags">'+tags+'</div>' : '')+
+    '<div class="who">'+(SHOP_ON ? '<button class="closetbtn" id="closet">👕 Closet</button>' : '')+'<div class="name">'+esc(S.name)+'</div><div class="sub">Age '+S.age+' · '+STAGE_NAMES[st]+'</div>'+(tags ? '<div class="tags">'+tags+'</div>' : '')+heroGoalHTML()+
     (open && last ? '<div class="last"><b>Last year</b>'+last.emoji+' '+esc(last.text)+'</div>' : '')+'</div></div>'+
     '<div class="chips">'+chip('💪', S.h, 'var(--h)')+chip('🧠', S.s, 'var(--s)')+chip('😊', S.j, 'var(--j)')+'</div></div>';
 
@@ -1707,7 +1719,7 @@ function homeHTML(){
   const t = last ? TIER[last.tier] : null;
   const result = last ? '<div class="card result"><span class="ban" style="background:'+t.color+'">'+t.label+'</span><div class="ev">'+last.emoji+'</div>'+
       '<p><b>'+esc(last.text)+'</b></p>'+(last.mins != null ? '<p class="muted">'+fmtTime(last.mins)+' vs. your '+fmtTime(last.goal)+' goal</p>' : '')+
-      '<div class="fx">'+fxHTML(last.fx, last.earned)+'</div>'+
+      '<div class="fx">'+fxHTML(last.fx, last.earned)+'</div>'+yearGoalHTML(last)+
       (last.ms ? '<div class="msline">'+last.ms.emoji+' <b>'+esc(last.ms.title)+'</b></div>' : '')+share+'</div>' : '';
   return header()+hero+result+todayMeterHTML()+weekHTML()+
     '<div class="card waiting">'+teaserHTML(S.age)+'<div class="muted" style="margin-top:12px">Next check-in opens in</div><div class="countdown" id="cd"></div></div>';
@@ -1741,8 +1753,6 @@ function fxHTML(fx, earned){
   const names = {h:'💪', s:'🧠', j:'😊'};
   let out = '';
   for (const k of ['h','s','j']) if (fx[k]) out += '<span class="'+(fx[k]<0?'neg':'')+'">'+(fx[k]>0?'+':'')+fx[k]+' '+names[k]+'</span>';
-  if (earned > 0) out += '<span>+'+fmtMoney(earned)+' saved 💰</span>';
-  if (earned < 0) out += '<span class="neg">-'+fmtMoney(-earned)+' savings 💸</span>';
   return out;
 }
 
@@ -1941,6 +1951,53 @@ function buyLine(b){
   return esc(S.name)+' bought a '+it.name+'!';
 }
 
+// ---- Saving goals: the Blip's money stays under the hood. Players see progress bars and moments, never dollars. ----
+const MOMENT = {hatch:'🚗 Got a first car!', starter:'🔑 Moved into a starter home!', trip:'✈️ Went on a dream trip!', suv:'🚙 Got a family SUV!',
+  family:'🔑 Moved into a family house!', dreamcar:'🏎️ Got a dream convertible!', dreamhome:'🏰 Moved into a dream home!', boat:'⛵ Got a sailboat!',
+  beach:'🏖️ Got a beach house!', island:'🏝️ Got a private island!'};
+function momentLine(k){ return MOMENT[k] || '🎉 Got a '+esc(ITEM[k].name)+'!'; }
+function goalName(it){
+  const o = owned();
+  if (it.kind === 'home') return o.home ? 'a bigger home' : 'a first home';
+  if (it.kind === 'car') return o.car ? 'a new car' : 'a first car';
+  return 'a '+it.name;
+}
+// pct of the way there, given savings m (defaults to now). Null when there's nothing to save for yet.
+function goalState(m){
+  if (m == null) m = S.money;
+  const clamp = v => Math.max(0, Math.min(100, Math.round(v)));
+  if (S.age < 18) return null;
+  if (m < 0) { const L = LOANS[S.eduTier] || -m; return {icon:'🎓', label:'Paying off college first', pct:clamp((1 - (-m) / L) * 100)}; }
+  const nxt = nextItem();
+  if (!nxt) return null;
+  const cost = itemCost(nxt);
+  return {icon:nxt.kind === 'home' ? '🏠' : nxt.kind === 'car' ? '🚗' : '✨', label:'Saving for '+goalName(nxt), next:goalName(nxt), pct:cost ? clamp(m / cost * 100) : 100};
+}
+function goalBar(base, gain, loss){
+  return '<i class="gb"><u style="width:'+base+'%"></u>'+(gain ? '<s style="width:'+gain+'%"></s>' : '')+(loss ? '<s class="lost" style="width:'+loss+'%"></s>' : '')+'</i>';
+}
+function heroGoalHTML(){
+  const g = goalState();
+  return g ? '<div class="hgoal"><div class="gl"><span>'+g.icon+' '+(g.next ? 'Next: '+g.next : g.label)+'</span></div>'+goalBar(g.pct)+'</div>' : '';
+}
+// The yearly pop-up's goal bar. Only for the newest year, since it reads today's savings.
+function yearGoalHTML(e){
+  if (!e || e !== S.log[S.log.length - 1] || e.buys || !e.earned) return '';
+  const now = goalState(), was = goalState(S.money - e.earned);
+  if (!now || !was || now.label !== was.label) return '';
+  const up = e.earned > 0;
+  return '<div class="ygoal"><div class="gl"><span>'+now.icon+' '+now.label+'</span>'+(up ? '<b class="up">a step closer!</b>' : '<b class="dn">slipped back</b>')+'</div>'+
+    (up ? goalBar(was.pct, now.pct - was.pct) : goalBar(now.pct, 0, was.pct - now.pct))+'</div>';
+}
+function nextUpHTML(){
+  const g = goalState();
+  return g ? '<div class="ygoal flat"><div class="gl"><span>'+g.icon+' Next up: '+(g.next || g.label)+'</span>'+(g.pct >= 100 ? '<b class="up">saved!</b>' : '')+'</div>'+goalBar(g.pct)+'</div>' : '';
+}
+// Old saves have dollar amounts in their year notes. Show them without.
+function cleanNote(n){
+  return String(n).replace(/ left a college fund: \$[\d.]+[KM]\./, '\'s college fund arrived!').replace(/^🎓 Graduated with \$[\d.]+[KM] in student loans\. Good years pay them off\./, '🎓 Graduated! Good years pay off the student loans.');
+}
+
 // ============ THE YARD ============
 // Good childhood years leave something behind at Mom and Dad's house. The weather follows your last check-in.
 const YARD = (function(){
@@ -2091,7 +2148,7 @@ function growHTML(){
   let h = '<div class="card"><h2 class="earnh">🌱 Growing up<small>Age '+S.age+'</small></h2><div class="muted small">At 18 these decide '+esc(S.name)+'\'s college. At 22, the first job.</div>'+
     bar('h','💪','Health','var(--h)')+bar('s','🧠','Smarts','var(--s)')+bar('j','😊','Joy','var(--j)')+
     '<div class="track">🎓 On track for <b>'+(at ? at[1] : 'no college yet')+'</b>'+(up ? '<br><span class="muted small">Smarts '+up[0]+' gets '+him+' into '+up[1]+'. '+(up[0] - S.s)+' to go.</span>' : '')+'</div>';
-  if (S.inherit && S.inherit.fund > 0) h += '<div class="talent">🎁 '+esc(S.inherit.from)+' left a <b>'+fmtMoney(S.inherit.fund)+'</b> college fund. It arrives at 18.</div>';
+  if (S.inherit && S.inherit.fund > 0) h += '<div class="talent">🎁 '+esc(S.inherit.from)+' left a <b>college fund</b>. It arrives at 18.</div>';
   const names = {athlete:'Sports', scientist:'Science', performer:'Performing', gamer:'Video games'};
   if (S.talent) h += '<div class="talent">⭐ Talent: <b>'+names[S.talent]+'</b></div>';
   else {
@@ -2213,19 +2270,19 @@ function trophyInfo(k){
 
 function lifeHTML(){
   const o = owned(), nxt = nextItem();
-  let earned = '<div class="card"><h2 class="earnh">💰 Earned by '+esc(S.name)+'<small>Net worth '+fmtMoney(netWorth())+'</small></h2>';
-  earned += '<div class="muted small">'+(S.money < 0 ? '🎓 Student loans: '+fmtMoney(-S.money)+' left. Good years pay them off.' : 'Savings '+fmtMoney(S.money)+'. '+esc(S.name)+' buys things automatically. Only good habits grow it.')+'</div>';
+  const n = esc(S.name), g = goalState();
+  let earned = '<div class="card"><h2 class="earnh">🏡 '+n+'\'s things<small>'+o.bought.length+' so far</small></h2>';
+  earned += '<div class="muted small">'+(S.age < 18 ? n+' starts saving at 18.' : 'Good years help '+n+' save up. Rough years set '+(S.girl ? 'her' : 'him')+' back.')+'</div>';
   if (o.bought.length) earned += o.bought.map(b => '<div class="own">'+itemArt(b.key, CAR_KEY[b.key] ? 'oicon car' : 'oicon')+'<span>'+ITEM[b.key].name.replace(/^./, c => c.toUpperCase())+
     ((o.car === b.key || o.home === b.key || ['trip','extra'].includes(ITEM[b.key].kind)) ? '' : ' <i>traded in</i>')+'</span><span class="a">age '+b.age+'</span></div>').join('');
-  if (S.age < 18) earned += '<p class="nexttxt">'+esc(S.name)+' starts earning at 18. First up: a '+LADDER[0].name+'.</p>';
+  if (S.age < 18) earned += '<p class="nexttxt">First up: a '+LADDER[0].name+'.</p>';
   else if (nxt) {
-    const cost = itemCost(nxt), pct = Math.max(0, Math.min(100, Math.round(S.money / cost * 100))), at = unlockAge(nxt);
-    const status = S.money < 0 ? 'after the loans' : S.money < cost ? fmtMoney(cost - S.money)+' to go' : S.age + 1 < at ? 'saved! Waits until age '+at : 'buying soon!';
+    const cost = itemCost(nxt), at = unlockAge(nxt);
+    const status = S.money < 0 ? 'after college is paid off' : S.money < cost ? (g.pct < 25 ? 'just started' : g.pct < 75 ? 'getting there!' : 'almost there!') : S.age + 1 < at ? 'saved! Waits until age '+at : 'coming soon!';
     earned += '<div class="nexttxt">Next: '+itemArt(nxt.key, 'nicon')+' <b>'+nxt.name.replace(/^./, c => c.toUpperCase())+'</b> · '+status+
       (S.money < cost && S.age + 1 < at ? '<br><span class="muted small">Unlocks at age '+at+(nxt.key === 'suv' || nxt.key === 'family' ? (S.partner ? '' : ' (28 with a partner)') : '')+'</span>' : '')+
-      (tradeIn(nxt) ? '<br><span class="muted small">'+fmtMoney(nxt.price)+' minus '+fmtMoney(tradeIn(nxt))+' trade-in</span>' : '')+
-      '<i class="nbar"><u style="width:'+pct+'%"></u></i></div>';
-  } else earned += '<p class="nexttxt">🌟 '+esc(S.name)+' has everything '+(S.girl ? 'she' : 'he')+' ever dreamed of!</p>';
+      '<i class="nbar"><u style="width:'+g.pct+'%"></u></i></div>';
+  } else earned += '<p class="nexttxt">🌟 '+n+' has everything '+(S.girl ? 'she' : 'he')+' ever dreamed of!</p>';
   earned += '</div>';
   return header().replace('<div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
     '<div class="card scenecard">'+homeScene()+(sceneNote() ? '<div class="snote">'+sceneNote()+'</div>' : '')+'</div>'+pathHTML()+(S.age < 18 ? growHTML() : '')+earned+trophyCaseHTML()+storyHTML(true);
@@ -2241,7 +2298,7 @@ function storyHTML(inLife){
       '<div class="t">'+e.emoji+' '+esc(e.text)+'</div>'+
       '<div class="m"><span class="pill" style="background:'+t.color+'">'+(e.tier === 'restored' ? 'from backup' : e.tier)+'</span>'+(e.tier === 'restored' ? '' : e.mins == null ? 'No check-in' : fmtTime(e.mins)+' on phone')+'</div>'+
       (e.ms ? '<div class="ms"><b>'+e.ms.emoji+' '+esc(e.ms.title)+'</b><br><span class="muted">'+esc(e.ms.text)+'</span></div>' : '')+
-      (e.buys ? e.buys.map(b => '<div class="ms">🎉 <b>Bought a '+esc(ITEM[b.key].name)+'</b> <span class="muted">−'+fmtMoney(b.cost)+'</span></div>').join('') : '')+
+      (e.buys ? e.buys.map(b => '<div class="ms"><b>'+momentLine(b.key)+'</b></div>').join('') : '')+
       '</div></div>';
   }
   const met = S.log.filter(e=>e.tier==='good'||e.tier==='great').length;
@@ -2458,11 +2515,11 @@ function showYear(e){
     '<div class="agebig">'+esc(S.name)+' is now<b>'+e.age+'</b></div>'+
     '<p class="muted">'+fmtTime(e.mins)+' of screen time vs. your '+fmtTime(e.goal)+' goal</p>'+
     '<div class="evt">'+e.emoji+'</div><div class="evtxt">'+esc(e.text)+'</div>'+
-    '<div class="fx">'+fxHTML(e.fx, e.earned)+'</div>'+
+    '<div class="fx">'+fxHTML(e.fx, e.earned)+'</div>'+yearGoalHTML(e)+
     (e.shrunk ? '<p class="muted">⭐ Already near the top! Keep it up to stay there.</p>' : '');
-  for (const n of e.notes) h += '<p><b>'+n+'</b></p>';
-  if (e.buys) for (const b of e.buys) h += '<div class="mscard buy"><div class="k">Big purchase!</div>'+itemArt(b.key, CAR_KEY[b.key] ? 'buyart car' : 'buyart')+
-    '<div class="t">'+buyLine(b)+'</div><p>−'+fmtMoney(b.cost)+' from savings'+(b.traded ? ' (after a '+fmtMoney(b.traded)+' trade-in)' : '')+(ITEM[b.key].fx ? ' · +'+ITEM[b.key].fx.j+' 😊' : '')+'</p></div>';
+  for (const n of e.notes) h += '<p><b>'+cleanNote(n)+'</b></p>';
+  if (e.buys) for (const b of e.buys) h += '<div class="mscard buy"><div class="k">Big moment!</div>'+itemArt(b.key, CAR_KEY[b.key] ? 'buyart car' : 'buyart')+
+    '<div class="t">'+buyLine(b)+'</div><p>All those good years paid off.'+(ITEM[b.key].fx ? ' +'+ITEM[b.key].fx.j+' 😊' : '')+'</p>'+(e === S.log[S.log.length - 1] ? nextUpHTML() : '')+'</div>';
   if (e.ms) h += '<div class="mscard"><div class="k">Big life moment</div><div class="e">'+e.ms.emoji+'</div><div class="t">'+esc(e.ms.title)+'</div><p>'+esc(e.ms.text)+'</p></div>';
   if (S.done) h += '<div class="mscard"><div class="k">The end of an era</div><div class="e">🎂</div><div class="t">'+esc(S.name)+' turned '+SETTINGS.lifeLength+'!</div><p>Their story is complete. See how it went on the Today screen.</p></div>';
   // Turning 5: baby clothes come off and wait in the closet for the next generation.
@@ -2486,7 +2543,7 @@ function showYear(e){
   if (newDog) { store.dogName = 'Biscuit'; saveStore(); $('yrdog').oninput = ev => { store.dogName = ev.target.value.trim() || 'Biscuit'; saveStore(); }; }
   if (moment) $('mshare').onclick = () => shareModal(moment);
   if (card) $('lcard').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); showLifeCard(e.age); };
-  if (e.buys) confetti(['🎉','💰','✨','🔑']);
+  if (e.buys) confetti(['🎉','🏠','✨','🔑']);
   else if (e.tier === 'great' || e.ms) confetti(e.tier === 'great' ? ['🎉','⭐','✨','🎊'] : [e.ms.emoji,'✨']);
 }
 
@@ -2814,7 +2871,7 @@ function restoreModal(){
   $('rgo').onclick = () => {
     const d = readBackup($('rcode').value);
     if (!d) { $('rerr').textContent = 'That code didn\'t work. Make sure you copied all of it.'; return; }
-    S = d; save(); tab = 'home';
+    S = migrate(d); save(); tab = 'home';
     document.querySelectorAll('.modal').forEach(m => m.remove());
     catchUp(); render(); updateIcon();
     modal('<div class="birth">'+charSVG(S)+'</div><h2>'+esc(S.name)+' is back!</h2><p>Age '+S.age+', right where you left off.</p><button class="btn" data-close>Yay</button>');
