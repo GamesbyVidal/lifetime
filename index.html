@@ -315,6 +315,20 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .wtz{flex:1;display:flex;gap:8px;align-items:center;border:2.5px solid #3b2a4a;border-radius:16px;background:#fff6d6;padding:8px 10px}.wtz span{font-size:28px}.wtz small{display:block;font-size:11px;font-weight:700;color:#b26b00;text-transform:uppercase;letter-spacing:.5px}.wtz b{font-size:14px;line-height:1.25;display:block}
 .wdown{margin-top:12px;background:linear-gradient(180deg,#8f73ff,#6f50f0);box-shadow:0 4px 0 #4f35c4}
 .bye{text-align:center;padding:22px 16px;color:#fff}.bye .muted{color:#d9d2ff}.bye.card2 .muted{color:var(--soft)}.bye.card2{color:var(--ink)}.bye .e{font-size:46px}.bye h2{margin:6px 0}.bye.card2{background:#f6f3ff;border:2.5px solid #3b2a4a;border-radius:20px;margin:0 6px}
+.linkbtn{border:0;background:none;color:#7c5cff;font:inherit;font-weight:600;padding:0;cursor:pointer}.trow{grid-template-columns:repeat(4,1fr)}.tcase .card{text-align:left}
+.lmap{border-radius:14px;overflow:hidden;border:2.5px solid #3b2a4a}.mstop{cursor:pointer}
+.piles{display:flex;gap:10px;overflow-x:auto;padding:14px 2px 4px}.pile{flex:none;width:86px;border:0;background:none;font-family:inherit;color:inherit;position:relative;padding:0;cursor:pointer}
+.pile .pst{position:relative;height:84px}.pile b{display:block;font-size:14px;margin-top:4px}.pile small{color:var(--soft);font-size:11px}
+.mph{position:absolute;left:8px;top:4px;width:66px;height:70px;background:#fff;border:2px solid #3b2a4a;border-radius:4px;padding:3px 3px 10px;box-shadow:0 2px 4px rgba(60,30,90,.15);overflow:hidden}
+.mph svg{width:100%;height:100%;display:block;background:#fff6e0}.mph.p0{transform:rotate(-2deg);z-index:3}.mph.p1{transform:rotate(6deg) translate(4px,2px);z-index:2}.mph.p2{transform:rotate(-8deg) translate(-4px,4px);z-index:1}
+.pile.now .pst{background:#fff6d6;border-radius:12px;box-shadow:0 0 0 2.5px #ffc23d}.nowt{position:absolute;right:-2px;top:-10px;z-index:5;background:#7c5cff;color:#fff;font-size:11px;font-weight:700;border-radius:99px;padding:1px 8px}
+.chh small{color:var(--soft)}.chh h2{margin:0 0 6px;font-size:30px}
+.bigs{display:grid;grid-template-columns:1fr 1fr;gap:4px}.bigs .bigp:first-child:nth-last-child(odd){grid-column:1/-1}.bigp{border:0;background:none;padding:0;font-family:inherit;color:inherit;position:relative;cursor:pointer}
+.bigs .polaroid{margin:10px 6px 6px}.bigs .photo{height:110px}.bigs .cap{font-size:13px}.bigs .stk,.bigs .bigm{display:none}.bage{position:absolute;left:0;top:4px;z-index:4;background:#5cc26b;color:#fff;border:2px solid #3b2a4a;border-radius:99px;font-weight:700;font-size:12px;padding:1px 7px}
+.every{margin:10px 0;text-align:left}.every summary{color:#7c5cff;font-weight:600;cursor:pointer;text-align:center}.yrow{display:flex;gap:10px;width:100%;text-align:left;border:0;border-top:1px solid #f0ecfb;background:none;padding:8px 2px;font-family:inherit;font-size:14px;color:inherit;cursor:pointer}.yrow .a{font-weight:700;width:26px;flex:none}
+.phm{display:flex;justify-content:space-between;align-items:center;margin:4px 6px}.phm b{font-size:22px}.phs{text-align:left;margin:8px 6px}
+.fwall{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:#fdf0f6;border-radius:14px;padding:12px 8px}.frm{text-align:center}.fpic{background:#fff6e0;border:5px solid #e0b07a;outline:2.5px solid #3b2a4a;border-radius:4px;aspect-ratio:4/5;overflow:hidden}
+.fpic svg{width:100%;height:100%;display:block}.frm b{display:block;font-size:12px;margin-top:6px}.frm small{font-size:11px;color:var(--soft)}
 .confetti{position:fixed;top:-20px;font-size:22px;pointer-events:none;z-index:30;animation:drop linear forwards}
 @keyframes drop{to{transform:translateY(110vh) rotate(540deg)}}
 .hide{display:none!important}
@@ -2335,6 +2349,16 @@ function trophyCaseHTML(){
   });
   return h+'</div>';
 }
+// The life tab shows a short row (earned first, then the closest locked one). "See all" opens the full case.
+// The end-age trophy stays out of the row: the life tab never names an end age.
+function trophyRowHTML(){
+  const got = trophyCase(), n = TROPHIES.filter(t => got[t.k]).length;
+  const list = TROPHIES.filter(t => t.k !== 'age80'), earned = list.filter(t => got[t.k]), locked = list.filter(t => !got[t.k]);
+  const pct = t => { const p = t.have(); return Math.max(0, p[0]) / p[1]; };
+  const row = earned.slice(-3).concat(locked.sort((a, b) => pct(b) - pct(a)).slice(0, Math.max(1, 4 - Math.min(3, earned.length))));
+  return '<div class="card" id="trophies"><h2 class="earnh">🏆 Trophies<small>'+n+' of '+TROPHIES.length+' · <button class="linkbtn" id="trall">See all ›</button></small></h2><div class="tiles trow">'+
+    row.map(t => '<button class="tile'+(got[t.k] ? ' got' : '')+'" data-trophy="'+t.k+'">'+trophySVG(t, !got[t.k], 48)+'<b>'+t.name+'</b>'+(got[t.k] ? '' : '<span>Locked</span>')+'</button>').join('')+'</div></div>';
+}
 function trophyInfo(k){
   const t = TROPHIES.find(x => x.k === k), e = trophyCase()[k], p = t.have();
   if (e) return modal('<div class="trbig">'+trophySVG(t, false, 130)+'</div><div class="tk">Earned</div><h2>'+esc(t.name)+'</h2><p>'+esc(t.how)+'</p>'+
@@ -2345,24 +2369,105 @@ function trophyInfo(k){
 }
 
 function lifeHTML(){
-  const o = owned(), nxt = nextItem();
-  const n = esc(S.name), g = goalState();
-  let earned = '<div class="card"><h2 class="earnh">🏡 '+n+'\'s things<small>'+o.bought.length+' so far</small></h2>';
-  earned += '<div class="muted small">'+(S.age < 18 ? n+' starts saving at 18.' : 'Good years help '+n+' save up. Rough years set '+(S.girl ? 'her' : 'him')+' back.')+'</div>';
-  if (o.bought.length) earned += o.bought.map(b => '<div class="own">'+itemArt(b.key, CAR_KEY[b.key] ? 'oicon car' : 'oicon')+'<span>'+ITEM[b.key].name.replace(/^./, c => c.toUpperCase())+
-    ((o.car === b.key || o.home === b.key || ['trip','extra'].includes(ITEM[b.key].kind)) ? '' : ' <i>traded in</i>')+'</span><span class="a">age '+b.age+'</span></div>').join('');
-  if (S.age < 18) earned += '<p class="nexttxt">First up: a '+LADDER[0].name+'.</p>';
-  else if (nxt) {
-    const cost = itemCost(nxt), at = unlockAge(nxt);
-    const status = S.money < 0 ? 'after college is paid off' : S.money < cost ? (g.pct < 25 ? 'just started' : g.pct < 75 ? 'getting there!' : 'almost there!') : S.age + 1 < at ? 'saved! Waits until age '+at : 'coming soon!';
-    earned += '<div class="nexttxt">Next: '+itemArt(nxt.key, 'nicon')+' <b>'+nxt.name.replace(/^./, c => c.toUpperCase())+'</b> · '+status+
-      (S.money < cost && S.age + 1 < at ? '<br><span class="muted small">Unlocks at age '+at+(nxt.key === 'suv' || nxt.key === 'family' ? (S.partner ? '' : ' (28 with a partner)') : '')+'</span>' : '')+
-      '<i class="nbar"><u style="width:'+g.pct+'%"></u></i></div>';
-  } else earned += '<p class="nexttxt">🌟 '+n+' has everything '+(S.girl ? 'she' : 'he')+' ever dreamed of!</p>';
-  earned += '</div>';
   return header().replace('<div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
     '<div class="card scenecard">'+homeScene()+(sceneNote() ? '<div class="snote">'+sceneNote()+'</div>' : '')+'</div>'+
-    (S.log.length && MORNING && autoOn() ? weekHTML()+'<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '')+pathHTML()+(S.age < 18 ? growHTML() : '')+earned+trophyCaseHTML()+storyHTML(true);
+    (S.log.length && MORNING && autoOn() ? weekHTML()+'<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '')+
+    lifeMapHTML()+(S.age < 18 ? growHTML() : '')+chaptersHTML()+familyWallHTML()+trophyRowHTML();
+}
+
+// ---- Life map: a winding road of big moments. Past stops, "Now", the next stop glowing, then faded stops into the clouds.
+// Stops are story only: no good or rough coloring, so the road is safe to show anywhere.
+function lifeStops(){
+  const past = [{age:0, e:'🍼', t:'Born'}];
+  for (const e of S.log) {
+    if (e.ms) past.push({age:e.age, e:e.ms.emoji, t:e.ms.title.replace(/^(First real job|Talent discovered): /, ''), photo:true});
+    if (e.buys) for (const b of e.buys) past.push({age:e.age, e:MOMENT[b.key] ? MOMENT[b.key].split(' ')[0] : '🔑', t:momentLine(b.key).replace(/^\S+ /, '').replace(/!$/, ''), photo:true, key:true});
+  }
+  const up = Object.keys(UPCOMING).map(Number).filter(a => a > S.age).slice(0, 3).map(a => ({age:a, e:UPCOMING[a][0], t:UPCOMING[a][1]}));
+  const nx = S.age >= 18 ? nextItem() : null;
+  if (nx) up.splice(1, 0, {e:(MOMENT[nx.key] || '✨').split(' ')[0], t:goalName(nx).replace(/^a /, '').replace(/^./, c => c.toUpperCase()), dream:true});
+  return {past:past.slice(-7), up};
+}
+function lifeMapHTML(){
+  const {past, up} = lifeStops(), O = '#3b2a4a';
+  const pts = past.map(x => Object.assign({k:'past'}, x)).concat([{k:'now', age:S.age}], up.map((x, i) => Object.assign({k:i ? 'later' : 'next'}, x)));
+  const per = 3, rows = Math.ceil(pts.length / per), RH = 92, H = rows * RH + 54, xs = [52, 150, 248];
+  const pos = pts.map((p, i) => { const r = Math.floor(i / per), c = i % per; return [r % 2 ? xs[per - 1 - c] : xs[c], H - 40 - r * RH]; });
+  let road = 'M'+(pos[0][0] - 30)+' '+pos[0][1];
+  pos.forEach((q, i) => { if (i && Math.floor(i / per) !== Math.floor((i - 1) / per)) { const pr = pos[i - 1], side = pr[0] > 150 ? 1 : -1;
+      road += ' C'+(pr[0] + side*44)+' '+pr[1]+' '+(q[0] + side*44)+' '+q[1]+' '+q[0]+' '+q[1]; } else road += ' L'+q[0]+' '+q[1]; });
+  const last = pos[pos.length - 1];
+  road += ' L'+(last[0] + (Math.floor((pos.length - 1) / per) % 2 ? -30 : 30))+' '+last[1];
+  let g = '<path d="'+road+'" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/><path d="'+road+'" fill="none" stroke="'+O+'" stroke-width="3" stroke-dasharray="0" opacity=".0"/>'+
+    '<path d="'+road+'" fill="none" stroke="#e9dcc8" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><path d="'+road+'" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="7 7"/>';
+  const lab = (x, y, t, sub, cls) => '<text x="'+x+'" y="'+y+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="11" fill="'+O+'"'+(cls ? ' opacity="'+cls+'"' : '')+'>'+esc(t.length > 16 ? t.slice(0, 15)+'…' : t)+'</text>'+
+    (sub ? '<text x="'+x+'" y="'+(y+12)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="10" fill="#7a7195"'+(cls ? ' opacity="'+cls+'"' : '')+'>'+esc(sub)+'</text>' : '');
+  pts.forEach((p, i) => { const [x, y] = pos[i];
+    if (p.k === 'now') { g += '<svg x="'+(x-24)+'" y="'+(y-52)+'" width="48" height="58" viewBox="0 0 200 240">'+charSVG(S).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')+'</svg>'+
+      '<rect x="'+(x-30)+'" y="'+(y+10)+'" width="60" height="18" rx="9" fill="#7c5cff" stroke="'+O+'" stroke-width="2"/><text x="'+x+'" y="'+(y+23)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="11" fill="#fff">Now · '+S.age+'</text>'; return; }
+    const op = p.k === 'later' ? '.45' : '';
+    g += '<g'+(p.photo ? ' class="mstop" data-age="'+p.age+'"' : '')+(op ? ' opacity="'+op+'"' : '')+'>'+(p.k === 'next' ? '<circle cx="'+x+'" cy="'+y+'" r="25" fill="#ffd36e" opacity=".55"/>' : '')+
+      '<circle cx="'+x+'" cy="'+y+'" r="17" fill="'+(p.k === 'past' ? '#fff' : p.dream ? '#f6f3ff' : '#fff6d6')+'" stroke="'+O+'" stroke-width="2.5"'+(p.dream ? ' stroke-dasharray="4 3"' : '')+'/>'+
+      '<text x="'+x+'" y="'+(y+6)+'" text-anchor="middle" font-size="17">'+p.e+'</text>'+
+      (p.k === 'past' && p.age ? '<circle cx="'+(x+13)+'" cy="'+(y-13)+'" r="6.5" fill="#5cc26b" stroke="'+O+'" stroke-width="2"/><path d="M'+(x+10)+' '+(y-13)+' l2 2.5 4 -4.5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>' : '')+
+      (p.k === 'next' ? '<rect x="'+(x-18)+'" y="'+(y-36)+'" width="36" height="15" rx="7.5" fill="#ffc23d" stroke="'+O+'" stroke-width="2"/><text x="'+x+'" y="'+(y-25)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="10" fill="'+O+'">Next</text>' : '')+
+      lab(x, y + 30, p.t, p.dream ? 'someday' : p.age != null ? (p.k === 'past' ? 'age '+p.age : 'at '+p.age) : '')+'</g>'; });
+  const top = '<g opacity=".9"><ellipse cx="80" cy="22" rx="34" ry="13" fill="#fff"/><ellipse cx="112" cy="16" rx="24" ry="12" fill="#fff"/><ellipse cx="220" cy="24" rx="36" ry="13" fill="#fff"/><ellipse cx="190" cy="18" rx="20" ry="10" fill="#fff"/>'+
+    '<text x="150" y="26" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="11" fill="#9a90b8">still to come…</text></g>';
+  const gs = goalState();
+  const nb = up.find(x => !x.dream), hint = nb && PATH_HINT[nb.age], he = S.girl ? 'she' : 'he';
+  return '<div class="card"><h2 class="earnh">🗺️ Life map<small>Big moments</small></h2><div class="lmap"><svg viewBox="0 0 300 '+H+'" width="100%" style="display:block">'+
+    '<rect width="300" height="'+H+'" rx="14" fill="#e8f6e4"/>'+top+g+'</svg></div>'+
+    (hint ? '<div class="tmr"><b>At '+nb.age+': '+esc(nb.t)+'</b><br>Hit your goal that day and '+esc(S.name)+' '+hint[0]+'. Miss it and '+he+' '+hint[1]+'.</div>' : '')+
+    (gs ? '<div class="ygoal flat"><div class="gl"><span>'+gs.icon+' '+gs.label+'</span><b class="up">'+(gs.pct >= 100 ? 'saved!' : gs.pct >= 50 ? 'getting closer' : 'just started')+'</b></div>'+goalBar(gs.pct)+'</div>' : '')+'</div>';
+}
+
+// ---- Chapters: one pile of photos per stage of life so far, best moment on top.
+const CHAPTERS = [['Baby',1,4],['Kid',5,12],['Teen',13,19],['20s',20,29],['30s',30,39],['40s',40,49],['50s',50,59],['60s',60,69],['Golden years',70,999]];
+function bestYears(list){ const score = e => (e.buys ? 4 : 0) + (e.ms ? 3 : 0) + (e.tier === 'great' ? 2 : e.tier === 'good' ? 1 : 0); return list.slice().sort((a, b) => score(b) - score(a) || b.age - a.age); }
+function miniPhoto(e, cls){ return '<div class="mph '+(cls || '')+'">'+blipAt(e.age, e.tier, 60)+'</div>'; }
+function chaptersHTML(){
+  if (!S.log.length) return '<div class="card"><h2 class="earnh">📚 Chapters</h2><p class="muted">'+esc(S.name)+'\'s story starts after your first check-in.</p></div>';
+  const ch = CHAPTERS.map((c, i) => ({i, n:c[0], list:S.log.filter(e => e.age >= c[1] && e.age <= c[2])})).filter(c => c.list.length);
+  const now = ch[ch.length - 1];
+  const piles = ch.map(c => { const top = bestYears(c.list).slice(0, 3);
+    return '<button class="pile'+(c === now ? ' now' : '')+'" data-ch="'+c.i+'">'+(c === now ? '<span class="nowt">Now</span>' : '')+
+      '<div class="pst">'+top.slice().reverse().map((e, k) => miniPhoto(e, 'p'+(top.length - 1 - k))).join('')+'</div><b>'+c.n+'</b><small>'+c.list.length+' year'+(c.list.length > 1 ? 's' : '')+'</small></button>'; }).join('');
+  const cards = LIFE_CARD_AGES.filter(a => S.age >= a).map(a => '<button class="btn ghost lcbtn" data-age="'+a+'">✨ Age '+a+' card</button>').join('');
+  return '<div class="card"><h2 class="earnh">📚 Chapters<small>Tap a stack</small></h2><div class="piles">'+piles+'</div>'+(cards ? '<div class="row lcrow">'+cards+'</div>' : '')+'</div>';
+}
+function showChapter(i){
+  const c = CHAPTERS[i], list = S.log.filter(e => e.age >= c[1] && e.age <= c[2]);
+  if (!list.length) return;
+  let big = list.filter(e => e.ms || e.buys);
+  if (!big.length) big = bestYears(list).slice(0, 2);
+  const rows = list.slice().reverse().map(e => '<button class="yrow" data-y="'+e.age+'"><span class="a">'+e.age+'</span><span>'+e.emoji+' '+esc(e.text)+'</span></button>').join('');
+  modal('<div class="chh"><small>Ages '+list[0].age+' to '+list[list.length - 1].age+' · '+list.length+' year'+(list.length > 1 ? 's' : '')+'</small><h2>'+c[0]+'</h2></div>'+
+    '<div class="rh">⭐ Big moments</div><div class="bigs">'+big.slice().reverse().map(e => '<button class="bigp" data-y="'+e.age+'">'+polaroidHTML(e)+'<span class="bage">'+e.age+'</span></button>').join('')+'</div>'+
+    '<details class="every"><summary>Show every year ›</summary>'+rows+'</details><button class="btn" data-close>Close</button>', 'yearpol chap');
+  document.querySelectorAll('.chap [data-y]').forEach(b => b.onclick = ev => { ev.stopPropagation(); showPhoto(+b.dataset.y); });
+}
+// Tap a photo: the year big, with its story and stat stickers, and a story-only share.
+function showPhoto(age){
+  const e = S.log.find(x => x.age === age);
+  if (!e) return;
+  const t = TIER[e.tier];
+  const moment = e.ms ? {emoji:e.ms.emoji, title:e.ms.title, text:e.ms.text} : e.buys ? {emoji:'🔑', title:plain(buyLine(e.buys[0]))} : {emoji:e.emoji, title:e.text};
+  modal(polaroidHTML(e)+'<div class="phm"><span class="tpill" style="background:'+t.color+'">'+t.label+'</span><b>Age '+e.age+'</b></div>'+
+    '<p class="phs">'+(e.ms ? '<b>'+e.ms.emoji+' '+esc(e.ms.title)+'.</b> '+esc(e.ms.text)+' ' : '')+(e.buys ? esc(e.text) : e.ms ? '' : '')+'</p>'+
+    '<button class="btn sharebtn" id="phshare">📸 Share this photo</button><button class="btn ghost" data-close style="margin-top:8px">Close</button>'+
+    (e.mins != null ? '<div class="ysmall">'+(e.src === 'st' ? 'That day\'s screen time: ' : '')+fmtTime(e.mins)+'</div>' : ''), 'yearpol');
+  $('phshare').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); shareModal(moment); };
+  document.querySelectorAll('.yearpol [data-stat]').forEach(b => b.onclick = ev => { ev.stopPropagation(); showStat(b.dataset.stat); });
+}
+
+// ---- Family wall (generation 2 and up): every earlier Blip, framed.
+function familyWallHTML(){
+  const fam = S.family || [];
+  if (!fam.length) return '';
+  const pic = f => '<div class="frm"><div class="fpic">'+charSVG({name:f.name, age:30, log:[{tier:'good'}], h:70, s:60, j:70, skin:f.skin, hair:f.hair, girl:f.girl, wear:{}}).replace(/<circle cx="100" cy="122" r="86"[^>]*\/>/, '')+'</div>'+
+    '<b>'+esc(f.name)+' · Gen '+f.gen+'</b><small>'+esc(f.line)+'</small></div>';
+  return '<div class="card"><h2 class="earnh">🖼️ Family wall<small>'+fam.length+' before '+esc(S.name)+'</small></h2><div class="fwall">'+fam.slice(-6).map(pic).join('')+'</div></div>';
 }
 
 function storyHTML(inLife){
@@ -2511,6 +2616,7 @@ function bindSetup(){
     S.avg = draft.avg;
     if (draft.tbPrev) S.tbPrev = draft.tbPrev;
     if (draft.trophies) S.trophies = draft.trophies;
+    if (draft.family) S.family = draft.family;
     if (draft.invites) S.invites = draft.invites;
     S.testMode = keepTest;
     if (draft.auto && IS_APP) { S.auto = true; S.stUsed = true; } // Screen Time stays connected for the next life
@@ -2534,10 +2640,13 @@ function bind(){
   if ($('share')) $('share').onclick = () => shareModal(null);
   if ($('tbpost')) $('tbpost').onclick = postTimeBack;
   if ($('tbinvite')) $('tbinvite').onclick = inviteFriend;
-  document.querySelectorAll('[data-trophy]').forEach(b => b.onclick = () => { trophyInfo(b.dataset.trophy);
+  const trTap = b => b.onclick = () => { trophyInfo(b.dataset.trophy);
     const t = TROPHIES.find(x => x.k === b.dataset.trophy);
     if ($('trshare')) $('trshare').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); shareTrophy(t); };
-    if ($('trinvite')) $('trinvite').onclick = inviteFriend; });
+    if ($('trinvite')) $('trinvite').onclick = inviteFriend; };
+  document.querySelectorAll('[data-trophy]').forEach(trTap);
+  if ($('trall')) $('trall').onclick = () => { modal(trophyCaseHTML().replace('<div class="card" id="trophies">', '<div>')+'<button class="btn" data-close style="margin-top:10px">Close</button>', 'tcase');
+    document.querySelectorAll('.tcase [data-trophy]').forEach(trTap); };
   if ($('tslide')) {
     const set = m => { m = Math.max(0, Math.min(960, m)); homeMins = m; $('tslide').value = m; $('tval').textContent = fmtTime(m); $('verdict').outerHTML = verdictHTML(m); };
     $('tslide').oninput = e => set(+e.target.value);
@@ -2565,6 +2674,8 @@ function bind(){
   };
   if ($('restore')) $('restore').onclick = restoreModal;
   document.querySelectorAll('.lcbtn').forEach(b => b.onclick = () => showLifeCard(+b.dataset.age));
+  document.querySelectorAll('.pile[data-ch]').forEach(b => b.onclick = () => showChapter(+b.dataset.ch));
+  document.querySelectorAll('.mstop[data-age]').forEach(b => b.onclick = () => showPhoto(+b.dataset.age));
   if ($('ics')) $('ics').onclick = () => addReminder('ics');
   if ($('gcal')) $('gcal').onclick = () => addReminder('google');
   if ($('reset')) $('reset').onclick = () => {
@@ -2582,7 +2693,8 @@ function bind(){
   }
   if ($('nextGen')) $('nextGen').onclick = () => {
     const bonus = Math.min(15, Math.round(lifeScore()/10));
-    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, inherit:inheritance(), tbPrev:timeBack(), trophies:S.trophies, invites:S.invites, step:0, testMode:S.testMode, auto:S.auto};
+    const fam = (S.family || []).concat([{name:S.name, skin:S.skin, hair:S.hair, girl:!!S.girl, gen:S.gen || 1, line:lifeTitle(lifeScore())[1]}]);
+    draft = {name:'', skin:S.skin, hair:S.hair, girl:S.girl, avg:S.avg || S.goal + 30, goal:S.goal, gen:S.gen+1, bonus, inherit:inheritance(), tbPrev:timeBack(), trophies:S.trophies, invites:S.invites, step:0, testMode:S.testMode, auto:S.auto, family:fam};
     S = null; appBackup(); try { localStorage.removeItem(KEY); } catch(e){}
     render();
   };
@@ -2892,8 +3004,8 @@ function showYears(list){
   showYear(list[0], () => showYears(list.slice(1)));
 }
 
-function showYear(e, next){
-  const t = TIER[e.tier], good = e.tier === 'good' || e.tier === 'great', big = e.buys || e.ms;
+function polaroidHTML(e){
+  const good = e.tier === 'good' || e.tier === 'great', big = e.buys || e.ms;
   const names = {h:'💪', s:'🧠', j:'😊'}, spots = [['l',22],['r',30],['l',68]];
   let i = 0, stickers = '';
   for (const k of ['h','s','j']) if (e.fx && e.fx[k] && i < 3) { const [side, top] = spots[i++];
@@ -2903,12 +3015,14 @@ function showYear(e, next){
     ? '<svg class="pbg" viewBox="0 0 200 150" preserveAspectRatio="none"><rect width="200" height="150" fill="#fff6e0"/><rect y="112" width="200" height="38" fill="#f3d9b5"/><path d="M0 18 Q50 40 100 22 T200 20" stroke="#3b2a4a" stroke-width="2" fill="none"/>'+
       [14,38,62,86,112,138,162,186].map((x, j) => '<circle cx="'+x+'" cy="'+(27 + Math.sin(j)*5).toFixed(1)+'" r="5" fill="'+['#ff6b8b','#ffc23d','#4da3ff','#6fd06a'][j%4]+'" stroke="#3b2a4a" stroke-width="1.5"/>').join('')+'</svg>'
     : '<svg class="pbg" viewBox="0 0 200 150" preserveAspectRatio="none"><rect width="200" height="150" fill="#e6e3f3"/><rect y="112" width="200" height="38" fill="#d8d2e8"/><rect x="16" y="16" width="46" height="46" rx="4" fill="#8b9fe0" stroke="#3b2a4a" stroke-width="2.5"/><path d="M39 16 V62 M16 39 H62" stroke="#3b2a4a" stroke-width="2"/><circle cx="50" cy="28" r="6" fill="#fff6b0"/></svg>';
-  const nb = !S.done ? nextBig(e.age) : null;
+  return '<div class="polaroid'+(good ? '' : ' tilt')+'"><i class="tape a"></i><i class="tape b"></i>'+(big ? '<span class="bigm">Big<br>moment</span>' : '')+
+    '<div class="photo">'+scene+'<div class="pfig">'+blipAt(e.age, e.tier, e.buys ? 104 : 120)+art+'</div>'+stickers+'</div>'+
+    '<div class="cap">'+(e.buys ? momentLine(e.buys[0].key) : e.emoji+' '+esc(e.text))+'</div></div>';
+}
+function showYear(e, next){
+  const t = TIER[e.tier], big = e.buys || e.ms, nb = !S.done ? nextBig(e.age) : null;
   let h = '<span class="tpill" style="background:'+t.color+'">'+(big ? '⭐ Big year!' : t.label)+'</span>'+
-    '<div class="nowage">'+esc(S.name)+' is now <b>'+e.age+'</b></div>'+
-    '<div class="polaroid'+(good ? '' : ' tilt')+'"><i class="tape a"></i><i class="tape b"></i>'+(big ? '<span class="bigm">Big<br>moment</span>' : '')+
-      '<div class="photo">'+scene+'<div class="pfig">'+blipAt(e.age, e.tier, e.buys ? 104 : 120)+art+'</div>'+stickers+'</div>'+
-      '<div class="cap">'+(e.buys ? momentLine(e.buys[0].key) : e.emoji+' '+esc(e.text))+'</div></div>'+
+    '<div class="nowage">'+esc(S.name)+' is now <b>'+e.age+'</b></div>'+polaroidHTML(e)+
     (e.buys ? '<p class="muted small">'+e.emoji+' '+esc(e.text)+' All those good years paid off.'+(ITEM[e.buys[0].key].fx ? ' +'+ITEM[e.buys[0].key].fx.j+' 😊' : '')+'</p>' : '')+
     yearGoalHTML(e)+(e.buys && e === S.log[S.log.length - 1] ? nextUpHTML() : '')+
     (e.shrunk ? '<p class="muted small">⭐ Already near the top! Keep it up to stay there.</p>' : '');
