@@ -265,6 +265,34 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .firstword{display:inline-block;background:#fff;border:3px solid #3b2a4a;border-radius:16px;padding:6px 12px;font-weight:600;margin:4px 0 6px}
 .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0}
 .switch input{width:22px;height:22px;accent-color:var(--accent2)}
+.takeover{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;align-items:center;padding:calc(24px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));text-align:center;overflow:hidden;color:var(--ink)}
+.party{background:linear-gradient(180deg,#fff3c4,#ffd6e4 60%,#f4efff)}
+.takeover .k2{font-size:24px;font-weight:700;margin-top:18px;position:relative}
+.takeover .duo{display:flex;align-items:flex-end;justify-content:center;margin:auto 0;padding:12px 0;position:relative}.takeover .duo>svg{margin-right:-14px;display:block}.takeover .cake{margin-bottom:14px}.takeover .cake svg{display:block}
+.takeover .sheet{width:100%;max-width:440px;background:#fff;border-radius:22px;padding:14px;box-shadow:0 8px 20px rgba(60,30,90,.18);position:relative}.takeover .sheet .btn{margin-top:10px}
+.takeover .k{font-size:12px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.yb{text-align:left}.yl{display:flex;justify-content:space-between;font-size:14px;color:var(--soft)}.yl b{color:var(--ink);font-size:17px}
+.ybar{position:relative;height:12px;border-radius:9px;background:#eee9f8;margin:6px 0 10px}.ybar u{display:block;height:100%;border-radius:9px}.ybar em{position:absolute;top:-5px;width:3px;height:22px;background:#3b2a4a;border-radius:2px;margin-left:-1px}
+.vd{border-radius:12px;padding:8px;font-weight:600;font-size:15px}
+.takeover .skip{font-size:12px;color:var(--soft);margin-top:8px}.cf{position:absolute;width:7px;height:12px;border-radius:2px;opacity:.85}
+.reveal .cf{animation:cfdrop 2.6s ease-in forwards}@keyframes cfdrop{to{transform:translateY(70vh) rotate(400deg);opacity:0}}
+.agebig2{font-size:72px;font-weight:700;color:#ff5a8a;line-height:1;-webkit-text-stroke:3px #3b2a4a;paint-order:stroke;margin:4px 0 -8px;animation:pop .6s cubic-bezier(.2,1.4,.4,1) .3s both}
+.reveal .smoke{animation:fade 1s}.reveal{animation:fade .3s}
+.takeover .dl{display:flex;justify-content:space-between;align-items:center;font-size:14px;padding:5px 2px;border-bottom:1px solid #f0ecfb}.takeover .dl b{flex:1;text-align:left;margin-left:12px}
+.yearpol .card{background:linear-gradient(180deg,#fff3c4,#ffd6e4 60%,#f4efff);padding:16px 16px 10px}
+.tpill{display:inline-block;color:#fff;font-weight:700;font-size:15px;border-radius:99px;padding:5px 16px;border:3px solid #fff;box-shadow:0 2px 6px rgba(60,30,90,.15)}
+.nowage{font-size:18px;font-weight:600;margin:6px 0 2px}.nowage b{font-size:40px;color:#ffc23d;-webkit-text-stroke:2px #3b2a4a;paint-order:stroke;vertical-align:-4px}
+.polaroid{position:relative;background:#fff;border-radius:6px;padding:10px 10px 12px;margin:12px 14px 10px;box-shadow:0 8px 18px rgba(60,30,90,.2);transform:rotate(-2deg);border:2px solid #3b2a4a}
+.polaroid.tilt{transform:rotate(2deg)}
+.polaroid .tape{position:absolute;top:-10px;width:56px;height:20px;opacity:.85;border:1.5px solid rgba(59,42,74,.4)}.tape.a{left:6px;background:#ff9fb8;transform:rotate(-18deg)}.tape.b{right:6px;background:#a99cff;transform:rotate(16deg)}
+.photo{position:relative;border:2px solid #3b2a4a;border-radius:3px;overflow:visible;height:170px}.photo .pbg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.photo .pfig{position:absolute;left:0;right:0;bottom:-2px;display:flex;justify-content:center;align-items:flex-end}.photo .pfig svg{display:block}.photo .pbuy{width:84px;height:84px;margin-left:-16px}.photo .pbuy.car{width:120px;height:72px}
+.stk{position:absolute;background:#e4f7ee;color:#148a55;border:2.5px solid #3b2a4a;border-radius:99px;padding:2px 9px;font-weight:700;font-size:14px;white-space:nowrap;z-index:2}
+.stk.l{left:-18px;transform:rotate(-8deg)}.stk.r{right:-18px;transform:rotate(7deg)}.stk.neg{background:#ffe9ee;color:#c23c3c}
+.bigm{position:absolute;right:-14px;top:-16px;z-index:3;width:62px;height:62px;border-radius:50%;background:#ffc23d;border:3px solid #3b2a4a;font-size:11px;font-weight:700;line-height:1.1;display:flex;align-items:center;justify-content:center;transform:rotate(12deg);text-transform:uppercase}
+.polaroid .cap{font-size:16px;font-weight:600;margin-top:10px;line-height:1.3}
+.soon{display:flex;gap:10px;align-items:center;text-align:left;background:#fff6d6;border:2.5px solid #3b2a4a;border-radius:14px;padding:8px 12px;margin:8px 0 4px}.soon span{font-size:28px}.soon small{display:block;font-size:11px;font-weight:700;color:#b26b00;text-transform:uppercase;letter-spacing:.6px}.soon b{font-size:16px}
+.ysmall{font-size:12px;color:var(--soft);margin-top:6px}
 .confetti{position:fixed;top:-20px;font-size:22px;pointer-events:none;z-index:30;animation:drop linear forwards}
 @keyframes drop{to{transform:translateY(110vh) rotate(540deg)}}
 .hide{display:none!important}
@@ -1047,7 +1075,7 @@ function tierFor(mins){
   if (mins <= g * SETTINGS.awfulIfOver) return 'bad';
   return 'awful';
 }
-function checkIn(mins, src, tierOverride){
+function checkIn(mins, src, tierOverride, silent){
   const tier = tierOverride || tierFor(mins);
   const entry = liveYear(mins, tier);
   if (src === 'st') { entry.src = 'st'; S.stUsed = true; }
@@ -1057,6 +1085,7 @@ function checkIn(mins, src, tierOverride){
   if ([2,3,7,14,30,60,100].includes(S.log.length) && !S.testMode) track('day-'+S.log.length);
   checkTrophies();
   render();
+  if (silent) return entry;
   showYear(entry);
 }
 
@@ -1160,17 +1189,21 @@ const CATCHUP_DAYS = 7;
 let catchingUp = false;
 function catchUp(){
   if (!S || S.done || S.testMode || !S.lastDate || catchingUp) return;
+  if (pendingMiss && pendingMiss.last === S.lastDate) return;
+  pendingMiss = null;
   const t = dayNum(today()), last = S.lastDate, missed = t - dayNum(last) - 1;
   if (missed < 1) return;
   // The calendar days nobody lived (in the app, the last check-in covered the day before it, and today's covers yesterday).
   const days = []; for (let d = dayNum(last); d < t - 1; d++) days.push(d);
   const p = MORNING && autoOn() ? stPlugin() : null, near = days.filter(d => d >= t - CATCHUP_DAYS);
-  if (!p || !near.length) return playMissed(days, {});
+  const wait = got => { pendingMiss = {days, got, last}; if (tab === 'home') render(); };
+  if (!p || !near.length) return p ? wait({}) : playMissed(days, {});
   catchingUp = true;
   Promise.all(near.map(d => p.minutesFor({day: stKey(d)}).then(x => [d, x && typeof x.minutes === 'number' ? x.minutes : null]).catch(() => [d, null])))
-    .then(r => { catchingUp = false; if (S.lastDate !== last) return; const got = {}; for (const [d, m] of r) if (m != null) got[d] = m; playMissed(days, got); });
+    .then(r => { catchingUp = false; if (S.lastDate !== last) return; const got = {}; for (const [d, m] of r) if (m != null) got[d] = m; wait(got); });
 }
-function playMissed(days, got){
+let pendingMiss = null;   // {days, got, last}: missed years waiting on the cake screen (app + automatic Screen Time)
+function playMissed(days, got, silent){
   const missed = days.length, entries = [], auto = MORNING && autoOn();
   let rough = 0;
   for (const d of days) {
@@ -1183,7 +1216,7 @@ function playMissed(days, got){
   save();
   if (real) checkTrophies();
   render();
-  if (!entries.length) return;
+  if (silent || !entries.length) return entries;
   let h = real ? '<div class="banner" style="background:var(--good)">📱 Welcome back</div>'+
       '<h2>'+esc(S.name)+' lived '+entries.length+' year'+(entries.length > 1 ? 's' : '')+' while you were away</h2>'+
       '<p>'+(rough ? real+' of them used that day\'s Screen Time. The rest were quiet years.' : 'Each one used that day\'s Screen Time, so your time off your phone still counted.')+'</p>' :
@@ -1698,6 +1731,7 @@ function homeHTML(){
       '<p>'+esc(S.name)+' has passed the torch. Keep going as their kid, who gets a head start from the life you built.</p>'+
       '<button class="btn alt" id="nextGen">Play as '+esc(S.name)+'\'s kid</button>'+share+'</div>';
   }
+  if (open && MORNING && autoOn() && (stYest != null || pendingMiss)) return header()+hero+readyHTML();
   if (open && autoOn() && stYest != null) {
     const m = Math.min(960, stYest);
     return header()+hero+
@@ -2485,6 +2519,7 @@ function bind(){
   }
   if ($('go')) $('go').onclick = () => { const m = +$('tslide').value; homeMins = null; checkIn(m); };
   if ($('goauto')) $('goauto').onclick = () => { if (stYest != null) { const m = Math.min(960, stYest); checkIn(m, 'st', joinedTier(m)); } };
+  if ($('golive')) $('golive').onclick = liveTheYears;
   if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(4,0,0,0); if (m <= n) m.setDate(m.getDate()+1); const s = Math.floor((m-n)/1000);
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
       if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
@@ -2525,18 +2560,129 @@ function bind(){
   };
 }
 
-function showYear(e){
-  const t = TIER[e.tier];
-  let h = '<div class="banner" style="background:'+t.color+'">'+t.label+'</div>'+
-    '<div class="agebig">'+esc(S.name)+' is now<b>'+e.age+'</b></div>'+
-    '<p class="muted">'+fmtTime(e.mins)+' of screen time vs. your '+fmtTime(e.goal)+' goal</p>'+
-    '<div class="evt">'+e.emoji+'</div><div class="evtxt">'+esc(e.text)+'</div>'+
-    '<div class="fx">'+fxHTML(e.fx, e.earned)+'</div>'+yearGoalHTML(e)+
-    (e.shrunk ? '<p class="muted">⭐ Already near the top! Keep it up to stay there.</p>' : '');
+// ============ LIVING THE YEAR (app + automatic Screen Time) ============
+// Each morning a full-screen birthday cake waits with yesterday's number. One button: blow out the candles,
+// then the year arrives as a Polaroid. Screen Time numbers appear only here and on Today, never in shares.
+const CAKE_O = '#3b2a4a', CAKE_W = 'stroke="#3b2a4a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"';
+function cakeTop(label, lit){
+  label = String(label); const xs = label.length > 1 ? [66, 94] : [80];
+  let s = '<ellipse cx="80" cy="110" rx="62" ry="8" fill="#fff" '+CAKE_W+'/><rect x="26" y="70" width="108" height="38" rx="10" fill="#ff9fb8" '+CAKE_W+'/>'+
+    '<path d="M26 82 Q26 70 36 70 H124 Q134 70 134 82 q-8 8 -14 0 q-8 10 -16 0 q-8 10 -16 0 q-8 10 -16 0 q-8 10 -16 0 q-8 10 -16 0 q-8 8 -14 0z" fill="#fff" '+CAKE_W+'/>'+
+    '<circle cx="46" cy="96" r="3.5" fill="#7c5cff"/><circle cx="72" cy="98" r="3.5" fill="#5cc26b"/><circle cx="98" cy="96" r="3.5" fill="#ffc23d"/><circle cx="118" cy="98" r="3.5" fill="#7c5cff"/>';
+  label.slice(0, 2).split('').forEach((d, i) => {
+    s += '<text x="'+xs[i]+'" y="66" font-family="Fredoka,sans-serif" font-weight="700" font-size="46" text-anchor="middle" fill="#ffc23d" stroke="'+CAKE_O+'" stroke-width="5" paint-order="stroke" stroke-linejoin="round">'+d+'</text>'+
+      '<rect x="'+(xs[i]-1.5)+'" y="18" width="3" height="10" fill="'+CAKE_O+'"/>'+
+      (lit ? '<g class="flame"><path d="M'+xs[i]+' 6 q9 10 0 16 q-9 -6 0 -16z" fill="#ffb627" stroke="'+CAKE_O+'" stroke-width="2.5"/><path d="M'+xs[i]+' 14 q3 4 0 7 q-3 -3 0 -7z" fill="#fff3b0"/></g>'
+        : '<path class="smoke" d="M'+xs[i]+' 18 q-7 -8 0 -14 q7 -6 0 -14" stroke="#b9b3cc" stroke-width="3" fill="none" stroke-linecap="round"/>');
+  });
+  return s;
+}
+function cakeTable(w){
+  return '<ellipse cx="'+(w/2)+'" cy="196" rx="'+(w/2-18)+'" ry="4" fill="rgba(0,0,0,.12)"/><rect x="24" y="120" width="12" height="76" rx="5" fill="#b57a4c" '+CAKE_W+'/>'+
+    '<rect x="'+(w-36)+'" y="120" width="12" height="76" rx="5" fill="#b57a4c" '+CAKE_W+'/><rect x="6" y="112" width="'+(w-12)+'" height="14" rx="7" fill="#d79a64" '+CAKE_W+'/>';
+}
+function cakeSVG(ages, lit){
+  if (ages.length === 1) return '<svg viewBox="0 0 160 200" width="124">'+cakeTable(160)+cakeTop(ages[0], lit)+'</svg>';
+  const n = Math.min(3, ages.length), w = 20 + n*96, show = ages.length > 3 ? [ages[0], '…', ages[ages.length - 1]] : ages;
+  return '<svg viewBox="0 0 '+w+' 200" width="'+Math.min(190, 60 + n*44)+'">'+cakeTable(w)+show.map((a, i) => a === '…' ? '<text x="'+(10+i*96+48)+'" y="100" font-size="40" text-anchor="middle" fill="'+CAKE_O+'">…</text>' :
+    '<g transform="translate('+(10+i*96)+' 44) scale(.6)">'+cakeTop(a, lit)+'</g>').join('')+'</svg>';
+}
+function ybarHTML(m, g){
+  const max = Math.max(m, g) * 1.25, ok = m <= g;
+  return '<div class="yb"><div class="yl"><span>Yesterday <b>'+fmtTime(m)+'</b></span><span>goal '+fmtTime(g)+'</span></div>'+
+    '<div class="ybar"><u style="width:'+(m/max*100)+'%;background:'+(ok ? 'var(--good)' : 'var(--bad)')+'"></u><em style="left:'+(g/max*100)+'%"></em></div></div>';
+}
+function confettiBits(n){ return Array.from({length:n}, (_, i) => '<i class="cf" style="left:'+(4+i*91/n)+'%;top:'+(4+(i*37)%26)+'%;background:'+['#ff6b8b','#ffc23d','#4da3ff','#6fd06a','#7c5cff'][i%5]+';transform:rotate('+(i*47)+'deg)"></i>').join(''); }
+function blipAt(age, tier, w){
+  const c = Object.assign({}, S, {age, log:[{tier}], wear:myWear()});
+  return charSVG(c).replace('<svg ', '<svg width="'+w+'" ');
+}
+function wkday(d){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(d * 864e5).getUTCDay()]; }
+// What the cake screen is about to play: missed days (real numbers or quiet), then yesterday.
+function readyPlan(){
+  const plan = [];
+  if (pendingMiss) { let quiet = 0;
+    for (const d of pendingMiss.days) { const m = pendingMiss.got[d];
+      if (m != null) plan.push({d, m:Math.min(960, m), tier:tierFor(Math.min(960, m))});
+      else if (quiet < SETTINGS.maxSkippedYears) { plan.push({d, m:null, tier:'quiet'}); quiet++; } } }
+  if (stYest != null) { const m = Math.min(960, stYest); plan.push({d:dayNum(today()) - 1, m, tier:joinedTier(m), yest:true}); }
+  return plan.filter((x, i) => S.age + i + 1 <= SETTINGS.lifeLength);
+}
+function readyHTML(){
+  const plan = readyPlan(), n = esc(S.name);
+  if (!plan.length) return '';
+  const ages = plan.map((x, i) => S.age + i + 1), first = S.age === 0, y = plan[plan.length - 1];
+  let sheet;
+  if (plan.length > 1) {
+    sheet = '<div class="k">You were away '+(plan.length - (y.yest ? 1 : 0))+' day'+(plan.length - (y.yest ? 1 : 0) > 1 ? 's' : '')+'. Blip kept count.</div>'+
+      plan.map(x => '<div class="dl"><span>'+wkday(x.d)+'</span><b>'+(x.m == null ? 'no number' : fmtTime(x.m))+'</b><span class="pill" style="background:'+TIER[x.tier].color+'">'+
+        (x.tier === 'quiet' ? 'quiet' : x.tier === 'good' || x.tier === 'great' ? 'good' : x.tier === 'meh' ? 'so-so' : 'rough')+'</span></div>').join('')+
+      '<button class="btn" id="golive">🎂 Live years '+ages[0]+' to '+ages[ages.length - 1]+'</button><div class="skip">They play one after another.</div>';
+  } else {
+    const v = VERDICT[y.tier] || VERDICT.meh, note = y.yest ? joinedNote(stYestKey()) : '';
+    sheet = (first ? '<div class="k">Your first whole day with Blip</div>' : '')+(y.m != null ? ybarHTML(y.m, S.goal) : '')+
+      '<div class="vd" style="background:'+v[2]+';color:'+v[3]+'">'+v[0]+' '+(y.tier === 'great' ? 'Way under your goal' : y.tier === 'good' ? 'Under your goal' : y.tier === 'meh' ? 'A little over your goal' : 'Over your goal')+'</div>'+
+      (note ? '<div class="skip">'+note+'</div>' : '')+
+      '<button class="btn" id="golive">🎂 Live year '+ages[0]+'</button>';
+  }
+  return '<div class="takeover party" id="ready">'+(first ? confettiBits(10) : '')+
+    '<div class="k2">'+(first ? '🍼 '+n+'\'s first birthday!' : plan.length > 1 ? '🎉 '+plan.length+' years are ready!' : '🎉 Year '+ages[0]+' is ready!')+'</div>'+
+    '<div class="duo">'+blipAt(S.age, 'good', plan.length > 1 ? 124 : 150)+'<div class="cake">'+cakeSVG(ages, true)+'</div></div>'+
+    '<div class="sheet">'+sheet+'</div></div>';
+}
+let living = false;
+function liveTheYears(){
+  if (living) return; living = true;
+  const plan = readyPlan(), y = plan[plan.length - 1], before = S.age;
+  let entries = [];
+  if (pendingMiss) { const pm = pendingMiss; pendingMiss = null; if (S.lastDate === pm.last) entries = playMissed(pm.days, pm.got, true) || []; }
+  if (y && y.yest && stYest != null && !S.done) entries.push(checkIn(y.m, 'st', y.tier, true));
+  entries = entries.filter(Boolean);
+  living = false;
+  if (!entries.length) return render();
+  const last = entries[entries.length - 1], good = entries.some(e => e.tier === 'good' || e.tier === 'great');
+  const ages = entries.map(e => e.age), v = VERDICT[last.tier];
+  const r = document.createElement('div');
+  r.className = 'takeover party reveal';
+  r.innerHTML = (good ? confettiBits(18) : '')+'<div class="k2">'+(before === 0 ? 'Happy first birthday, '+esc(S.name)+'!' : 'Happy birthday, '+esc(S.name)+'!')+'</div>'+
+    '<div class="agebig2">'+last.age+'</div><div class="duo">'+blipAt(last.age, 'good', 140)+'<div class="cake">'+cakeSVG(ages, false)+'</div></div>'+
+    '<div class="sheet">'+(entries.length === 1 && last.mins != null ? ybarHTML(last.mins, last.goal)+(v ? '<div class="vd" style="background:'+v[2]+';color:'+v[3]+'">'+v[0]+' '+v[1].replace('{name}', esc(S.name))+'</div>' : '') :
+      '<div class="k">'+entries.length+' years lived</div>')+'<div class="skip">Tap anywhere to skip</div></div>';
+  document.body.appendChild(r);
+  let done = false;
+  const next = () => { if (done) return; done = true; r.remove(); showYears(entries); };
+  r.onclick = next; setTimeout(next, 3400);
+}
+// Several years in a row: one Polaroid after another, one Done at the end.
+function showYears(list){
+  if (!list.length) return;
+  if (list.length === 1) return showYear(list[0]);
+  showYear(list[0], () => showYears(list.slice(1)));
+}
+
+function showYear(e, next){
+  const t = TIER[e.tier], good = e.tier === 'good' || e.tier === 'great', big = e.buys || e.ms;
+  const names = {h:'💪', s:'🧠', j:'😊'}, spots = [['l',22],['r',30],['l',68]];
+  let i = 0, stickers = '';
+  for (const k of ['h','s','j']) if (e.fx && e.fx[k] && i < 3) { const [side, top] = spots[i++];
+    stickers += '<span class="stk '+side+(e.fx[k] < 0 ? ' neg' : '')+'" style="top:'+top+'%">'+(e.fx[k] > 0 ? '+' : '−')+Math.abs(e.fx[k])+' '+names[k]+'</span>'; }
+  const art = e.buys ? itemArt(e.buys[0].key, CAR_KEY[e.buys[0].key] ? 'pbuy car' : 'pbuy') : '';
+  const scene = good || e.tier === 'quiet' || e.tier === 'restored'
+    ? '<svg class="pbg" viewBox="0 0 200 150" preserveAspectRatio="none"><rect width="200" height="150" fill="#fff6e0"/><rect y="112" width="200" height="38" fill="#f3d9b5"/><path d="M0 18 Q50 40 100 22 T200 20" stroke="#3b2a4a" stroke-width="2" fill="none"/>'+
+      [14,38,62,86,112,138,162,186].map((x, j) => '<circle cx="'+x+'" cy="'+(27 + Math.sin(j)*5).toFixed(1)+'" r="5" fill="'+['#ff6b8b','#ffc23d','#4da3ff','#6fd06a'][j%4]+'" stroke="#3b2a4a" stroke-width="1.5"/>').join('')+'</svg>'
+    : '<svg class="pbg" viewBox="0 0 200 150" preserveAspectRatio="none"><rect width="200" height="150" fill="#e6e3f3"/><rect y="112" width="200" height="38" fill="#d8d2e8"/><rect x="16" y="16" width="46" height="46" rx="4" fill="#8b9fe0" stroke="#3b2a4a" stroke-width="2.5"/><path d="M39 16 V62 M16 39 H62" stroke="#3b2a4a" stroke-width="2"/><circle cx="50" cy="28" r="6" fill="#fff6b0"/></svg>';
+  const nb = !S.done ? nextBig(e.age) : null;
+  let h = '<span class="tpill" style="background:'+t.color+'">'+(big ? '⭐ Big year!' : t.label)+'</span>'+
+    '<div class="nowage">'+esc(S.name)+' is now <b>'+e.age+'</b></div>'+
+    '<div class="polaroid'+(good ? '' : ' tilt')+'"><i class="tape a"></i><i class="tape b"></i>'+(big ? '<span class="bigm">Big<br>moment</span>' : '')+
+      '<div class="photo">'+scene+'<div class="pfig">'+blipAt(e.age, e.tier, e.buys ? 104 : 120)+art+'</div>'+stickers+'</div>'+
+      '<div class="cap">'+(e.buys ? momentLine(e.buys[0].key) : e.emoji+' '+esc(e.text))+'</div></div>'+
+    (e.buys ? '<p class="muted small">'+e.emoji+' '+esc(e.text)+' All those good years paid off.'+(ITEM[e.buys[0].key].fx ? ' +'+ITEM[e.buys[0].key].fx.j+' 😊' : '')+'</p>' : '')+
+    yearGoalHTML(e)+(e.buys && e === S.log[S.log.length - 1] ? nextUpHTML() : '')+
+    (e.shrunk ? '<p class="muted small">⭐ Already near the top! Keep it up to stay there.</p>' : '');
   for (const n of e.notes) h += '<p><b>'+cleanNote(n)+'</b></p>';
-  if (e.buys) for (const b of e.buys) h += '<div class="mscard buy"><div class="k">Big moment!</div>'+itemArt(b.key, CAR_KEY[b.key] ? 'buyart car' : 'buyart')+
-    '<div class="t">'+buyLine(b)+'</div><p>All those good years paid off.'+(ITEM[b.key].fx ? ' +'+ITEM[b.key].fx.j+' 😊' : '')+'</p>'+(e === S.log[S.log.length - 1] ? nextUpHTML() : '')+'</div>';
-  if (e.ms) h += '<div class="mscard"><div class="k">Big life moment</div><div class="e">'+e.ms.emoji+'</div><div class="t">'+esc(e.ms.title)+'</div><p>'+esc(e.ms.text)+'</p></div>';
+  if (e.ms) h += '<div class="mscard"><div class="k">Big life moment</div><div class="t">'+e.ms.emoji+' '+esc(e.ms.title)+'</div><p>'+esc(e.ms.text)+'</p></div>';
+  else if (nb) h += '<div class="soon"><span>'+nb[1]+'</span><div><small>Coming up at '+nb[0]+'</small><b>'+esc(nb[2])+'</b></div></div>';
   if (S.done) h += '<div class="mscard"><div class="k">The end of an era</div><div class="e">🎂</div><div class="t">'+esc(S.name)+' turned '+SETTINGS.lifeLength+'!</div><p>Their story is complete. See how it went on the Today screen.</p></div>';
   // Turning 5: baby clothes come off and wait in the closet for the next generation.
   if (e.age === 5 && SHOP_ON) {
@@ -2551,11 +2697,13 @@ function showYear(e){
   const newDog = YARD.BY_EMOJI[e.emoji] === 'dog' && e.age < 18 && (e.tier === 'good' || e.tier === 'great') && !store.dogName;
   if (newDog) h += '<div class="mscard"><div class="k">A new best friend</div><div class="gdogpic">'+giftDog()+'</div><div class="t">What\'s the family dog\'s name?</div>'+
     '<input type="text" id="yrdog" maxlength="16" placeholder="Biscuit"></div>';
-  const card = LIFE_CARD_AGES.includes(e.age);
+  const card = LIFE_CARD_AGES.includes(e.age) && !next;
   const moment = e.ms ? {emoji:e.ms.emoji, title:e.ms.title, text:e.ms.text} : e.buys ? {emoji:'🔑', title:plain(buyLine(e.buys[0]))} : null;
-  if (moment) h += '<button class="btn sharebtn" id="mshare">📤 Share this moment</button>';
-  h += card ? '<button class="btn" id="lcard">See '+esc(S.name)+'\'s life card ✨</button>' : '<button class="btn" data-close>Continue</button>';
-  modal(h);
+  if (moment) h += '<button class="btn ghost sharebtn" id="mshare">📤 Share this moment</button>';
+  h += card ? '<button class="btn" id="lcard">See '+esc(S.name)+'\'s life card ✨</button>' : next ? '<button class="btn" id="ynext">Next year ➜</button>' : '<button class="btn" data-close>Done</button>';
+  if (e.mins != null) h += '<div class="ysmall">'+(e.src === 'st' ? 'Yesterday ' : '')+fmtTime(e.mins)+' · goal '+fmtTime(e.goal)+'</div>';
+  modal(h, 'yearpol');
+  if (next) $('ynext').onclick = () => { document.querySelectorAll('.modal.yearpol').forEach(m => m.remove()); next(); };
   if (newDog) { store.dogName = 'Biscuit'; saveStore(); $('yrdog').oninput = ev => { store.dogName = ev.target.value.trim() || 'Biscuit'; saveStore(); }; }
   if (moment) $('mshare').onclick = () => shareModal(moment);
   if (card) $('lcard').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); showLifeCard(e.age); };
