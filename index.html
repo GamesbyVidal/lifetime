@@ -1352,9 +1352,24 @@ function charSVG(c){
   const bodyY = st === 'baby' ? 128 : 118, bodyH = st === 'baby' ? 66 : 66;
   // arms (a missed year means the phone is in their hand, glowing at their face)
   const ay = sad ? bodyY + 14 : bodyY + 10;
+  // Round mitten hands at each sleeve end (never fingers). Sleeve end = the rect's bottom center, turned with the arm.
+  const hands = [];
+  const handAt = (x, h, a, px) => { const lx = x + arm/2, ly = ay + h - arm*.22, r = a*Math.PI/180, dx = lx - px, dy = ly - ay;
+    const cx = px + dx*Math.cos(r) - dy*Math.sin(r), cy = ay + dx*Math.sin(r) + dy*Math.cos(r);
+    hands.push('<ellipse cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" rx="'+(arm*.62).toFixed(1)+'" ry="'+(arm*.55).toFixed(1)+'" fill="'+c.skin+'" '+W+' transform="rotate('+a+' '+cx.toFixed(1)+' '+cy.toFixed(1)+')"/>');
+    return [cx, cy]; };
   b += '<rect x="'+(bodyX-arm+4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate('+(sad?4:14)+' '+(bodyX+4)+' '+ay+')"/>';
-  if (sad && st !== 'baby') b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="40" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate(-40 '+(bodyX+bodyW+4)+' '+ay+')"/><rect x="146" y="128" width="16" height="26" rx="3" fill="#222" stroke="'+O+'" stroke-width="2.5"/><rect x="148" y="131" width="12" height="18" fill="#7fd1ff"/><path d="M146 132 L112 104 L112 120Z" fill="#7fd1ff" opacity=".35"/>';
-  else b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate(-14 '+(bodyX+bodyW-4)+' '+ay+')"/>';
+  handAt(bodyX-arm+4, 44, sad?4:14, bodyX+4);
+  let phone = '';
+  if (sad && st !== 'baby') {
+    b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="40" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate(-40 '+(bodyX+bodyW+4)+' '+ay+')"/>';
+    const [hx, hy] = handAt(bodyX+bodyW-4, 40, -40, bodyX+bodyW+4);
+    // the phone sits in the raised mitten, glowing at their face
+    phone = '<g transform="translate('+(hx-154).toFixed(1)+' '+(hy-153).toFixed(1)+')"><rect x="146" y="128" width="16" height="26" rx="3" fill="#222" stroke="'+O+'" stroke-width="2.5"/><rect x="148" y="131" width="12" height="18" fill="#7fd1ff"/><path d="M146 132 L112 104 L112 120Z" fill="#7fd1ff" opacity=".35"/></g>';
+  } else {
+    b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate(-14 '+(bodyX+bodyW-4)+' '+ay+')"/>';
+    handAt(bodyX+bodyW-4, 44, -14, bodyX+bodyW-4);
+  }
   // body and outfit details
   b += '<rect x="'+bodyX+'" y="'+bodyY+'" width="'+bodyW+'" height="'+bodyH+'" rx="24" fill="'+shirt+'" '+W+'/>';
   if (outfit) b += outfit.body(bodyX, bodyY, bodyW, bodyH);
@@ -1370,6 +1385,7 @@ function charSVG(c){
   if (st === 'senior') b += (outfit ? '' : '<circle cx="100" cy="140" r="3" fill="'+O+'"/><circle cx="100" cy="156" r="3" fill="'+O+'"/><circle cx="100" cy="172" r="3" fill="'+O+'"/>')+
     (sad ? '' : '<path d="M150 150 L156 220 M150 150 q-2 -12 -12 -8" stroke="#8a5a34" stroke-width="6" fill="none" stroke-linecap="round"/>');
 
+  b += phone + hands.join('');
   // head
   b += '<g'+(sad ? ' transform="rotate(8 100 90)"' : '')+'>';
   if (c.girl) {
