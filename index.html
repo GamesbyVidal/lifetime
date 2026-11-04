@@ -101,6 +101,12 @@ details ul{padding-left:18px;margin:6px 0}
 .nav button{flex:1;border:0;background:none;font-size:13px;color:var(--soft);padding:4px;font-weight:500}
 .nav button b{display:block;font-size:22px}
 .nav button.on{color:var(--accent2)}
+.nav button .ic{display:flex;height:30px;width:48px;margin:0 auto 1px;align-items:center;justify-content:center;border-radius:99px;transition:background .15s}
+.nav button .ic svg{width:26px;height:26px;display:block;overflow:visible}
+.nav button.on{color:#3b2a4a;font-weight:700}
+.nav button.on[data-tab=home] .ic{background:#ffe7a6}.nav button.on[data-tab=story] .ic{background:#ffd3e0}.nav button.on[data-tab=time] .ic{background:#e3dbff}.nav button.on[data-tab=shop] .ic{background:#d3f2d7}.nav button.on[data-tab=settings] .ic{background:#ebe6f7}
+.nav button.hop .ic svg{animation:navhop .38s ease-out}
+@keyframes navhop{0%{transform:none}30%{transform:translateY(-4px) scale(.94,1.06)}65%{transform:translateY(0) scale(1.08,.92)}100%{transform:none}}
 /* story */
 .year{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .year:last-child{border-bottom:0}
@@ -305,15 +311,24 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .nw{display:flex;gap:8px;align-items:flex-start;font-size:15px;padding:3px 0}.nw span:first-child{width:22px;flex:none;text-align:center}
 .nx{background:#fff6d6;border:2.5px solid #3b2a4a;border-radius:16px;padding:10px 12px;margin:10px 0 4px;text-align:left}.nxh{display:flex;gap:10px;align-items:center}.nxe{font-size:30px}.nx small{display:block;font-size:11px;font-weight:700;color:#b26b00;text-transform:uppercase;letter-spacing:.6px}.nx b{font-size:16px}
 .nx .sbar{margin-top:8px}.days{text-align:right;font-size:13px;font-weight:600;margin-top:4px}
-.wincard{padding:0;overflow:hidden}.wart{position:relative;aspect-ratio:300/230;background:#fff1d6}
+.wincard{padding:0;overflow:hidden;border:5px solid #3b2a4a;box-shadow:0 5px 0 rgba(0,0,0,.28)}.wart{position:relative;aspect-ratio:300/230;background:#fff1d6}
 .wpill{position:absolute;left:10px;top:10px;background:#fff;border:2.5px solid #3b2a4a;border-radius:99px;padding:3px 10px;font-size:13px;font-weight:600}
-.wcl{position:absolute;right:10px;top:10px}.wname{position:absolute;left:10px;bottom:8px;background:rgba(255,255,255,.85);border-radius:99px;padding:2px 10px;font-weight:700;font-size:14px}
+.wcl{position:absolute;right:10px;top:10px}
+.hangbtn{position:absolute;right:8px;top:8px;width:48px;height:48px;border-radius:50%;background:#fff;border:2.5px solid #3b2a4a;box-shadow:0 3px 0 rgba(59,42,74,.35);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.hangbtn b{position:absolute;top:50px;left:50%;transform:translateX(-50%);background:#fff;border:2px solid #3b2a4a;border-radius:99px;padding:0 7px;font-size:11px;font-weight:700;color:#3b2a4a;white-space:nowrap}
+.hdot{position:absolute;right:-1px;top:-1px;width:12px;height:12px;border-radius:50%;background:#ff5a8a;border:2px solid #fff}
+.clm .card{text-align:left}.clh{display:flex;justify-content:space-between;align-items:center}.clh h2{margin:0}.clDone{border:2.5px solid #3b2a4a;background:#fff;border-radius:99px;padding:4px 14px;font-weight:700;color:#3b2a4a}
+.clstage{display:flex;align-items:flex-end;justify-content:center;gap:4px;background:#fff1d6;border:2.5px solid #3b2a4a;border-radius:16px;margin:10px 0;padding:8px 0 4px;height:150px}.clstage .clb svg{height:140px;width:auto;display:block}.clstage .gdog{width:60px;height:72px}
+.clsw{display:flex;gap:8px;margin-bottom:10px}.clsw button{flex:1;border:2.5px solid #3b2a4a;border-radius:99px;background:#fff;padding:5px;font-weight:700;color:#3b2a4a}.clsw button.on{background:#7c5cff;color:#fff}
+.clgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.cltile{position:relative;border:2.5px solid #3b2a4a;border-radius:14px;background:#fff;padding:6px 4px;text-align:center;font-size:12px;color:#3b2a4a}.cltile svg{width:100%;height:64px;display:block}
+.cltile b{display:block;font-weight:700;line-height:1.2;margin-top:2px}.cltile span{display:block;font-size:11px;color:#2f9a4a;font-weight:700}.cltile.on{border-color:#5cc26b;background:#effbf0}.cltile[disabled]{opacity:.5}
+.clnew{position:absolute;right:-4px;top:-6px;background:#ff5a8a;color:#fff;font-style:normal;font-size:10px;font-weight:700;border-radius:99px;padding:1px 6px;border:2px solid #fff}.wname{position:absolute;left:10px;bottom:8px;background:rgba(255,255,255,.85);border-radius:99px;padding:2px 10px;font-weight:700;font-size:14px}
 .wincard .chips{padding:0 10px 10px}
 .wpanel{background:#fffaf0}.wm{border:2.5px solid #3b2a4a;border-radius:16px;padding:10px 12px;background:#fff}.wml{display:flex;justify-content:space-between;font-size:13px;color:var(--soft)}.wml b{font-size:13px}
 .wmv{font-size:15px;color:var(--soft)}.wmv b{font-size:22px;color:var(--ink)}.wbar{height:12px;border-radius:9px;background:#eee9f8;border:2px solid #3b2a4a;overflow:hidden;margin-top:6px}.wbar u{display:block;height:100%}
 .wrow{display:flex;gap:10px;margin-top:10px}.wst{flex:none;width:78px;border:2.5px solid #3b2a4a;border-radius:16px;background:#fff;text-align:center;padding:6px 4px}.wst span{display:block;font-size:22px}.wst b{display:block;font-size:22px;line-height:1}.wst small{font-size:11px;color:var(--soft)}
 .wtz{flex:1;display:flex;gap:8px;align-items:center;border:2.5px solid #3b2a4a;border-radius:16px;background:#fff6d6;padding:8px 10px}.wtz span{font-size:28px}.wtz small{display:block;font-size:11px;font-weight:700;color:#b26b00;text-transform:uppercase;letter-spacing:.5px}.wtz b{font-size:14px;line-height:1.25;display:block}
-.wdown{margin-top:12px;background:linear-gradient(180deg,#8f73ff,#6f50f0);box-shadow:0 4px 0 #4f35c4}
+.wdown{margin-top:12px;background:linear-gradient(90deg,#ff9f43,#ff6b6b);color:#fff;text-shadow:0 1px 0 rgba(59,42,74,.45);border:2.5px solid #3b2a4a;box-shadow:0 4px 0 #3b2a4a}
 .bye{text-align:center;padding:22px 16px;color:#fff}.bye .muted{color:#d9d2ff}.bye.card2 .muted{color:var(--soft)}.bye.card2{color:var(--ink)}.bye .e{font-size:46px}.bye h2{margin:6px 0}.bye.card2{background:#f6f3ff;border:2.5px solid #3b2a4a;border-radius:20px;margin:0 6px}
 .linkbtn{border:0;background:none;color:#7c5cff;font:inherit;font-weight:600;padding:0;cursor:pointer}.trow{grid-template-columns:repeat(4,1fr)}.tcase .card{text-align:left}
 .lmap{border-radius:14px;overflow:hidden;border:2.5px solid #3b2a4a}.mstop{cursor:pointer}
@@ -329,7 +344,7 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .phm{display:flex;justify-content:space-between;align-items:center;margin:4px 6px}.phm b{font-size:22px}.phs{text-align:left;margin:8px 6px}
 .fwall{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:#fdf0f6;border-radius:14px;padding:12px 8px}.frm{text-align:center}.fpic{background:#fff6e0;border:5px solid #e0b07a;outline:2.5px solid #3b2a4a;border-radius:4px;aspect-ratio:4/5;overflow:hidden}
 .fpic svg{width:100%;height:100%;display:block}.frm b{display:block;font-size:12px;margin-top:6px}.frm small{font-size:11px;color:var(--soft)}
-.housecard{padding:0;overflow:hidden;position:relative;border:3px solid #3b2a4a}.hhint{position:absolute;left:10px;top:10px;z-index:2;background:#fff;border:2.5px solid #3b2a4a;border-radius:99px;padding:2px 10px;font-size:13px;font-weight:600}
+.housecard{padding:0;overflow:hidden;position:relative;border:5px solid #3b2a4a;box-shadow:0 5px 0 rgba(0,0,0,.28)}.hhint{position:absolute;left:10px;top:10px;z-index:2;background:#fff;border:2.5px solid #3b2a4a;border-radius:99px;padding:2px 10px;font-size:13px;font-weight:600}
 .hroom{cursor:pointer}.rbig{margin:0 auto;max-width:360px}
 .confetti{position:fixed;top:-20px;font-size:22px;pointer-events:none;z-index:30;animation:drop linear forwards}
 @keyframes drop{to{transform:translateY(110vh) rotate(540deg)}}
@@ -353,6 +368,7 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .gbb{width:54px;height:64px;flex:none;background:rgba(255,255,255,.85);border-radius:50%;overflow:hidden}.gbb svg{width:54px;height:64px}
 .gbt{flex:1;min-width:0}.gbt b{display:block;font-size:17px}.gbt span{font-size:13px;opacity:.9}.gbp{background:#fff;color:#c8405f;font-weight:700;border-radius:999px;padding:6px 10px;font-size:15px;flex:none}
 .gdn{border:0;background:#f1edff;color:var(--accent2);border-radius:999px;padding:3px 10px;font-weight:600;font-size:14px;margin-bottom:4px}.gdogpic svg{width:110px;height:130px}
+[data-tap]{cursor:pointer;-webkit-tap-highlight-color:transparent}[data-tap]:active{transform:scale(.97)}.tbig{font-size:54px;line-height:1.1}.tgift{display:flex;justify-content:center}
 .closetbtn{float:right;border:0;background:#f1edff;color:var(--accent2);border-radius:999px;padding:5px 11px;font-weight:600;font-size:13px}
 .gempty{text-align:center}.gsoon{display:flex;gap:12px;align-items:center}.gsoon svg{width:96px;height:96px;flex:none;filter:grayscale(.5);opacity:.85}.gsoon>div{flex:1;min-width:0}.gsoon .gname{font-size:19px}.gsoon p{margin:2px 0}.gempty .big{font-size:44px}
 .gfoot{color:#fff;opacity:.75;text-align:center;font-size:13px;margin:4px 0}.linkbtn.gfoot{display:block;margin:6px auto;background:none;border:0;text-decoration:underline}
@@ -1041,6 +1057,39 @@ function shopTabs(){
   return '<div class="gtabs">'+(baby ? [['baby','Baby 🍼']] : styleOn() ? [['style','Style 🎀']] : []).concat([['hats','Hats'],['outfits','Outfits'],['pets','Pupgrades 🐶'],['closet','👕 Closet']]).map(t => '<button data-gtab="'+t[0]+'" class="'+(t[0] === shopTab ? 'on' : '')+'">'+t[1]+'</button>').join('')+'</div>';
 }
 function openCloset(){ tab = 'shop'; shopTab = 'closet'; shopPick = null; render(); window.scrollTo(0,0); }
+// ---- Today's closet button (option B): a round hanger button in the corner of the room. Only clothes already owned, no prices, no shop link.
+function closetHanger(){ const c = S.girl ? '#ff8fbf' : '#4da3ff', O = '#3b2a4a';
+  return '<svg viewBox="0 0 40 40" width="28" height="28" aria-hidden="true"><path d="M17 10.5 a3.3 3.3 0 1 1 3.3 3.3 V15.5" fill="none" stroke="'+O+'" stroke-width="2.6" stroke-linecap="round"/>'+
+    '<path d="M12 18 L20 15 L28 18 L34 23 L30 27 L28 25.5 V35 H12 V25.5 L10 27 L6 23 Z" fill="'+c+'" stroke="'+O+'" stroke-width="2.6" stroke-linejoin="round"/><path d="M16 18 q4 4 8 0" fill="none" stroke="'+O+'" stroke-width="2.2"/></svg>'; }
+function closetItems(){ return Object.keys(GIFT.ITEMS).filter(ownsGift); }
+function closetNew(){ const seen = store.seen || []; return closetItems().filter(k => !seen.includes(k)); }
+function closetBtnHTML(){ return '<button class="hangbtn" id="hangbtn" aria-label="Closet">'+closetHanger()+(closetNew().length ? '<i class="hdot"></i>' : '')+'<b>Closet</b></button>'; }
+let closetWho = 'blip';
+function closetSheetHTML(){
+  const name = esc(S.name), dg = store.dogName, all = closetItems(), fresh = closetNew();
+  const items = all.filter(k => closetWho === 'dog' ? GIFT.ITEMS[k].pet : !GIFT.ITEMS[k].pet);
+  const top = '<div class="clh"><h2>'+name+'\'s closet</h2><button class="clDone" data-close>Done</button></div>';
+  const stagePic = '<div class="clstage">'+(closetWho === 'dog' ? giftDog() : '<div class="clb">'+charSVG(Object.assign({}, S, {wear: myWear()}))+'</div>'+(store.wear.dog ? giftDog() : ''))+'</div>';
+  const sw = dg && all.some(k => GIFT.ITEMS[k].pet) ? '<div class="clsw"><button data-who="blip" class="'+(closetWho === 'blip' ? 'on' : '')+'">'+name+'</button><button data-who="dog" class="'+(closetWho === 'dog' ? 'on' : '')+'">'+esc(dg)+'</button></div>' : '';
+  if (!all.length) return top+stagePic+'<p class="muted">Clothes you give '+name+' will hang here.</p>';
+  const grid = '<div class="clgrid">'+items.map(k => { const x = GIFT.ITEMS[k], lock = outgrown(k) || tooYoung(k);
+    return '<button class="cltile'+(isWorn(k) ? ' on' : '')+'" data-cl="'+k+'"'+(lock ? ' disabled' : '')+'>'+(fresh.includes(k) ? '<i class="clnew">New</i>' : '')+
+      (x.pet ? giftDog(k) : giftBlip(k, true))+'<b>'+esc(x.name)+'</b>'+(isWorn(k) ? '<span>Wearing ✓</span>' : lock ? '<span>Saved for later</span>' : '')+'</button>'; }).join('')+'</div>';
+  return top+stagePic+sw+grid+'<p class="muted small">Tap to put on or take off.</p>';
+}
+function showCloset(){
+  closetWho = 'blip';
+  modal('<div class="closet">'+closetSheetHTML()+'</div>', 'clm');
+  const m = document.querySelector('.modal.clm'), box = m.querySelector('.closet');
+  const bindC = () => {
+    box.querySelectorAll('[data-who]').forEach(b => b.onclick = () => { closetWho = b.dataset.who; box.innerHTML = closetSheetHTML(); bindC(); });
+    box.querySelectorAll('[data-cl]').forEach(b => b.onclick = () => { const k = b.dataset.cl; if (isWorn(k)) takeOff(k); else wearItem(k); box.innerHTML = closetSheetHTML(); bindC(); });
+  };
+  bindC();
+  // Everything in the closet has now been seen; "New" badges stay until the sheet closes.
+  store.seen = closetItems(); saveStore();
+  const close = m.onclick; m.onclick = ev => { close(ev); if (!document.body.contains(m)) render(); };
+}
 function bindShop(){
   document.querySelectorAll('[data-gtab]').forEach(b => b.onclick = () => { shopTab = b.dataset.gtab; shopPick = null; render(); });
   document.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => { shopPick = b.dataset.gift; render(); });
@@ -1116,6 +1165,7 @@ function tierFor(mins){
 function checkIn(mins, src, tierOverride, silent){
   const tier = tierOverride || tierFor(mins);
   const entry = liveYear(mins, tier);
+  if (S.goalNext != null) { S.goal = S.goalNext; delete S.goalNext; } // a goal changed on Today starts the day after it was changed
   if (src === 'st') { entry.src = 'st'; S.stUsed = true; }
   S.lastDate = today();
   save();
@@ -1610,6 +1660,7 @@ function render(){
   else app.innerHTML = settingsHTML();
   bind();
   if ($('closet')) $('closet').onclick = openCloset;
+  if ($('hangbtn')) $('hangbtn').onclick = showCloset;
   document.querySelectorAll('[data-stat]').forEach(b => b.onclick = ev => { ev.stopPropagation(); showStat(b.dataset.stat); });
 }
 
@@ -1726,33 +1777,91 @@ function verdictHTML(mins, tier){
 function weekHTML(){
   const open = canCheckIn() && !S.done;
   const days = S.log.slice(open ? -6 : -7);
-  let cells = days.map(e => '<div><span class="'+e.tier+'"></span>'+e.age+'</div>').join('');
+  let cells = days.map(e => '<div data-tap="photo" data-age="'+e.age+'"><span class="'+e.tier+'"></span>'+e.age+'</div>').join('');
   if (open) cells += '<div class="next"><span></span>'+(S.age+1)+'</div>';
   const keys = Object.keys(SETTINGS.streakBonuses).map(Number).sort((a, b) => a - b);
   const next = keys.find(k => k > S.streak);
   let nudge;
   if (!S.streak) nudge = 'Hit your goal today to start a streak 🔥';
   else nudge = '🔥 '+S.streak+' day streak'+(next ? ' · <b>'+(next - S.streak)+' more day'+(next - S.streak > 1 ? 's' : '')+' for a +'+SETTINGS.streakBonuses[next]+' bonus</b>' : ' · <b>Legendary!</b>');
-  return '<div class="card"><div class="week">'+cells+'</div><div class="nudge">'+nudge+'</div></div>';
+  return '<div class="card"><div class="week">'+cells+'</div><div class="nudge" data-tap="streak">'+nudge+'</div></div>';
 }
 function teaserHTML(after){
   const nb = nextBig(after);
   if (!nb) return '';
   if (!canCheckIn()) {
     const turning = S.age + 1, big = nb[0] === turning;
-    return '<div class="tease"><div class="e">🎂</div><div><b>Tomorrow'+(MORNING ? ' morning' : '')+' '+esc(S.name)+' turns '+turning+'</b><span>'+(big ? nb[2]+'! '+nb[1] : 'Coming up at '+nb[0]+': '+nb[2]+' '+nb[1])+'</span></div></div>';
+    return '<div class="tease" data-tap="tomorrow"><div class="e">🎂</div><div><b>Tomorrow'+(MORNING ? ' morning' : '')+' '+esc(S.name)+' turns '+turning+'</b><span>'+(big ? nb[2]+'! '+nb[1] : 'Coming up at '+nb[0]+': '+nb[2]+' '+nb[1])+'</span></div></div>';
   }
   const soon = nb[0] === S.age + 1;
-  return '<div class="tease"><div class="e">'+nb[1]+'</div><div><b>'+(soon ? 'This year: ' : 'Coming up at '+nb[0]+': ')+nb[2]+'</b><span>'+(soon ? 'Hit your goal today so it goes well!' : 'Hit your goal that day so it goes well!')+'</span></div></div>';
+  return '<div class="tease" data-tap="lifemap"><div class="e">'+nb[1]+'</div><div><b>'+(soon ? 'This year: ' : 'Coming up at '+nb[0]+': ')+nb[2]+'</b><span>'+(soon ? 'Hit your goal today so it goes well!' : 'Hit your goal that day so it goes well!')+'</span></div></div>';
+}
+
+// ---- Tap anything on Today (Matthew: everything that looks like a button does something). No visual change to the screen.
+// Lawyer: game facts only, no health claims; goal, streak and countdown cards are never in shares or analytics.
+function todayTap(k, el){
+  if (k === 'photo') return showPhoto(+el.dataset.age);
+  if (k === 'life') { tab = 'story'; render(); window.scrollTo(0,0); return; }
+  if (k === 'lifemap') { tab = 'story'; render(); const m = document.querySelector('.lmap'); if (m) m.scrollIntoView({block:'center'}); return; }
+  if (k === 'streak') return showStreakCard();
+  if (k === 'tomorrow') return showTomorrowCard();
+  if (k === 'goal') return showGoalCard();
+  if (k === 'dog') return showDogCard();
+}
+function showStreakCard(){
+  const keys = Object.keys(SETTINGS.streakBonuses).map(Number).sort((a, b) => a - b), next = keys.find(k => k > S.streak), n = esc(S.name);
+  const pct = next ? Math.round(S.streak / next * 100) : 100;
+  modal('<div class="tbig">🔥</div><h2 style="margin:4px 0">'+(S.streak ? S.streak+' day streak' : 'No streak yet')+'</h2>'+
+    '<p class="muted">'+(S.streak ? 'You\'ve hit your goal '+S.streak+' day'+(S.streak > 1 ? 's' : '')+' in a row.' : 'Hit your goal today to start one.')+' Best ever: '+S.best+'.</p>'+
+    (next ? '<div class="sbox"><div class="rh">Next streak bonus</div><b>'+(next - S.streak)+' more day'+(next - S.streak > 1 ? 's' : '')+'</b> for +'+SETTINGS.streakBonuses[next]+' to all of '+n+'\'s stats<i class="nbar" style="margin-top:8px"><u style="width:'+pct+'%"></u></i></div>' : '<div class="sbox"><b>Legendary!</b> You\'ve earned every streak bonus.</div>')+
+    '<button class="btn" data-close style="margin-top:12px">Got it</button>');
+}
+function showTomorrowCard(){
+  const n = esc(S.name), turning = S.age + 1, nb = nextBig(S.age), big = nb && nb[0] === turning;
+  const gift = '<svg viewBox="0 0 100 100" width="96" height="96" aria-hidden="true"><path d="M50 32 Q34 8 22 20 Q16 32 50 32 Z M50 32 Q66 8 78 20 Q84 32 50 32 Z" fill="#ff5a8a" stroke="#3b2a4a" stroke-width="5" stroke-linejoin="round"/>'+
+    '<rect x="18" y="46" width="64" height="46" rx="6" fill="#ffc23d" stroke="#3b2a4a" stroke-width="5"/><rect x="11" y="32" width="78" height="18" rx="6" fill="#ffd36e" stroke="#3b2a4a" stroke-width="5"/><rect x="42" y="32" width="16" height="60" fill="#ff5a8a" stroke="#3b2a4a" stroke-width="5"/></svg>';
+  const r = MORNING ? '<div class="switch" style="text-align:left"><span>Remind me in the morning</span><input type="checkbox" id="trm" '+(remind.on ? 'checked' : '')+'></div><p class="muted small" id="trmn" style="margin:4px 0 0"></p>' : '';
+  modal('<div class="tgift">'+gift+'</div><h2 style="margin:4px 0">Tomorrow'+(MORNING ? ' morning' : '')+', '+n+' turns '+turning+'</h2>'+
+    (nb ? '<p class="muted">'+(big ? esc(nb[2])+'! '+nb[1] : 'Coming up at '+nb[0]+': '+esc(nb[2])+' '+nb[1])+'</p>' : '')+
+    '<div class="sbox"><b>'+(MORNING ? '🌅 Unlocks at 4 AM.' : '🌙 Unlocks tomorrow.')+'</b> '+(MORNING ? 'Every minute until then counts toward the year.' : 'Check in at the end of your day.')+'</div>'+r+
+    '<button class="btn" data-close style="margin-top:12px">Can\'t wait</button>');
+  const t = $('trm'); if (t) t.onchange = () => { remind.on = t.checked; remindSave();
+    remindSync().then(ok => { if (!ok && remind.on) { remind.on = false; remindSave(); t.checked = false; $('trmn').textContent = 'Notifications are off for Blip. You can turn them on in iPhone Settings > Notifications > Blip.'; } }); };
+}
+function showGoalCard(){
+  const recent = S.log.slice(-7).filter(e => e.mins != null), avg = recent.length ? Math.round(recent.reduce((a, e) => a + e.mins, 0) / recent.length / 5) * 5 : null;
+  const cur = S.goal; let v = S.goalNext != null ? S.goalNext : cur;
+  const comfy = recent.length >= 5 && avg != null && avg <= cur - 30 && cur > 30;
+  const body = () => '<div class="tbig">🎯</div><h2 style="margin:4px 0">Your daily goal</h2>'+
+    '<p class="muted">'+fmtTime(cur)+' or less a day'+(avg != null ? '. Last '+recent.length+' day'+(recent.length > 1 ? 's' : '')+': about '+fmtTime(avg)+' a day on average.' : '.')+'</p>'+
+    (comfy && v === cur ? '<div class="sbox">You\'ve been comfortably under. Try 15 minutes less? <button class="linkbtn" id="gtrim">Try '+fmtTime(cur - 15)+'</button></div>' : '')+
+    '<div class="picker"><button id="gminus" aria-label="Less">–</button><div class="v">'+fmtTime(v)+'</div><button id="gplus" aria-label="More">+</button></div>'+
+    '<p class="muted small" style="margin:0">'+(v === cur ? 'Change it in 15 minute steps.' : 'Starts tomorrow. Today still counts against '+fmtTime(cur)+'.')+'</p>'+
+    '<button class="btn" id="gsave" style="margin-top:12px">'+(v === cur ? 'Keep '+fmtTime(cur) : 'Use '+fmtTime(v)+' from tomorrow')+'</button>';
+  modal('<div id="gcard">'+body()+'</div>');
+  const box = $('gcard'), b = () => {
+    box.innerHTML = body();
+    $('gminus').onclick = () => { v = Math.max(15, v - 15); b(); };
+    $('gplus').onclick = () => { v = Math.min(960, v + 15); b(); };
+    if ($('gtrim')) $('gtrim').onclick = () => { v = cur - 15; b(); };
+    $('gsave').onclick = () => { if (v === cur) delete S.goalNext; else S.goalNext = v; save(); document.querySelector('.modal').remove(); render(); };
+  };
+  b();
+}
+function showDogCard(){
+  const d = esc(store.dogName || 'The dog');
+  modal('<div class="tgift"><svg viewBox="2 -14 96 116" width="110" height="110">'+(SHOP_ON && store.wear.dog ? GIFT.dog(store.wear.dog) : ICONS.dog)+'</svg></div><h2 style="margin:4px 0">'+d+' is waiting by the door</h2>'+
+    '<p class="muted">Put your phone down and '+esc(S.name)+' takes '+d+' for a walk.</p><button class="btn wdown" id="dogwalk">Put my phone down 👋</button><button class="btn ghost" data-close style="margin-top:8px">Not yet</button>');
+  $('dogwalk').onclick = () => { document.querySelector('.modal').remove(); const pd = $('phonedown'); if (pd) pd.click(); };
 }
 
 function homeHTML(){
   const st = stage(S.age);
   let tags = '';
-  if (S.gen > 1) tags += '<span class="tag">Gen '+S.gen+'</span>';
-  if (S.edu && S.age < 23) tags += '<span class="tag">🎓 '+S.edu+'</span>';
-  if (S.job) tags += '<span class="tag">💼 '+S.job+'</span>';
-  if (S.partner) tags += '<span class="tag">💞 '+S.partner+'</span>';
+  if (S.gen > 1) tags += '<span class="tag" data-tap="life">Gen '+S.gen+'</span>';
+  if (S.edu && S.age < 23) tags += '<span class="tag" data-tap="life">🎓 '+S.edu+'</span>';
+  if (S.job) tags += '<span class="tag" data-tap="life">💼 '+S.job+'</span>';
+  if (S.partner) tags += '<span class="tag" data-tap="life">💞 '+S.partner+'</span>';
   const open = canCheckIn() && !S.done;
   const last = S.log.length ? S.log[S.log.length - 1] : null;
   const share = S.log.length ? '<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '';
@@ -1805,23 +1914,23 @@ function homeHTML(){
     return header()+hero+'<div class="card center"><h2>🌱 '+n+'\'s first year is happening right now</h2>'+
       '<p class="muted">Blip is counting your screen time today. Tomorrow morning, '+n+' turns 1 and you\'ll see how the year went.</p>'+
       (remind.on ? '' : '<button class="btn alt" id="firstremind">⏰ Remind me in the morning</button>')+'</div>'+todayMeterHTML()+
-      '<div class="card waiting"><div class="muted">'+n+'\'s first birthday is in</div><div class="countdown" id="cd"></div></div>';
+      '<div class="card waiting" data-tap="tomorrow"><div class="muted">'+n+'\'s first birthday is in</div><div class="countdown" id="cd"></div></div>';
   }
   const t = last ? TIER[last.tier] : null;
-  const result = last ? '<div class="card result"><span class="ban" style="background:'+t.color+'">'+t.label+'</span><div class="ev">'+last.emoji+'</div>'+
+  const result = last ? '<div class="card result" data-tap="photo" data-age="'+last.age+'"><span class="ban" style="background:'+t.color+'">'+t.label+'</span><div class="ev">'+last.emoji+'</div>'+
       '<p><b>'+esc(last.text)+'</b></p>'+(last.mins != null ? '<p class="muted">'+fmtTime(last.mins)+' vs. your '+fmtTime(last.goal)+' goal</p>' : '')+
       '<div class="fx">'+fxHTML(last.fx, last.earned)+'</div>'+yearGoalHTML(last)+
       (last.ms ? '<div class="msline">'+last.ms.emoji+' <b>'+esc(last.ms.title)+'</b></div>' : '')+share+'</div>' : '';
   if (MORNING && autoOn() && stToday != null && last && !S.done) return header()+windowHTML();
   return header()+hero+result+todayMeterHTML()+weekHTML()+
-    '<div class="card waiting">'+teaserHTML(S.age)+'<div class="muted" style="margin-top:12px">Next check-in opens in</div><div class="countdown" id="cd"></div></div>';
+    '<div class="card waiting">'+teaserHTML(S.age)+'<div class="muted" style="margin-top:12px">Next check-in opens in</div><div class="countdown" id="cd" data-tap="tomorrow"></div></div>';
 }
 let homeMins = null; // what the player has dialed in so far today
 // Live "today so far" meter (app + automatic Screen Time only). Home screen only: never in shares, links or the friend page.
 function todayMeterHTML(){
   if (!MORNING || !autoOn() || stToday == null) return '';
   const m = Math.min(960, stToday), pct = Math.min(100, Math.round(m / Math.max(1, S.goal) * 100)), over = m > S.goal;
-  return '<div class="card"><h2 style="margin:0 0 6px">📱 Today so far</h2>'+
+  return '<div class="card" data-tap="goal"><h2 style="margin:0 0 6px">📱 Today so far</h2>'+
     '<div class="goalnote"><span><b>'+fmtTime(m)+'</b> of your '+fmtTime(S.goal)+' goal</span><span>'+(over ? 'Over' : fmtTime(S.goal - m)+' left')+'</span></div>'+
     '<i class="nbar"><u style="width:'+pct+'%'+(over ? ';background:var(--bad)' : '')+'"></u></i>'+
     '<p class="muted small" style="margin:8px 0 0">'+(joinedNote(stDayKey()) ? joinedNote(stDayKey())+' ' : '')+'Nothing is decided until the day ends. Every minute until midnight counts.</p></div>';
@@ -2765,6 +2874,7 @@ function bindSetup(){
 let cdTimer;
 function bind(){
   clearInterval(cdTimer);
+  document.querySelectorAll('#app [data-tap]').forEach(el => el.onclick = ev => { ev.stopPropagation(); todayTap(el.dataset.tap, el); });
   if ($('buddy')) $('buddy').onclick = tapCharacter;
   if ($('sblip')) $('sblip').onclick = () => tapCharacter('sblip', 'sbub');
   if ($('ydog')) $('ydog').onclick = tapDog;
@@ -2793,7 +2903,7 @@ function bind(){
       if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
   bindST(); bindRemind();
   if ($('firstremind')) $('firstremind').onclick = () => { remind.on = true; remindSave(); remindSync().then(ok => { if (!ok) { remind.on = false; remindSave(); } render(); }); };
-  if ($('goal')) $('goal').oninput = e => { S.goal = +e.target.value; $('gv').textContent = fmtTime(S.goal); save(); };
+  if ($('goal')) $('goal').oninput = e => { S.goal = +e.target.value; delete S.goalNext; $('gv').textContent = fmtTime(S.goal); save(); };
   if ($('nm')) $('nm').onchange = e => { const v = e.target.value.trim(); if (v) { S.name = v; save(); } };
   if ($('tm')) $('tm').onchange = e => { S.testMode = e.target.checked; save(); };
   if ($('bkcopy')) $('bkcopy').onclick = () => {
@@ -2839,10 +2949,10 @@ function bind(){
 const WIN = (function(){
 const O = '#3b2a4a', W = w => 'stroke="'+O+'" stroke-width="'+(w||3.5)+'" stroke-linejoin="round" stroke-linecap="round"';
 const T = {
-  morning:{wall:'#fff1d6',wl:'#ffe2b0',floor:'#f3d2a2',fl:'#e2b67f',sky:'#bfe6ff',beam:'#fff9df',bo:.75},
+  morning:{wall:'#fff1d6',wl:'#ffe2b0',floor:'#e3a96b',fl:'#c4864a',sky:'#bfe6ff',beam:'#fff9df',bo:.75},
   afternoon:{wall:'#ffdcc0',wl:'#ffc9a0',floor:'#eebd8a',fl:'#d9a46c',sky:'#ffc98a',beam:'#ffe9c2',bo:.55},
-  evening:{wall:'#5d4f99',wl:'#51438b',floor:'#7a6296',fl:'#68508a',sky:'#2b2350',beam:null},
-  night:{wall:'#3f3672',wl:'#372e66',floor:'#5a4a78',fl:'#4c3d6a',sky:'#1f1840',beam:null}
+  evening:{wall:'#ffd79a',wl:'#f6c27a',floor:'#c98a55',fl:'#a96d3c',sky:'#26306b',beam:null},
+  night:{wall:'#f2c27e',wl:'#e3ab66',floor:'#b67a48',fl:'#985f33',sky:'#1c2456',beam:null}
 };
 const noGlow = s => s.replace(/<circle cx="100" cy="122" r="86"[^>]*\/>/, '');
 const front = (s, p) => s.replace(/<\/svg>$/, p+'</svg>');
@@ -2931,7 +3041,7 @@ const WIN_LINES = {
 function windowHTML(){
   const m = Math.min(960, stToday), g = S.goal, over = m > g, near = !over && g - m <= 30, t = timeOfDay(), n = esc(S.name), dg = store.dogName && esc(store.dogName);
   const nb = nextBig(S.age), turning = S.age + 1;
-  const tease = '<div class="wtz"><span>🎂</span><div><small>Tomorrow morning</small><b>'+n+' turns '+turning+(nb && nb[0] === turning ? '. '+esc(nb[2])+'!' : '.')+'</b></div></div>';
+  const tease = '<div class="wtz" data-tap="tomorrow"><span>🎂</span><div><small>Tomorrow morning</small><b>'+n+' turns '+turning+(nb && nb[0] === turning ? '. '+esc(nb[2])+'!' : '.')+'</b></div></div>';
   if (goodbye) {
     const art = WIN.scene({t, kind: goodbye === 1 ? 'wave' : 'empty', dog: !!dg});
     const msg = goodbye === 1 ? '<div class="bye"><div class="e">👋</div><h2>'+n+'\'s going for a walk</h2><p class="muted">'+(dg ? dg+' is going too. ' : '')+'Enjoy your '+(t === 'morning' ? 'day' : t === 'afternoon' ? 'afternoon' : 'evening')+'.</p></div>'
@@ -2945,12 +3055,12 @@ function windowHTML(){
   const art = WIN.scene({t, kind, mood, dog: !!dg, say: kind === 'studio' && !near ? words : null});
   const pct = Math.min(100, Math.round(m / Math.max(1, g) * 100)), col = over ? '#ff5a8a' : near ? '#ffc23d' : '#5cc26b';
   const chip = (e, v, c, k) => '<button class="chip tchip" data-stat="'+k+'">'+e+' '+v+'<span class="chev">›</span><i><u style="width:'+v+'%;background:'+c+'"></u></i></button>';
-  return '<div class="card wincard"><div class="wart">'+art+(pill ? '<span class="wpill">'+pill+'</span>' : '')+(SHOP_ON ? '<button class="closetbtn wcl" id="closet">👕 Closet</button>' : '')+
-      '<div class="wname">'+n+' · '+S.age+'</div></div>'+
+  return '<div class="card wincard"><div class="wart">'+art+(pill ? '<span class="wpill" data-tap="dog">'+pill+'</span>' : '')+(SHOP_ON ? closetBtnHTML() : '')+
+      '<div class="wname" data-tap="life">'+n+' · '+S.age+'</div></div>'+
       '<div class="chips">'+chip('💪', S.h, 'var(--h)', 'h')+chip('🧠', S.s, 'var(--s)', 's')+chip('😊', S.j, 'var(--j)', 'j')+'</div></div>'+
-    '<div class="card wpanel"><div class="wm"><div class="wml"><span>📱 Today so far</span><b style="color:'+col+'">'+(over ? fmtTime(m - g)+' over' : fmtTime(g - m)+' left')+'</b></div>'+
+    '<div class="card wpanel"><div class="wm" data-tap="goal"><div class="wml"><span>📱 Today so far</span><b style="color:'+col+'">'+(over ? fmtTime(m - g)+' over' : fmtTime(g - m)+' left')+'</b></div>'+
       '<div class="wmv"><b>'+fmtTime(m)+'</b> of your '+fmtTime(g)+' goal</div><div class="wbar"><u style="width:'+pct+'%;background:'+col+'"></u></div></div>'+
-      '<div class="wrow"><div class="wst"><span>🔥</span><b>'+S.streak+'</b><small>day streak</small></div>'+tease+'</div>'+
+      '<div class="wrow"><div class="wst" data-tap="streak"><span>🔥</span><b>'+S.streak+'</b><small>day streak</small></div>'+tease+'</div>'+
       '<button class="btn wdown" id="phonedown">Put my phone down 👋</button></div>';
 }
 
@@ -3565,8 +3675,29 @@ function confetti(set){
   }
 }
 
+if (SHOP_ON && !store.seen) { store.seen = store.owned.slice(); saveStore(); }
 if (SHOP_ON) { document.querySelector('.nav [data-tab=settings]').insertAdjacentHTML('beforebegin', '<button data-tab="shop"><b>🎁</b>Shop</button>'); shopInit(); }
-document.querySelectorAll('.nav button').forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); window.scrollTo(0,0); });
+// Blip-style tab icons (nav option C): same thick outline and pastel fills as the rest of the art.
+const NAV_ICONS = (function(){
+  const O = '#3b2a4a', sv = inner => '<svg viewBox="0 0 100 100" aria-hidden="true">'+inner+'</svg>';
+  const st = w => 'stroke="'+O+'" stroke-width="'+(w || 7)+'" stroke-linejoin="round" stroke-linecap="round"';
+  const rays = [-158,-124,-90,-56,-22].map(a => { const r = a*Math.PI/180; return [50+35*Math.cos(r), 62+35*Math.sin(r), 50+44*Math.cos(r), 62+44*Math.sin(r)].map(v => v.toFixed(1)); });
+  const home = sv(rays.map(p => '<path d="M'+p[0]+' '+p[1]+' L'+p[2]+' '+p[3]+'" stroke="'+O+'" stroke-width="13" stroke-linecap="round"/>').join('')+
+    rays.map(p => '<path d="M'+p[0]+' '+p[1]+' L'+p[2]+' '+p[3]+'" stroke="#ffc23d" stroke-width="4" stroke-linecap="round"/>').join('')+
+    '<circle cx="50" cy="62" r="25" fill="#ffc23d" '+st()+'/><ellipse cx="42" cy="57" rx="3.8" ry="4.8" fill="'+O+'"/><ellipse cx="58" cy="57" rx="3.8" ry="4.8" fill="'+O+'"/>'+
+    '<ellipse cx="34" cy="66" rx="5" ry="3.2" fill="#ff8fa3"/><ellipse cx="66" cy="66" rx="5" ry="3.2" fill="#ff8fa3"/><path d="M44 65 Q50 71 56 65" fill="none" '+st(4.5)+'/>'+
+    '<path d="M3 95 C10 78 34 72 52 79 C68 72 90 77 97 95 Z" fill="#5cc26b" '+st()+'/>');
+  const story = sv('<rect x="20" y="46" width="60" height="46" rx="6" fill="#fff3c4" '+st()+'/><path d="M9 52 L50 13 L91 52 Z" fill="#ff5a8a" '+st()+'/><rect x="41" y="62" width="18" height="30" rx="9" fill="#b9a6ff" '+st(6)+'/>');
+  const time = sv('<path d="M28 20 H72 Q72 42 56 50 Q72 58 72 80 H28 Q28 58 44 50 Q28 42 28 20 Z" fill="#e9f5ff"/><path d="M37 30 H63 Q60 42 50 47 Q40 42 37 30 Z" fill="#ffc23d"/><path d="M33 79 Q50 60 67 79 Z" fill="#ffc23d"/>'+
+    '<path d="M28 20 H72 Q72 42 56 50 Q72 58 72 80 H28 Q28 58 44 50 Q28 42 28 20 Z" fill="none" '+st()+'/><rect x="16" y="8" width="68" height="14" rx="7" fill="#7c5cff" '+st()+'/><rect x="16" y="78" width="68" height="14" rx="7" fill="#7c5cff" '+st()+'/>');
+  const shop = sv('<path d="M50 32 Q34 8 22 20 Q16 32 50 32 Z M50 32 Q66 8 78 20 Q84 32 50 32 Z" fill="#ff5a8a" '+st(6)+'/><rect x="18" y="46" width="64" height="46" rx="6" fill="#5cc26b" '+st()+'/>'+
+    '<rect x="11" y="32" width="78" height="18" rx="6" fill="#8fe09a" '+st()+'/><rect x="42" y="32" width="16" height="60" fill="#ff5a8a" '+st(6)+'/>');
+  let gp = ''; for (let i = 0; i < 8; i++) { const a = i*45; [[33,a-17],[45,a-9],[45,a+9],[33,a+17]].forEach((q, k) => { const r = q[1]*Math.PI/180; gp += (i || k ? ' L' : 'M')+(50+q[0]*Math.cos(r)).toFixed(1)+' '+(50+q[0]*Math.sin(r)).toFixed(1); }); }
+  const settings = sv('<path d="'+gp+' Z" fill="#b9a6ff" '+st()+'/><circle cx="50" cy="50" r="13" fill="#fff" '+st()+'/>');
+  return {home, story, time, shop, settings};
+})();
+document.querySelectorAll('.nav button').forEach(b => { const ic = NAV_ICONS[b.dataset.tab], em = b.querySelector('b'); if (ic && em) em.outerHTML = '<span class="ic">'+ic+'</span>'; });
+document.querySelectorAll('.nav button').forEach(b => b.onclick = () => { tab = b.dataset.tab; b.classList.remove('hop'); void b.offsetWidth; b.classList.add('hop'); render(); window.scrollTo(0,0); });
 catchUp();
 render();
 updateIcon();
