@@ -329,6 +329,8 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .phm{display:flex;justify-content:space-between;align-items:center;margin:4px 6px}.phm b{font-size:22px}.phs{text-align:left;margin:8px 6px}
 .fwall{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:#fdf0f6;border-radius:14px;padding:12px 8px}.frm{text-align:center}.fpic{background:#fff6e0;border:5px solid #e0b07a;outline:2.5px solid #3b2a4a;border-radius:4px;aspect-ratio:4/5;overflow:hidden}
 .fpic svg{width:100%;height:100%;display:block}.frm b{display:block;font-size:12px;margin-top:6px}.frm small{font-size:11px;color:var(--soft)}
+.housecard{padding:0;overflow:hidden;position:relative;border:3px solid #3b2a4a}.hhint{position:absolute;left:10px;top:10px;z-index:2;background:#fff;border:2.5px solid #3b2a4a;border-radius:99px;padding:2px 10px;font-size:13px;font-weight:600}
+.hroom{cursor:pointer}.rbig{margin:0 auto;max-width:360px}
 .confetti{position:fixed;top:-20px;font-size:22px;pointer-events:none;z-index:30;animation:drop linear forwards}
 @keyframes drop{to{transform:translateY(110vh) rotate(540deg)}}
 .hide{display:none!important}
@@ -2370,11 +2372,136 @@ function trophyInfo(k){
 
 function lifeHTML(){
   return header().replace('<div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
-    '<div class="card scenecard">'+homeScene()+(sceneNote() ? '<div class="snote">'+sceneNote()+'</div>' : '')+'</div>'+
+    '<div class="card housecard"><span class="hhint">👆 Tap a lit room</span>'+HOUSE.house()+'</div>'+
     (S.log.length && MORNING && autoOn() ? weekHTML()+'<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '')+
     lifeMapHTML()+(S.age < 18 ? growHTML() : '')+chaptersHTML()+familyWallHTML()+trophyRowHTML();
 }
 
+// ============ THE HOUSE: a lived-in dollhouse on the Blip's life tab ============
+// Every room and the yard has life. Rooms that come later are "coming soon" rooms with a sign (never a lock or a price).
+// No screens in any room, only the player's own Blip and pets, mitten hands. Nothing here is sold yet.
+const HOUSE = (function(){
+const O='#3b2a4a';
+const W=(w)=>'stroke="'+O+'" stroke-width="'+(w||3)+'" stroke-linejoin="round" stroke-linecap="round"';
+const F='font-family="Fredoka,sans-serif"';
+const strip=s=>s.replace(/<circle cx="100" cy="122" r="86"[^>]*\/>/,'').replace(/<text[^>]*>✨<\/text>/g,'').replace(/<svg[^>]*>/,'').replace(/<\/svg>$/,'');
+const blipAt=(x,y,h,wave)=>{const k=h/196;return '<svg x="'+(x-100*k)+'" y="'+(y-226*k)+'" width="'+(200*k)+'" height="'+(240*k)+'" viewBox="0 0 200 240" overflow="visible">'+strip(charSVG(Object.assign({}, S, {log:[{tier:'good'}], wear:myWear(), pose:wave ? 'wave' : null})))+'</svg>';};
+const icon=(k,x,y,w)=>'<svg x="'+x+'" y="'+y+'" width="'+w+'" height="'+w+'" viewBox="0 0 100 100" overflow="visible">'+ICONS[k]+'</svg>';
+const dogAt=(x,y,w)=>icon('dog',x-w/2,y-w*.92,w);
+const carAt=(x,y,w)=>icon('car',x-w/2,y-w*.86,w); // y = where the wheels touch the ground
+let UID=0;const uid=p=>p+(++UID);
+const txt=(x,y,t,sz,col,wt,anchor)=>'<text x="'+x+'" y="'+y+'" font-size="'+sz+'" font-weight="'+(wt||700)+'" text-anchor="'+(anchor||'middle')+'" fill="'+(col||O)+'" '+F+'>'+t+'</text>';
+const chip=(x,y,t,c)=>{const w=t.length*6.4+16;return '<rect x="'+(x-w/2)+'" y="'+y+'" width="'+w+'" height="18" rx="9" fill="'+c+'" '+W(2)+'/>'+txt(x,y+13,t,11,'#fff');};
+
+// ---------- small props (all in the house's own units)
+const cloud=(x,y,s)=>'<g transform="translate('+x+' '+y+') scale('+(s||1)+')"><path d="M-30 10 Q-34 -6 -16 -6 Q-12 -22 6 -18 Q20 -26 28 -8 Q42 -6 38 10Z" fill="#fff" '+W(3)+'/></g>';
+const sun=(x,y,r)=>'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#ffd23d" '+W(3.5)+'/>';
+const smoke=(x,y,c)=>'<g fill="'+(c||'#fff')+'" opacity=".75"><circle cx="'+x+'" cy="'+y+'" r="6"/><circle cx="'+(x+8)+'" cy="'+(y-14)+'" r="8"/><circle cx="'+(x+2)+'" cy="'+(y-32)+'" r="10"/></g>';
+const tree=(x,y,s,leaf,leaf2)=>'<g transform="translate('+x+' '+y+') scale('+(s||1)+')"><path d="M-6 0 V-50 M0 -30 L12 -42" '+W(3)+'/><rect x="-6" y="-56" width="12" height="56" rx="3" fill="#a5734a" '+W(3)+'/>'+
+ '<path d="M-38 -62 Q-46 -96 -18 -100 Q-12 -126 14 -118 Q40 -122 40 -94 Q54 -72 30 -58 Q0 -44 -38 -62Z" fill="'+(leaf||'#5cc26b')+'" '+W(3)+'/><path d="M-22 -88 q8 -10 18 -6 M12 -104 q10 0 14 8" fill="none" stroke="'+(leaf2||'#8fe09a')+'" stroke-width="4" stroke-linecap="round"/></g>';
+const bush=(x,y,c)=>'<path d="M'+(x-16)+' '+y+' Q'+(x-20)+' '+(y-16)+' '+(x-6)+' '+(y-16)+' Q'+x+' '+(y-26)+' '+(x+8)+' '+(y-16)+' Q'+(x+20)+' '+(y-14)+' '+(x+16)+' '+y+'Z" fill="'+(c||'#4cae5c')+'" '+W(2.5)+'/>';
+const mailbox=(x,y,name)=>'<g><path d="M'+x+' '+y+' V'+(y-30)+'" '+W(4)+'/><rect x="'+(x-15)+'" y="'+(y-46)+'" width="30" height="18" rx="7" fill="#7c5cff" '+W(2.5)+'/><path d="M'+(x+12)+' '+(y-44)+' V'+(y-58)+' h8 v6 h-8" fill="#ff5a8a" '+W(2)+'/>'+
+ '<rect x="'+(x-29)+'" y="'+(y-25)+'" width="58" height="15" rx="4" fill="#fff" '+W(2)+'/>'+txt(x,y-13.5,name,10.5)+'</g>';
+const doghouse=(x,y,name)=>'<g><path d="M'+(x-24)+' '+y+' V'+(y-30)+' L'+x+' '+(y-50)+' L'+(x+24)+' '+(y-30)+' V'+y+'Z" fill="#ff8fb0" '+W(3)+'/><path d="M'+(x-29)+' '+(y-27)+' L'+x+' '+(y-53)+' L'+(x+29)+' '+(y-27)+'" fill="none" stroke="'+O+'" stroke-width="6" stroke-linecap="round"/>'+
+ '<path d="M'+(x-10)+' '+y+' V'+(y-14)+' Q'+x+' '+(y-26)+' '+(x+10)+' '+(y-14)+' V'+y+'Z" fill="#5a3f6e"/>'+
+ '<rect x="'+(x-20)+'" y="'+(y-44)+'" width="40" height="13" rx="4" fill="#fff" '+W(2)+'/>'+txt(x,y-34.5,name,9.5)+'</g>';
+const lights=(d,n,pts)=>{const cs=['#ffc23d','#ff5a8a','#7c5cff','#5cc26b'];return '<path d="'+d+'" fill="none" stroke="'+O+'" stroke-width="1.6"/>'+pts.map((p,i)=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.4" fill="'+cs[i%4]+'" stroke="'+O+'" stroke-width="1.4"/>').join('');};
+const swing=(bx,by,len)=>'<path d="M'+(bx-11)+' '+by+' V'+(by+len)+' M'+(bx+11)+' '+by+' V'+(by+len)+'" stroke="'+O+'" stroke-width="2"/><rect x="'+(bx-15)+'" y="'+(by+len)+'" width="30" height="6" rx="2" fill="#ffc23d" '+W(2)+'/>';
+const box=(x,y,w,h,c)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="2" fill="'+(c||'#e3b47c')+'" '+W(2)+'/><path d="M'+(x+w/2)+' '+y+' v'+(h*.45)+'" stroke="#c88f52" stroke-width="3"/>';
+const books=(x,y)=>'<rect x="'+x+'" y="'+y+'" width="5" height="13" fill="#ff5a8a" '+W(1.4)+'/><rect x="'+(x+5)+'" y="'+(y+2)+'" width="5" height="11" fill="#7c5cff" '+W(1.4)+'/><rect x="'+(x+10)+'" y="'+(y-1)+'" width="5" height="14" fill="#5cc26b" '+W(1.4)+'/><rect x="'+(x+15)+'" y="'+(y+3)+'" width="5" height="10" fill="#ffc23d" '+W(1.4)+'/>';
+const glow=(x,y,r)=>'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#fff1b8" opacity=".55"/>';
+const sign=(x,y,w,l1,l2)=>'<path d="M'+(x-w/2+10)+' '+(y-12)+' L'+x+' '+(y-24)+' L'+(x+w/2-10)+' '+(y-12)+'" fill="none" stroke="'+O+'" stroke-width="1.6"/><circle cx="'+x+'" cy="'+(y-24)+'" r="2.2" fill="'+O+'"/>'+
+ '<rect x="'+(x-w/2)+'" y="'+(y-12)+'" width="'+w+'" height="34" rx="5" fill="#fff3c4" '+W(2.2)+'/>'+txt(x,y+3,l1,11.5)+txt(x,y+16,l2,9.5,'#7a5a3e',600);
+
+// ---------- rooms (local units, top-left at 0,0)
+function roomKid(w,h){const f=h-20;
+ return '<rect width="'+w+'" height="'+h+'" fill="#ffe7a8"/><rect y="'+f+'" width="'+w+'" height="20" fill="#dfb68b"/><path d="M0 '+f+' H'+w+'" '+W(2)+'/>'+
+  '<rect x="40" y="26" width="26" height="22" rx="2" fill="#bfe6ff" '+W(2)+'/><path d="M53 26 V48 M40 37 H66" '+W(1.6)+'/><path d="M37 25 q3 12 0 24 M69 25 q-3 12 0 24" fill="none" stroke="#ff8fb0" stroke-width="4" stroke-linecap="round"/>'+
+  '<path d="M6 '+(f+2)+' V'+(f-26)+'" '+W(3)+'/><rect x="8" y="'+(f-14)+'" width="42" height="13" rx="3" fill="#fff" '+W(2)+'/><rect x="20" y="'+(f-14)+'" width="30" height="12" rx="3" fill="#7c5cff" '+W(1.8)+'/><rect x="9" y="'+(f-20)+'" width="13" height="8" rx="3" fill="#fff" '+W(1.8)+'/>'+
+  '<rect x="78" y="22" width="26" height="4" fill="#a5734a" '+W(1.6)+'/>'+books(80,9)+
+  glow(62,f-22,12)+'<rect x="54" y="'+(f-10)+'" width="14" height="10" fill="#e3a96b" '+W(1.8)+'/><path d="M61 '+(f-10)+' v-6" '+W(1.6)+'/><path d="M55 '+(f-16)+' h12 l-3 -8 h-6z" fill="#ffc23d" '+W(1.6)+'/>'+
+  '<rect x="84" y="'+(f-6)+'" width="8" height="7" fill="#5cc26b" '+W(1.4)+'/><rect x="92" y="'+(f-6)+'" width="8" height="7" fill="#ff5a8a" '+W(1.4)+'/><rect x="88" y="'+(f-13)+'" width="8" height="7" fill="#ffc23d" '+W(1.4)+'/>'+
+  '<ellipse cx="50" cy="'+(f+11)+'" rx="26" ry="5" fill="#ff8fb0" '+W(1.8)+'/>'+(store.dogName ? dogAt(52,f+13,24) : '')+
+  '<g fill="none" stroke="#7c5cff" stroke-width="1.6" opacity=".8"><path d="M64 '+(f-4)+' h5 l-5 6 h5"/></g>';}
+function roomLiving(w,h,blip){const f=h-20;
+ return '<rect width="'+w+'" height="'+h+'" fill="#ffd9b0"/><rect y="'+f+'" width="'+w+'" height="20" fill="#c48a58"/><path d="M0 '+f+' H'+w+'" '+W(2)+'/>'+
+  '<rect x="14" y="26" width="24" height="18" rx="2" fill="#ffc23d" '+W(2)+'/><rect x="18" y="30" width="16" height="10" fill="#cfe9ff"/><path d="M18 40 L24 33 L28 37 L34 40Z" fill="#6b8f71"/>'+
+  '<rect x="84" y="16" width="24" height="4" fill="#a5734a" '+W(1.6)+'/>'+books(86,3)+
+  glow(w-10,f-36,16)+'<path d="M'+(w-10)+' '+f+' V'+(f-32)+'" '+W(2.2)+'/><path d="M'+(w-18)+' '+(f-32)+' h16 l-4 -10 h-8z" fill="#ffb3c8" '+W(1.8)+'/>'+
+  '<path d="M6 '+(f+2)+' V'+(f-16)+' Q6 '+(f-22)+' 12 '+(f-22)+' H50 Q56 '+(f-22)+' 56 '+(f-16)+' V'+(f+2)+'Z" fill="#5cc26b" '+W(2)+'/><rect x="2" y="'+(f-12)+'" width="9" height="14" rx="4" fill="#4cae5c" '+W(1.8)+'/><rect x="51" y="'+(f-12)+'" width="9" height="14" rx="4" fill="#4cae5c" '+W(1.8)+'/>'+
+  '<rect x="16" y="'+(f-14)+'" width="12" height="9" rx="3" fill="#ffc23d" '+W(1.6)+'/><rect x="34" y="'+(f-8)+'" width="12" height="3.5" fill="#ff5a8a" '+W(1.2)+'/>'+
+  '<ellipse cx="54" cy="'+(f+11)+'" rx="34" ry="5" fill="#ff8fb0" '+W(1.8)+'/>'+
+  (blip?blipAt(76,f+12,blip,true):'');}
+function roomSoon(w,h,l1,l2,kind){const f=h-18;
+ let s='<rect width="'+w+'" height="'+h+'" fill="#f6e6cf"/><path d="M0 0 H'+w+'" stroke="#e9d3b4" stroke-width="0"/>'+
+  '<rect y="'+f+'" width="'+w+'" height="18" fill="#e8cfa8"/><path d="M0 '+f+' H'+w+'" '+W(2)+'/><path d="M26 '+f+' v18 M58 '+f+' v18 M88 '+f+' v18" stroke="#d2b386" stroke-width="1.5"/>';
+ if(kind==='nursery'){ // boxes, paint and a step ladder
+  s+=box(6,f-16,22,16)+box(26,f-12,16,12,'#d9a46a')+box(10,f-30,16,14,'#efc796')+
+   '<rect x="50" y="'+(f-12)+'" width="13" height="12" rx="2" fill="#ffd9e6" '+W(1.8)+'/><path d="M50 '+(f-9)+' h13" stroke="#ff8fb0" stroke-width="3"/>'+
+   '<path d="M'+(w-30)+' '+f+' L'+(w-20)+' '+(f-40)+' L'+(w-10)+' '+f+' M'+(w-27)+' '+(f-12)+' h14 M'+(w-24)+' '+(f-24)+' h8" fill="none" stroke="#a5734a" stroke-width="3" stroke-linecap="round"/>';
+ } else { // scaffolding, boxes, a hard hat
+  s+='<path d="M10 '+f+' V18 M'+(w-12)+' '+f+' V18" stroke="#9aa3b5" stroke-width="3.5"/><rect x="6" y="'+(f-30)+'" width="'+(w-14)+'" height="5" fill="#d9a46a" '+W(1.6)+'/><path d="M10 '+(f-25)+' L'+(w-12)+' '+f+'" stroke="#9aa3b5" stroke-width="2"/>'+
+   box(26,f-14,20,14)+box(48,f-11,14,11,'#d9a46a')+icon('hardhat',58,f-46,22);
+ }
+ return s+sign(w/2,24,w-14,l1,l2);}
+
+// a lit kitchen (from the family house on) and a blooming garden (from the dream home on)
+function roomKitchen(w,h){const f=h-20;
+ return '<rect width="'+w+'" height="'+h+'" fill="#fff0c9"/><rect y="'+f+'" width="'+w+'" height="20" fill="#d9a46a"/><path d="M0 '+f+' H'+w+'" '+W(2)+'/>'+
+  '<rect x="6" y="'+(f-46)+'" width="24" height="46" rx="4" fill="#e9f4ff" '+W(2)+'/><path d="M6 '+(f-28)+' H30 M26 '+(f-40)+' v6 M26 '+(f-22)+' v8" '+W(1.6)+'/>'+
+  '<rect x="34" y="'+(f-22)+'" width="'+(w-40)+'" height="22" fill="#ffb27a" '+W(2)+'/><rect x="32" y="'+(f-26)+'" width="'+(w-36)+'" height="5" rx="2" fill="#fff" '+W(1.8)+'/>'+
+  '<rect x="46" y="'+(f-36)+'" width="18" height="10" rx="3" fill="#7c5cff" '+W(1.8)+'/><path d="M44 '+(f-36)+' h22" '+W(2)+'/><path d="M51 '+(f-42)+' q2 -4 0 -7 M58 '+(f-42)+' q2 -4 0 -7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>'+
+  '<rect x="76" y="'+(f-34)+'" width="12" height="8" rx="2" fill="#ff8fb0" '+W(1.6)+'/><path d="M82 '+(f-34)+' q-6 -10 0 -14 q6 4 0 14" fill="#5cc26b" '+W(1.4)+'/>'+
+  '<rect x="40" y="22" width="30" height="22" rx="2" fill="#bfe6ff" '+W(2)+'/><path d="M55 22 V44 M40 33 H70" '+W(1.6)+'/>'+glow(90,30,12)+'<path d="M90 0 V22" '+W(1.6)+'/><path d="M83 22 h14 l-3 6 h-8z" fill="#ffc23d" '+W(1.6)+'/>';}
+const HOUSE_ROOMS = {
+  kid:{n:"Kid's room", c:'#7c5cff', line:n => n+'\'s room since day one. Books, blocks and a comfy bed.'},
+  living:{n:'Living room', c:'#2fb67c', line:n => 'Where '+n+' hangs out. No TV, just games, books and the couch.'},
+  kitchen:{n:'Kitchen', c:'#ff7a59', line:n => 'Came with the family house. Something good is always cooking.'},
+  nursery:{n:'Nursery', soon:'When a baby arrives'},
+  kitchenSoon:{n:'Kitchen', soon:'Family house, 28'}
+};
+function house(){
+  const g = uid('ga'), o = owned(), n = S.name, dog = store.dogName;
+  const kitchen = o.home === 'family' || o.home === 'dreamhome', garden = o.home === 'dreamhome';
+  let s='<defs><linearGradient id="'+g+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9b8"/><stop offset="1" stop-color="#ffc59e"/></linearGradient></defs>';
+  s+='<rect width="440" height="430" fill="url(#'+g+')"/>'+sun(392,52,20)+cloud(56,84,.9)+cloud(150,30,.8);
+  s+='<path d="M-4 350 Q220 338 444 350 V434 H-4Z" fill="#7fd48a" '+W(3.5)+'/>';
+  s+='<path d="M-4 352 L74 348 L84 434 H-4Z" fill="#cfc6dd" '+W(3)+'/><path d="M30 360 l3 14 M36 392 l3 16" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
+  s+='<path d="M196 346 Q192 380 214 400 Q232 416 228 434 H262 Q266 410 246 394 Q226 378 230 346Z" fill="#f3dcb5" '+W(2.5)+'/>';
+  s+=tree(398,348,1.15)+'<path d="M398 302 L352 286" stroke="'+O+'" stroke-width="9" stroke-linecap="round"/><path d="M398 302 L352 286" stroke="#a5734a" stroke-width="4.5" stroke-linecap="round"/>'+swing(368,290,34);
+  s+='<rect x="258" y="62" width="26" height="46" fill="#c25a48" '+W(3.5)+'/>'+smoke(270,50);
+  s+='<path d="M66 136 L205 50 L344 136Z" fill="#e8705a" '+W(4.5)+'/><path d="M92 128 L205 60 L318 128" fill="none" stroke="#ff9a85" stroke-width="5"/>';
+  s+='<circle cx="205" cy="104" r="14" fill="#fff1b8" '+W(3)+'/><path d="M205 90 V118 M191 104 H219" '+W(2.2)+'/>';
+  s+='<rect x="84" y="134" width="242" height="210" fill="#ffe3c4" '+W(4.5)+'/>';
+  const room=(x,y,w,h,inner,key)=>{const c=uid('rc');return '<clipPath id="'+c+'"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'"/></clipPath><g clip-path="url(#'+c+')"><g transform="translate('+x+' '+y+')">'+inner+'</g></g><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+(key ? 'rgba(0,0,0,0)' : 'none')+'" '+W(2.5)+(key ? ' class="hroom" data-room="'+key+'"' : '')+'/>';};
+  s+=room(92,144,110,92,roomKid(110,92),'kid')+room(208,144,110,92,roomSoon(110,92,'Nursery','When a baby arrives','nursery'),'nursery');
+  s+=room(92,244,110,92,roomLiving(110,92,58),'living')+room(208,244,110,92,kitchen ? roomKitchen(110,92) : roomSoon(110,92,'Kitchen','Family house, 28','kitchen'),kitchen ? 'kitchen' : 'kitchenSoon');
+  s+='<path d="M84 240 H326" '+W(5)+'/><path d="M205 134 V344" '+W(4)+'/><rect x="78" y="340" width="254" height="10" rx="3" fill="#c79f74" '+W(3)+'/>';
+  s+=lights('M74 139 Q110 149 139 139 Q172 149 205 139 Q238 149 270 139 Q300 149 336 139',4,[[86,143],[110,146],[128,143],[149,143],[172,146],[192,143],[218,143],[238,146],[258,143],[282,143],[300,146],[322,143]]);
+  s+=chip(130,148,"Kid's room",'#7c5cff')+chip(132,248,'Living room','#2fb67c')+(kitchen ? chip(248,248,'Kitchen','#ff7a59') : '');
+  s+=(dog ? doghouse(130,404,esc(dog.length > 9 ? dog.slice(0, 8)+'…' : dog)) : bush(120,404,'#5cc26b'))+mailbox(282,410,esc(n.length > 10 ? n.slice(0, 9)+'…' : n))+bush(176,404)+bush(330,372,'#5cc26b');
+  if (o.car && CAR_KEY[o.car]) s+='<ellipse cx="40" cy="404" rx="34" ry="4" fill="rgba(0,0,0,.15)"/><svg x="2" y="356" width="80" height="48" viewBox="0 0 200 120" overflow="visible">'+CAR_ART[CAR_KEY[o.car]].svg+'</svg>';
+  if (garden) s+='<rect x="352" y="378" width="84" height="40" rx="4" fill="#8fd694" '+W(2.5)+'/>'+[364,380,396,412,428].map((x,i)=>'<path d="M'+x+' 410 v-14" stroke="#2f9a4a" stroke-width="2.2"/><circle cx="'+x+'" cy="394" r="5" fill="'+['#ff5a8a','#ffc23d','#7c5cff','#ff8fb0','#ffc23d'][i]+'" '+W(1.6)+'/>').join('')+
+    '<path d="M350 414 H440 M350 404 H440" stroke="#fff" stroke-width="3"/>'+[356,372,388,404,420,436].map(x=>'<rect x="'+(x-3)+'" y="396" width="6" height="22" rx="2" fill="#fff" '+W(1.6)+'/>').join('');
+  else s+='<rect x="352" y="378" width="84" height="40" rx="4" fill="#b98a5c" '+W(2.5)+'/>'+[364,380,396,412,428].map(x=>'<path d="M'+x+' 392 q-4 -6 -6 -4 M'+x+' 392 q4 -7 7 -4 M'+x+' 392 v-8" fill="none" stroke="#2f9a4a" stroke-width="2.2" stroke-linecap="round"/>').join('')+
+    '<path d="M350 414 H440 M350 404 H440" stroke="#fff" stroke-width="3"/>'+[356,372,388,404,420,436].map(x=>'<rect x="'+(x-3)+'" y="396" width="6" height="22" rx="2" fill="#fff" '+W(1.6)+'/>').join('')+
+    '<rect x="350" y="352" width="86" height="26" rx="5" fill="#fff3c4" '+W(2.2)+'/><path d="M393 378 v4" '+W(2.5)+'/>'+txt(393,363,'Garden',10.5)+txt(393,374,'Dream home, 45',8.5,'#7a5a3e',600);
+  return '<svg viewBox="0 0 440 430" width="100%" style="display:block">'+s+'</svg>';
+}
+function roomBig(key){
+  const r = HOUSE_ROOMS[key];
+  const inner = key === 'kid' ? roomKid(110,92) : key === 'living' ? roomLiving(110,92,58) : key === 'kitchen' ? roomKitchen(110,92) : roomSoon(110,92,r.n,r.soon,key === 'nursery' ? 'nursery' : 'kitchen');
+  return '<svg viewBox="0 0 110 92" width="100%" style="display:block;border:3px solid '+O+';border-radius:14px;overflow:hidden">'+inner+'</svg>';
+}
+return {house, roomBig, ROOMS:HOUSE_ROOMS};
+})();
+
+function showRoom(k){
+  const r = HOUSE.ROOMS[k]; if (!r) return;
+  modal('<div class="rbig">'+HOUSE.roomBig(k)+'</div><h2 style="margin:12px 0 4px">'+r.n+'</h2>'+
+    (r.soon ? '<p class="muted">Coming soon: '+esc(r.soon)+'. '+esc(S.name)+'\'s home grows as life goes on.</p>' : '<p class="muted">'+esc(r.line(S.name))+'</p>')+
+    '<button class="btn" data-close>Close</button>');
+}
 // ---- Life map: a winding road of big moments. Past stops, "Now", the next stop glowing, then faded stops into the clouds.
 // Stops are story only: no good or rough coloring, so the road is safe to show anywhere.
 function lifeStops(){
@@ -2675,6 +2802,7 @@ function bind(){
   if ($('restore')) $('restore').onclick = restoreModal;
   document.querySelectorAll('.lcbtn').forEach(b => b.onclick = () => showLifeCard(+b.dataset.age));
   document.querySelectorAll('.pile[data-ch]').forEach(b => b.onclick = () => showChapter(+b.dataset.ch));
+  document.querySelectorAll('.hroom[data-room]').forEach(b => b.onclick = () => showRoom(b.dataset.room));
   document.querySelectorAll('.mstop[data-age]').forEach(b => b.onclick = () => showPhoto(+b.dataset.age));
   if ($('ics')) $('ics').onclick = () => addReminder('ics');
   if ($('gcal')) $('gcal').onclick = () => addReminder('google');
