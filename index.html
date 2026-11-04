@@ -2518,8 +2518,8 @@ function lifeStops(){
 function lifeMapHTML(){
   const {past, up} = lifeStops(), O = '#3b2a4a';
   const pts = past.map(x => Object.assign({k:'past'}, x)).concat([{k:'now', age:S.age}], up.map((x, i) => Object.assign({k:i ? 'later' : 'next'}, x)));
-  const per = 3, rows = Math.ceil(pts.length / per), RH = 92, H = rows * RH + 54, xs = [52, 150, 248];
-  const pos = pts.map((p, i) => { const r = Math.floor(i / per), c = i % per; return [r % 2 ? xs[per - 1 - c] : xs[c], H - 40 - r * RH]; });
+  const per = 3, rows = Math.ceil(pts.length / per), RH = 104, H = rows * RH + 84, xs = [52, 150, 248];
+  const pos = pts.map((p, i) => { const r = Math.floor(i / per), c = i % per; return [r % 2 ? xs[per - 1 - c] : xs[c], H - 70 - r * RH]; });
   let road = 'M'+(pos[0][0] - 30)+' '+pos[0][1];
   pos.forEach((q, i) => { if (i && Math.floor(i / per) !== Math.floor((i - 1) / per)) { const pr = pos[i - 1], side = pr[0] > 150 ? 1 : -1;
       road += ' C'+(pr[0] + side*44)+' '+pr[1]+' '+(q[0] + side*44)+' '+q[1]+' '+q[0]+' '+q[1]; } else road += ' L'+q[0]+' '+q[1]; });
@@ -2527,8 +2527,12 @@ function lifeMapHTML(){
   road += ' L'+(last[0] + (Math.floor((pos.length - 1) / per) % 2 ? -30 : 30))+' '+last[1];
   let g = '<path d="'+road+'" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/><path d="'+road+'" fill="none" stroke="'+O+'" stroke-width="3" stroke-dasharray="0" opacity=".0"/>'+
     '<path d="'+road+'" fill="none" stroke="#e9dcc8" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><path d="'+road+'" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="7 7"/>';
-  const lab = (x, y, t, sub, cls) => '<text x="'+x+'" y="'+y+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="11" fill="'+O+'"'+(cls ? ' opacity="'+cls+'"' : '')+'>'+esc(t.length > 16 ? t.slice(0, 15)+'…' : t)+'</text>'+
-    (sub ? '<text x="'+x+'" y="'+(y+12)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="10" fill="#7a7195"'+(cls ? ' opacity="'+cls+'"' : '')+'>'+esc(sub)+'</text>' : '');
+  const wrap = t => { if (t.length <= 15) return [t]; const w = t.split(' '); let a = '';
+    while (w.length && (a + (a ? ' ' : '') + w[0]).length <= 15) a += (a ? ' ' : '') + w.shift();
+    if (!a) a = w.shift(); let b = w.join(' '); if (b.length > 15) b = b.slice(0, 14)+'…'; return b ? [a, b] : [a]; };
+  const lab = (x, y, t, sub, cls) => { const ls = wrap(t), op = cls ? ' opacity="'+cls+'"' : '';
+    return ls.map((l, i) => '<text x="'+x+'" y="'+(y + i*12)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="11" fill="'+O+'"'+op+'>'+esc(l)+'</text>').join('')+
+    (sub ? '<text x="'+x+'" y="'+(y + ls.length*12)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="10" fill="#7a7195"'+op+'>'+esc(sub)+'</text>' : ''); };
   pts.forEach((p, i) => { const [x, y] = pos[i];
     if (p.k === 'now') { g += '<svg x="'+(x-24)+'" y="'+(y-52)+'" width="48" height="58" viewBox="0 0 200 240">'+charSVG(S).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')+'</svg>'+
       '<rect x="'+(x-30)+'" y="'+(y+10)+'" width="60" height="18" rx="9" fill="#7c5cff" stroke="'+O+'" stroke-width="2"/><text x="'+x+'" y="'+(y+23)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="11" fill="#fff">Now · '+S.age+'</text>'; return; }
