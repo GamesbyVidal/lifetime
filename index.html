@@ -305,6 +305,16 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .nw{display:flex;gap:8px;align-items:flex-start;font-size:15px;padding:3px 0}.nw span:first-child{width:22px;flex:none;text-align:center}
 .nx{background:#fff6d6;border:2.5px solid #3b2a4a;border-radius:16px;padding:10px 12px;margin:10px 0 4px;text-align:left}.nxh{display:flex;gap:10px;align-items:center}.nxe{font-size:30px}.nx small{display:block;font-size:11px;font-weight:700;color:#b26b00;text-transform:uppercase;letter-spacing:.6px}.nx b{font-size:16px}
 .nx .sbar{margin-top:8px}.days{text-align:right;font-size:13px;font-weight:600;margin-top:4px}
+.wincard{padding:0;overflow:hidden}.wart{position:relative;aspect-ratio:300/230;background:#fff1d6}
+.wpill{position:absolute;left:10px;top:10px;background:#fff;border:2.5px solid #3b2a4a;border-radius:99px;padding:3px 10px;font-size:13px;font-weight:600}
+.wcl{position:absolute;right:10px;top:10px}.wname{position:absolute;left:10px;bottom:8px;background:rgba(255,255,255,.85);border-radius:99px;padding:2px 10px;font-weight:700;font-size:14px}
+.wincard .chips{padding:0 10px 10px}
+.wpanel{background:#fffaf0}.wm{border:2.5px solid #3b2a4a;border-radius:16px;padding:10px 12px;background:#fff}.wml{display:flex;justify-content:space-between;font-size:13px;color:var(--soft)}.wml b{font-size:13px}
+.wmv{font-size:15px;color:var(--soft)}.wmv b{font-size:22px;color:var(--ink)}.wbar{height:12px;border-radius:9px;background:#eee9f8;border:2px solid #3b2a4a;overflow:hidden;margin-top:6px}.wbar u{display:block;height:100%}
+.wrow{display:flex;gap:10px;margin-top:10px}.wst{flex:none;width:78px;border:2.5px solid #3b2a4a;border-radius:16px;background:#fff;text-align:center;padding:6px 4px}.wst span{display:block;font-size:22px}.wst b{display:block;font-size:22px;line-height:1}.wst small{font-size:11px;color:var(--soft)}
+.wtz{flex:1;display:flex;gap:8px;align-items:center;border:2.5px solid #3b2a4a;border-radius:16px;background:#fff6d6;padding:8px 10px}.wtz span{font-size:28px}.wtz small{display:block;font-size:11px;font-weight:700;color:#b26b00;text-transform:uppercase;letter-spacing:.5px}.wtz b{font-size:14px;line-height:1.25;display:block}
+.wdown{margin-top:12px;background:linear-gradient(180deg,#8f73ff,#6f50f0);box-shadow:0 4px 0 #4f35c4}
+.bye{text-align:center;padding:22px 16px;color:#fff}.bye .muted{color:#d9d2ff}.bye.card2 .muted{color:var(--soft)}.bye.card2{color:var(--ink)}.bye .e{font-size:46px}.bye h2{margin:6px 0}.bye.card2{background:#f6f3ff;border:2.5px solid #3b2a4a;border-radius:20px;margin:0 6px}
 .confetti{position:fixed;top:-20px;font-size:22px;pointer-events:none;z-index:30;animation:drop linear forwards}
 @keyframes drop{to{transform:translateY(110vh) rotate(540deg)}}
 .hide{display:none!important}
@@ -1406,14 +1416,15 @@ function charSVG(c){
   b += '<rect x="'+(bodyX-arm+4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate('+(sad?4:14)+' '+(bodyX+4)+' '+ay+')"/>';
   handAt(bodyX-arm+4, 44, sad?4:14, bodyX+4);
   let phone = '';
-  if (sad && st !== 'baby') {
+  if ((sad || c.pose === 'phone') && st !== 'baby') {
     b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="40" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate(-40 '+(bodyX+bodyW+4)+' '+ay+')"/>';
     const [hx, hy] = handAt(bodyX+bodyW-4, 40, -40, bodyX+bodyW+4);
     // the phone sits in the raised mitten, glowing at their face
     phone = '<g transform="translate('+(hx-154).toFixed(1)+' '+(hy-153).toFixed(1)+')"><rect x="146" y="128" width="16" height="26" rx="3" fill="#222" stroke="'+O+'" stroke-width="2.5"/><rect x="148" y="131" width="12" height="18" fill="#7fd1ff"/><path d="M146 132 L112 104 L112 120Z" fill="#7fd1ff" opacity=".35"/></g>';
   } else {
-    b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate(-14 '+(bodyX+bodyW-4)+' '+ay+')"/>';
-    handAt(bodyX+bodyW-4, 44, -14, bodyX+bodyW-4);
+    const ra = c.pose === 'wave' ? -118 : -14;   // a wave raises the right arm over the head
+    b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate('+ra+' '+(bodyX+bodyW-4)+' '+ay+')"/>';
+    handAt(bodyX+bodyW-4, 44, ra, bodyX+bodyW-4);
   }
   // body and outfit details
   b += '<rect x="'+bodyX+'" y="'+bodyY+'" width="'+bodyW+'" height="'+bodyH+'" rx="24" fill="'+shirt+'" '+W+'/>';
@@ -1785,6 +1796,7 @@ function homeHTML(){
       '<p><b>'+esc(last.text)+'</b></p>'+(last.mins != null ? '<p class="muted">'+fmtTime(last.mins)+' vs. your '+fmtTime(last.goal)+' goal</p>' : '')+
       '<div class="fx">'+fxHTML(last.fx, last.earned)+'</div>'+yearGoalHTML(last)+
       (last.ms ? '<div class="msline">'+last.ms.emoji+' <b>'+esc(last.ms.title)+'</b></div>' : '')+share+'</div>' : '';
+  if (MORNING && autoOn() && stToday != null && last && !S.done) return header()+windowHTML();
   return header()+hero+result+todayMeterHTML()+weekHTML()+
     '<div class="card waiting">'+teaserHTML(S.age)+'<div class="muted" style="margin-top:12px">Next check-in opens in</div><div class="countdown" id="cd"></div></div>';
 }
@@ -2349,7 +2361,8 @@ function lifeHTML(){
   } else earned += '<p class="nexttxt">🌟 '+n+' has everything '+(S.girl ? 'she' : 'he')+' ever dreamed of!</p>';
   earned += '</div>';
   return header().replace('<div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
-    '<div class="card scenecard">'+homeScene()+(sceneNote() ? '<div class="snote">'+sceneNote()+'</div>' : '')+'</div>'+pathHTML()+(S.age < 18 ? growHTML() : '')+earned+trophyCaseHTML()+storyHTML(true);
+    '<div class="card scenecard">'+homeScene()+(sceneNote() ? '<div class="snote">'+sceneNote()+'</div>' : '')+'</div>'+
+    (S.log.length && MORNING && autoOn() ? weekHTML()+'<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '')+pathHTML()+(S.age < 18 ? growHTML() : '')+earned+trophyCaseHTML()+storyHTML(true);
 }
 
 function storyHTML(inLife){
@@ -2534,6 +2547,7 @@ function bind(){
   if ($('go')) $('go').onclick = () => { const m = +$('tslide').value; homeMins = null; checkIn(m); };
   if ($('goauto')) $('goauto').onclick = () => { if (stYest != null) { const m = Math.min(960, stYest); checkIn(m, 'st', joinedTier(m)); } };
   if ($('golive')) $('golive').onclick = liveTheYears;
+  if ($('phonedown')) $('phonedown').onclick = () => { track('phone-down'); goodbye = 1; render(); window.scrollTo(0, 0); setTimeout(() => { if (goodbye === 1) { goodbye = 2; if (tab === 'home') render(); } }, 2600); };
   if ($('cd')) { const tick = () => { const n = new Date(), m = new Date(n); m.setHours(4,0,0,0); if (m <= n) m.setDate(m.getDate()+1); const s = Math.floor((m-n)/1000);
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
       if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
@@ -2572,6 +2586,128 @@ function bind(){
     S = null; appBackup(); try { localStorage.removeItem(KEY); } catch(e){}
     render();
   };
+}
+
+// ============ TODAY: THE WINDOW (app + automatic Screen Time, after the morning's year) ============
+// A little room that follows the real time of day and reacts to today's screen time so far.
+// No screens in normal or good scenes: the phone shows up only near the goal, and the couch only over it.
+// Never in shares: this scene, the meter and the streak stay on this screen.
+const WIN = (function(){
+const O = '#3b2a4a', W = w => 'stroke="'+O+'" stroke-width="'+(w||3.5)+'" stroke-linejoin="round" stroke-linecap="round"';
+const T = {
+  morning:{wall:'#fff1d6',wl:'#ffe2b0',floor:'#f3d2a2',fl:'#e2b67f',sky:'#bfe6ff',beam:'#fff9df',bo:.75},
+  afternoon:{wall:'#ffdcc0',wl:'#ffc9a0',floor:'#eebd8a',fl:'#d9a46c',sky:'#ffc98a',beam:'#ffe9c2',bo:.55},
+  evening:{wall:'#5d4f99',wl:'#51438b',floor:'#7a6296',fl:'#68508a',sky:'#2b2350',beam:null},
+  night:{wall:'#3f3672',wl:'#372e66',floor:'#5a4a78',fl:'#4c3d6a',sky:'#1f1840',beam:null}
+};
+const noGlow = s => s.replace(/<circle cx="100" cy="122" r="86"[^>]*\/>/, '');
+const front = (s, p) => s.replace(/<\/svg>$/, p+'</svg>');
+const mug = '<path d="M146 152 q-4 -6 0 -12 M154 152 q4 -6 0 -12" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>'+
+  '<path d="M158 166 h4 q7 0 7 7 q0 7 -7 7 h-4" fill="none" '+W(3)+'/><rect x="138" y="158" width="22" height="26" rx="5" fill="#ffc23d" '+W(3)+'/><path d="M143 168 h12" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
+const sketch = '<g transform="rotate(8 54 168)"><rect x="40" y="164" width="30" height="38" rx="3" fill="#ff8fa8" '+W(3.5)+'/><path d="M40 170 h30" stroke="'+O+'" stroke-width="2.5"/><path d="M47 182 q8 -8 16 0 q-8 8 -16 0z" fill="#fff" stroke="'+O+'" stroke-width="2"/></g>';
+const marker = '<g transform="rotate(-25 147 172)"><rect x="143" y="160" width="9" height="26" rx="2.5" fill="#4da3ff" '+W(2.5)+'/><rect x="143" y="180" width="9" height="7" rx="2" fill="#3b2a4a"/></g>';
+const me = (o) => Object.assign({}, S, {log:[{tier:'good'}], wear:myWear()}, o || {});
+const nest = (s, x, y, w) => s.replace('<svg ', '<svg x="'+x+'" y="'+y+'" width="'+w+'" height="'+(w*1.2)+'" ');
+const place = (s, cx, F, w) => nest(s, cx - w/2, F - w*1.2*0.94, w);
+const icon = (k, x, y, w) => '<svg x="'+x+'" y="'+y+'" width="'+w+'" height="'+w+'" viewBox="0 0 100 100">'+ICONS[k]+'</svg>';
+function win(x, y, w, h, t){ const L = T[t]; let s = '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="6" fill="'+L.sky+'"/>';
+  if (t === 'morning') s += '<circle cx="'+(x+w*.3)+'" cy="'+(y+h*.32)+'" r="9" fill="#ffe066" '+W(2.5)+'/><path d="M'+(x+w*.5)+' '+(y+h*.62)+' q4 -9 12 -5 q8 -4 11 4 q6 1 4 7 h-27z" fill="#fff" stroke="'+O+'" stroke-width="2"/>';
+  if (t === 'afternoon') s += '<circle cx="'+(x+w*.68)+'" cy="'+(y+h*.66)+'" r="11" fill="#ff9d4d" '+W(2.5)+'/>';
+  if (t === 'evening' || t === 'night') s += '<circle cx="'+(x+w*.66)+'" cy="'+(y+h*.3)+'" r="9" fill="#fff3b0" '+W(2.5)+'/><circle cx="'+(x+w*.66+5)+'" cy="'+(y+h*.3-3)+'" r="7.5" fill="'+L.sky+'"/>'+
+    [[.2,.25],[.35,.6],[.15,.75],[.8,.7]].map(q => '<circle cx="'+(x+w*q[0])+'" cy="'+(y+h*q[1])+'" r="1.8" fill="#fff3b0"/>').join('');
+  return s+'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="6" fill="none" '+W(3.5)+'/><path d="M'+(x+w/2)+' '+y+' V'+(y+h)+' M'+x+' '+(y+h/2)+' H'+(x+w)+'" stroke="'+O+'" stroke-width="3"/>'+
+    '<rect x="'+(x-5)+'" y="'+(y+h-1)+'" width="'+(w+10)+'" height="7" rx="3" fill="'+L.wl+'" '+W(3)+'/>'; }
+function beam(x, y, w, h, F, t, sl){ const L = T[t]; return L.beam ? '<path d="M'+x+' '+(y+h)+' H'+(x+w)+' L'+(x+w+sl)+' '+(F+30)+' H'+(x+sl-10)+'Z" fill="'+L.beam+'" opacity="'+L.bo+'"/>' : ''; }
+function room(H, F, t){ const L = T[t]; return '<rect width="300" height="'+H+'" fill="'+L.wall+'"/><path d="M0 '+(F-70)+' H300" stroke="'+L.wl+'" stroke-width="8"/>'+
+  '<rect x="0" y="'+F+'" width="300" height="'+(H-F)+'" fill="'+L.floor+'"/><path d="M0 '+F+' H300" '+W(3)+'/><path d="M24 '+(F+18)+' h40 M140 '+(F+26)+' h46 M232 '+(F+14)+' h40" stroke="'+L.fl+'" stroke-width="3" stroke-linecap="round"/>'; }
+function desk(x, F){
+  return '<rect x="'+(x+8)+'" y="'+(F-58)+'" width="9" height="58" rx="3" fill="#b97c48" '+W(3)+'/><rect x="'+(x+96)+'" y="'+(F-58)+'" width="9" height="58" rx="3" fill="#b97c48" '+W(3)+'/>'+
+    '<rect x="'+(x+58)+'" y="'+(F-58)+'" width="40" height="26" rx="3" fill="#c98c55" '+W(3)+'/><path d="M'+(x+72)+' '+(F-45)+' h12" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/>'+
+    '<rect x="'+(x+4)+'" y="'+(F-84)+'" width="38" height="18" rx="3" fill="#ffc23d" '+W(3)+'/><path d="M'+(x+4)+' '+(F-78)+' h38" stroke="'+O+'" stroke-width="2.5"/><circle cx="'+(x+14)+'" cy="'+(F-71)+'" r="2.2" fill="#ff5a8a"/><circle cx="'+(x+23)+'" cy="'+(F-71)+'" r="2.2" fill="#7c5cff"/><circle cx="'+(x+32)+'" cy="'+(F-71)+'" r="2.2" fill="#5cc26b"/>'+
+    '<path d="M'+(x+18)+' '+(F-84)+' l3 -12 h4 l3 12z" fill="#ff5a8a" '+W(2.2)+'/><circle cx="'+(x+23)+'" cy="'+(F-99)+'" r="4.5" fill="#ff5a8a" '+W(2.2)+'/>'+
+    '<rect x="'+(x+44)+'" y="'+(F-77)+'" width="11" height="11" rx="2.5" fill="#fff" '+W(2.2)+'/><circle cx="'+(x+47)+'" cy="'+(F-74)+'" r="1.3" fill="'+O+'"/><circle cx="'+(x+52)+'" cy="'+(F-69)+'" r="1.3" fill="'+O+'"/>'+
+    '<rect x="'+(x+57)+'" y="'+(F-77)+'" width="11" height="11" rx="2.5" fill="#ff8fa8" '+W(2.2)+'/><circle cx="'+(x+62.5)+'" cy="'+(F-71.5)+'" r="1.4" fill="'+O+'"/>'+
+    '<rect x="'+(x+70)+'" y="'+(F-72)+'" width="16" height="6" rx="1.5" fill="#ffc23d" '+W(2)+'/><rect x="'+(x+72)+'" y="'+(F-77)+'" width="16" height="6" rx="1.5" fill="#4da3ff" '+W(2)+'/>'+
+    '<rect x="'+x+'" y="'+(F-66)+'" width="114" height="10" rx="3" fill="#d9a066" '+W(3)+'/>'+
+    '<path d="M'+(x+98)+' '+(F-80)+' l-3 -12 M'+(x+102)+' '+(F-80)+' l1 -14 M'+(x+106)+' '+(F-80)+' l4 -10" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/><rect x="'+(x+94)+'" y="'+(F-82)+'" width="16" height="16" rx="3" fill="#5cc26b" '+W(2.5)+'/>'; }
+function board(x, y, w, h){
+  return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="5" fill="#fbfaff" '+W(3.5)+'/><rect x="'+(x+8)+'" y="'+(y+h)+'" width="'+(w-16)+'" height="5" rx="2" fill="#c9c2e0" '+W(2.5)+'/>'+
+    '<path d="M'+(x+10)+' '+(y+h-14)+' h22 M'+(x+40)+' '+(y+h-26)+' h20 M'+(x+68)+' '+(y+h-40)+' h22" stroke="#4da3ff" stroke-width="3.5" stroke-linecap="round"/>'+
+    '<path d="M'+(x+26)+' '+(y+h-20)+' q10 -22 22 -10 M'+(x+54)+' '+(y+h-32)+' q10 -22 22 -12" fill="none" stroke="#ff5a8a" stroke-width="2.2" stroke-dasharray="3 3"/>'+
+    '<path d="M'+(x+79)+' '+(y+h-58)+' l2.5 5 5.5 .6 -4 3.8 1.2 5.4 -5.2 -2.8 -5.2 2.8 1.2 -5.4 -4 -3.8 5.5 -.6z" fill="#ffc23d" stroke="'+O+'" stroke-width="1.6"/>'+
+    [['#ffc23d',-6,w-30,6],['#b9f0b0',-3,8,6]].map(c => '<g transform="translate('+(x+c[2])+' '+(y+c[3])+') rotate('+c[1]+')"><rect width="20" height="20" rx="2" fill="'+c[0]+'" stroke="'+O+'" stroke-width="2"/></g>').join(''); }
+function dog(x, F, w, what){ const y = F - w*.92, k = w/100; let s = '<g>'+icon('dog', x, y, w);
+  if (what === 'ball') s += '<circle cx="'+(x+w+8)+'" cy="'+(F-8)+'" r="8" fill="#c8f04a" '+W(2.5)+'/>';
+  if (what === 'leash') s += '<path d="M'+(x+56*k)+' '+(y+68*k)+' Q'+(x+w+14)+' '+(F-40)+' '+(x+w+6)+' '+(F-4)+'" fill="none" stroke="'+O+'" stroke-width="6" stroke-linecap="round"/><path d="M'+(x+56*k)+' '+(y+68*k)+' Q'+(x+w+14)+' '+(F-40)+' '+(x+w+6)+' '+(F-4)+'" fill="none" stroke="#ff5a8a" stroke-width="3" stroke-linecap="round"/>';
+  return s+'</g>'; }
+function couchBack(x, F, w){ return '<rect x="'+x+'" y="'+(F-118)+'" width="'+w+'" height="76" rx="18" fill="#ff8fa8" '+W(3.5)+'/><rect x="'+(x+8)+'" y="'+(F-58)+'" width="'+(w-16)+'" height="16" rx="7" fill="#ffb3c8" '+W(3)+'/>'; }
+function couchFront(x, F, w){ return '<rect x="'+(x+4)+'" y="'+(F-50)+'" width="'+(w-8)+'" height="38" rx="9" fill="#ff8fa8" '+W(3.5)+'/>'+
+  '<rect x="'+(x-12)+'" y="'+(F-84)+'" width="28" height="74" rx="12" fill="#ff7a9a" '+W(3.5)+'/><rect x="'+(x+w-16)+'" y="'+(F-84)+'" width="28" height="74" rx="12" fill="#ff7a9a" '+W(3.5)+'/>'+
+  '<rect x="'+(x-4)+'" y="'+(F-12)+'" width="9" height="12" fill="#9b6a43" '+W(2.5)+'/><rect x="'+(x+w-5)+'" y="'+(F-12)+'" width="9" height="12" fill="#9b6a43" '+W(2.5)+'/>'; }
+function lamp(x, F, on){ return (on ? '<circle cx="'+x+'" cy="'+(F-130)+'" r="34" fill="#ffd36e" opacity=".22"/>' : '')+'<path d="M'+x+' '+F+' V'+(F-124)+'" stroke="'+O+'" stroke-width="4"/><ellipse cx="'+x+'" cy="'+(F-2)+'" rx="14" ry="4" fill="#8d86a8" '+W(2.5)+'/>'+
+  '<path d="M'+(x-16)+' '+(F-118)+' L'+(x-10)+' '+(F-146)+' H'+(x+10)+' L'+(x+16)+' '+(F-118)+'Z" fill="'+(on ? '#ffd36e' : '#c9b98a')+'" '+W(3)+'/>'; }
+function door(x, F, open){ const top = F - 160;
+  if (!open) return '<rect x="'+x+'" y="'+top+'" width="62" height="160" rx="3" fill="#e0b07a" '+W(3.5)+'/><rect x="'+(x+10)+'" y="'+(top+12)+'" width="42" height="56" rx="3" fill="none" stroke="'+O+'" stroke-width="2.5"/><rect x="'+(x+10)+'" y="'+(top+80)+'" width="42" height="64" rx="3" fill="none" stroke="'+O+'" stroke-width="2.5"/><circle cx="'+(x+50)+'" cy="'+(top+78)+'" r="4" fill="#ffc23d" '+W(2)+'/>';
+  return '<rect x="'+x+'" y="'+top+'" width="62" height="160" fill="#3b3270" '+W(3.5)+'/><path d="M'+x+' '+(F-30)+' q20 -10 62 -4 V'+F+' H'+x+'z" fill="#4b7a5a" stroke="'+O+'" stroke-width="2.5"/>'+
+    '<path d="M'+x+' '+top+' L'+(x-26)+' '+(top+10)+' V'+(F+6)+' L'+x+' '+F+'Z" fill="#e0b07a" '+W(3.5)+'/>'; }
+function bubble(x, y, w, lines, tx){ const h = lines.length > 1 ? 50 : 32;
+  let s = '<path d="M'+x+' '+y+' h'+w+' q10 0 10 10 v'+(h-20)+' q0 10 -10 10 H'+(tx+14)+' l-10 12 l0 -12 H'+x+' q-10 0 -10 -10 v'+(-(h-20))+' q0 -10 10 -10z" fill="#fff" '+W(3)+'/>';
+  lines.forEach((t, i) => s += '<text x="'+(x+w/2)+'" y="'+(y+21+i*19)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="600" font-size="15" fill="'+O+'">'+esc(t)+'</text>');
+  return s; }
+// o = {t, kind:'studio'|'couch'|'wave'|'empty', mood:'happy'|'sketch'|'phone', dog, say}
+function scene(o){ const H = 230, F = 196, t = o.t, w = 150;
+  let s = '<svg viewBox="0 0 300 '+H+'" preserveAspectRatio="xMidYMax slice" width="100%" height="100%" style="display:block">'+room(H, F, t);
+  if (o.kind === 'studio') {
+    const wy = F - 180;
+    s += win(16, wy, 70, 72, t)+beam(16, wy, 70, 72, F, t, t === 'afternoon' ? 90 : 50)+board(176, F-214, 114, 92)+desk(184, F);
+    if (o.dog) s += dog(222, F, 58, 'ball');
+    const b = o.mood === 'phone' ? noGlow(charSVG(me({pose:'phone'}))) : o.mood === 'sketch' ? front(noGlow(charSVG(me())).replace('<g class="bob">', sketch+'<g class="bob">'), marker) : front(noGlow(charSVG(me())), mug);
+    s += place(b, 128, F, w);
+    if (o.say) s += bubble(16, 8, 160, o.say, 96);
+  } else {
+    const wy = F - 196;
+    s += win(18, wy, 64, 80, t);
+    if (o.kind === 'couch') {
+      s += lamp(30, F, true)+door(226, F, false)+couchBack(72, F, 136)+nest(noGlow(charSVG(Object.assign({}, S, {log:[{tier:'bad'}], wear:myWear()}))), 140 - w/2, F - 44 - 184*w/200, w)+couchFront(72, F, 136);
+      if (o.dog) s += dog(212, F, 58, 'leash');
+    } else if (o.kind === 'wave') {
+      s += lamp(30, F, true)+door(226, F, true)+couchBack(72, F, 136)+couchFront(72, F, 136)+(o.dog ? dog(40, F, 56, 'leash') : '')+place(noGlow(charSVG(me({pose:'wave'}))), 150, F, w);
+    } else s += lamp(30, F, false)+door(226, F, false)+couchBack(72, F, 136)+couchFront(72, F, 136);
+  }
+  return s+'</svg>'; }
+return {scene};
+})();
+function timeOfDay(){ const h = new Date().getHours(); return h >= 4 && h < 12 ? 'morning' : h >= 4 && h < 17 ? 'afternoon' : h >= 4 && h < 21 ? 'evening' : 'night'; }
+let goodbye = 0;   // 0 = the room, 1 = waving goodbye, 2 = see you tomorrow
+const WIN_LINES = {
+  under:['Making up a new board game!','Sketching a big idea!','This is my favorite part of the day.','Best. Day. Ever.','Guess what I made today?'],
+  near:['Uh oh, almost at the goal…','Maybe one more scroll? No!','Help me stop, please!'],
+  over:['Too much phone today…','Can we go outside?','I feel kind of blah.']
+};
+function windowHTML(){
+  const m = Math.min(960, stToday), g = S.goal, over = m > g, near = !over && g - m <= 30, t = timeOfDay(), n = esc(S.name), dg = store.dogName && esc(store.dogName);
+  const nb = nextBig(S.age), turning = S.age + 1;
+  const tease = '<div class="wtz"><span>🎂</span><div><small>Tomorrow morning</small><b>'+n+' turns '+turning+(nb && nb[0] === turning ? '. '+esc(nb[2])+'!' : '.')+'</b></div></div>';
+  if (goodbye) {
+    const art = WIN.scene({t, kind: goodbye === 1 ? 'wave' : 'empty', dog: !!dg});
+    const msg = goodbye === 1 ? '<div class="bye"><div class="e">👋</div><h2>'+n+'\'s going for a walk</h2><p class="muted">'+(dg ? dg+' is going too. ' : '')+'Enjoy your '+(t === 'morning' ? 'day' : t === 'afternoon' ? 'afternoon' : 'evening')+'.</p></div>'
+      : '<div class="bye card2"><div class="e">🌙</div><h2>See you tomorrow morning</h2><p class="muted">'+n+' turns '+turning+' when you wake up.</p></div>';
+    return '<div class="card wincard"><div class="wart">'+art+'</div></div>'+msg;
+  }
+  const kind = over ? 'couch' : 'studio', mood = near ? 'phone' : t === 'morning' ? 'happy' : 'sketch';
+  const pool = WIN_LINES[over ? 'over' : near ? 'near' : 'under'], say = pick(pool);
+  const pill = dg ? (over ? '🐶 '+dg+' brought you his leash' : near ? '🐶 '+dg+' wants to play ball' : '') : '';
+  const words = say.length > 18 ? [say.slice(0, say.lastIndexOf(' ', 18) > 0 ? say.lastIndexOf(' ', 18) : 18), say.slice(say.lastIndexOf(' ', 18) > 0 ? say.lastIndexOf(' ', 18) + 1 : 18)] : [say];
+  const art = WIN.scene({t, kind, mood, dog: !!dg, say: kind === 'studio' && !near ? words : null});
+  const pct = Math.min(100, Math.round(m / Math.max(1, g) * 100)), col = over ? '#ff5a8a' : near ? '#ffc23d' : '#5cc26b';
+  const chip = (e, v, c, k) => '<button class="chip tchip" data-stat="'+k+'">'+e+' '+v+'<span class="chev">›</span><i><u style="width:'+v+'%;background:'+c+'"></u></i></button>';
+  return '<div class="card wincard"><div class="wart">'+art+(pill ? '<span class="wpill">'+pill+'</span>' : '')+(SHOP_ON ? '<button class="closetbtn wcl" id="closet">👕 Closet</button>' : '')+
+      '<div class="wname">'+n+' · '+S.age+'</div></div>'+
+      '<div class="chips">'+chip('💪', S.h, 'var(--h)', 'h')+chip('🧠', S.s, 'var(--s)', 's')+chip('😊', S.j, 'var(--j)', 'j')+'</div></div>'+
+    '<div class="card wpanel"><div class="wm"><div class="wml"><span>📱 Today so far</span><b style="color:'+col+'">'+(over ? fmtTime(m - g)+' over' : fmtTime(g - m)+' left')+'</b></div>'+
+      '<div class="wmv"><b>'+fmtTime(m)+'</b> of your '+fmtTime(g)+' goal</div><div class="wbar"><u style="width:'+pct+'%;background:'+col+'"></u></div></div>'+
+      '<div class="wrow"><div class="wst"><span>🔥</span><b>'+S.streak+'</b><small>day streak</small></div>'+tease+'</div>'+
+      '<button class="btn wdown" id="phonedown">Put my phone down 👋</button></div>';
 }
 
 // ============ TAP A STAT ============
@@ -3195,7 +3331,7 @@ if (readMeet()) track('friend-link-opened');
 else if (S && isInstalled()) track('opened-installed');
 window.addEventListener('hashchange', render);
 // If the app sat open overnight, catch up when it comes back on screen.
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { catchUp(); render(); stRefresh(); } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { goodbye = 0; catchUp(); render(); stRefresh(); } });
 if (remind.on) remindSync(); // keeps the reminder's Blip name current (new generation, renamed)
 // App Store builds never keep testing mode (a save carried over from TestFlight could have it on).
 if (MORNING && stPlugin()) stPlugin().env().then(r => { if (r && r.testflight) { TESTFLIGHT = true; if (tab === 'settings') render(); } else if (S && S.testMode) { S.testMode = false; save(); render(); } }).catch(() => {});
