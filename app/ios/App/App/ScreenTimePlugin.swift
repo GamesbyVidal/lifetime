@@ -17,6 +17,8 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "pickApps", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "start", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "minutesFor", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "checkLog", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "resync", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remindOn", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remindOff", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "env", returnType: CAPPluginReturnPromise)
@@ -75,30 +77,60 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     // Watches the whole day (midnight to midnight, repeating) with one event per 5 minutes (192 events, up to 16 hours).
-    @objc func start(_ call: CAPPluginCall) {
-        guard let data = defaults?.data(forKey: Self.selectionKey),
+    // On iOS 17.4+ each event also counts what was used earlier today (includesPastActivity), so a restart never loses minutes.
+    static func startMonitor(_ d: UserDefaults?, reason: String) throws {
+        guard let data = d?.data(forKey: selectionKey),
               let selection = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) else {
-            call.reject("Pick apps first"); return
+            throw NSError(domain: "Blip", code: 1, userInfo: [NSLocalizedDescriptionKey: "Pick apps first"])
         }
         let schedule = DeviceActivitySchedule(
             intervalStart: DateComponents(hour: 0, minute: 0),
             intervalEnd: DateComponents(hour: 23, minute: 59, second: 59),
             repeats: true)
         var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
-        for m in stride(from: Self.stepMinutes, through: Self.maxMinutes, by: Self.stepMinutes) {
-            events[DeviceActivityEvent.Name("m\(m)")] = DeviceActivityEvent(
-                applications: selection.applicationTokens,
-                categories: selection.categoryTokens,
-                webDomains: selection.webDomainTokens,
-                threshold: DateComponents(minute: m))
+        for m in stride(from: stepMinutes, through: maxMinutes, by: stepMinutes) {
+            let name = DeviceActivityEvent.Name("m\(m)")
+            if #available(iOS 17.4, *) {
+                events[name] = DeviceActivityEvent(
+                    applications: selection.applicationTokens,
+                    categories: selection.categoryTokens,
+                    webDomains: selection.webDomainTokens,
+                    threshold: DateComponents(minute: m),
+                    includesPastActivity: true)
+            } else {
+                events[name] = DeviceActivityEvent(
+                    applications: selection.applicationTokens,
+                    categories: selection.categoryTokens,
+                    webDomains: selection.webDomainTokens,
+                    threshold: DateComponents(minute: m))
+            }
         }
+        let center = DeviceActivityCenter()
+        center.stopMonitoring([.daily])
+        try center.startMonitoring(.daily, during: schedule, events: events)
+        log(d, "counter started (" + reason + ")")
+    }
+
+    @objc func start(_ call: CAPPluginCall) {
         do {
-            let center = DeviceActivityCenter()
-            center.stopMonitoring([.daily])
-            try center.startMonitoring(.daily, during: schedule, events: events)
+            try Self.startMonitor(defaults, reason: "connect or change what counts")
             call.resolve(["started": true])
         } catch {
             call.reject("Could not start: \(error.localizedDescription)")
+        }
+    }
+
+    // Called each time the app opens. On iOS 17.4+ restarting with includesPastActivity makes iOS re-check today's
+    // full total and re-send any 5-minute steps it missed. Older iOS would lose earlier minutes on a restart, so it skips.
+    @objc func resync(_ call: CAPPluginCall) {
+        guard #available(iOS 17.4, *) else { call.resolve(["resynced": false]); return }
+        guard AuthorizationCenter.shared.authorizationStatus == .approved else { call.resolve(["resynced": false]); return }
+        do {
+            try Self.startMonitor(defaults, reason: "app opened, re-sync")
+            call.resolve(["resynced": true])
+        } catch {
+            Self.log(defaults, "re-sync failed: " + error.localizedDescription)
+            call.resolve(["resynced": false])
         }
     }
 
@@ -107,6 +139,25 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         let day = call.getString("day") ?? ""
         if let m = defaults?.object(forKey: "minutes-" + day) as? Int { call.resolve(["minutes": m]) }
         else { call.resolve(["minutes": NSNull()]) }
+    }
+
+    // TestFlight "Screen Time check": the day's log of when each 5-minute step arrived, plus what is being counted.
+    static func log(_ d: UserDefaults?, _ what: String) {
+        let f = DateFormatter(); f.locale = Locale(identifier: "en_US_POSIX"); f.dateFormat = "yyyy-MM-dd"
+        let t = DateFormatter(); t.locale = Locale(identifier: "en_US_POSIX"); t.dateFormat = "HH:mm"
+        let key = "log-" + f.string(from: Date())
+        var list = d?.stringArray(forKey: key) ?? []
+        list.append(t.string(from: Date()) + " " + what)
+        d?.set(list, forKey: key)
+    }
+    @objc func checkLog(_ call: CAPPluginCall) {
+        let day = call.getString("day") ?? ""
+        var apps = 0, cats = 0, webs = 0
+        if let data = defaults?.data(forKey: Self.selectionKey), let sel = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) {
+            apps = sel.applicationTokens.count; cats = sel.categoryTokens.count; webs = sel.webDomainTokens.count
+        }
+        let acts = DeviceActivityCenter().activities.map { $0.rawValue }
+        call.resolve(["log": defaults?.stringArray(forKey: "log-" + day) ?? [], "apps": apps, "categories": cats, "webDomains": webs, "watching": acts])
     }
 
     // Daily totals are only kept for about a week (privacy policy). Keys look like "minutes-YYYY-MM-DD".
@@ -119,8 +170,9 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         f.dateFormat = "yyyy-MM-dd"
         guard let cutoff = Calendar.current.date(byAdding: .day, value: -keepDays, to: Date()) else { return }
         let oldest = f.string(from: cutoff)
-        for key in d.dictionaryRepresentation().keys where key.hasPrefix("minutes-") {
-            if String(key.dropFirst(8)) < oldest { d.removeObject(forKey: key) }
+        for key in d.dictionaryRepresentation().keys {
+            if key.hasPrefix("minutes-"), String(key.dropFirst(8)) < oldest { d.removeObject(forKey: key) }
+            if key.hasPrefix("log-"), String(key.dropFirst(4)) < oldest { d.removeObject(forKey: key) }
         }
     }
 

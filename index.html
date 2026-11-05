@@ -231,6 +231,8 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .scenecard{padding:0;overflow:hidden}.lifescene{position:relative}.lifescene .scene{display:block;width:100%;height:auto}
 .sblip{position:absolute;width:30%}.sblip svg{width:100%;height:auto;display:block}.sblip svg>circle:first-of-type{display:none}
 .where{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.88);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
+.wart #wblip{cursor:pointer;transform-box:fill-box;transform-origin:50% 100%;-webkit-tap-highlight-color:transparent}.wart #wblip.hop{animation:hop .55s ease}.wart #wblip.droop{animation:droop .7s ease}
+.wart .wbub{left:5%;top:4%;transform:scale(.6);transform-origin:20px 100%;max-width:62%;font-size:14px;padding:6px 10px;z-index:3}.wart .wbub.show{transform:scale(1)}.wart .wbub:after{left:auto;right:30%}
 .lifescene #sblip{cursor:pointer;-webkit-tap-highlight-color:transparent}.lifescene #sblip.hop{animation:hop .55s ease}.lifescene #sblip.droop{animation:droop .7s ease}
 .lifescene .bubble{left:45%;top:8%;transform:translate(0,-100%) scale(.6);transform-origin:16px 100%;max-width:190px;font-size:13px;padding:6px 10px;border-width:2.5px}
 .lifescene .bubble.show{transform:translate(0,-100%) scale(1)}.lifescene .bubble:after{left:20px}
@@ -715,6 +717,27 @@ function stRefresh(){
     });
   }).catch(() => {});
 }
+// TestFlight-only "Screen Time check": the phone's own log of when each step arrived today. Never shared or sent anywhere.
+function showStCheck(){
+  const p = stPlugin(); if (!p) return;
+  const day = calKey(Date.now());
+  p.checkLog({day}).then(r => {
+    const log = (r && r.log) || [];
+    const lines = log.slice().reverse().map(x => esc(x)).join('<br>') || 'Nothing logged yet today.';
+    modal('<h2>🔍 Screen Time check</h2><p class="muted small" style="text-align:left">Day: '+day+'<br>Blip\'s total so far: <b>'+(stToday == null ? 'none' : fmtTime(stToday))+'</b><br>'+
+      'Counting: '+(r.categories || 0)+' categories, '+(r.apps || 0)+' apps, '+(r.webDomains || 0)+' websites<br>Watching: '+esc(((r && r.watching) || []).join(', ') || 'nothing')+'</p>'+
+      '<div style="text-align:left;font-family:ui-monospace,Menlo,monospace;font-size:13px;max-height:45vh;overflow:auto;background:#f6f3ff;border-radius:12px;padding:10px">'+lines+'</div>'+
+      '<p class="muted small">Newest first. Screenshot this next to iPhone Screen Time.</p><button class="btn" data-close>Close</button>');
+  }).catch(e => modal('<h2>Screen Time check</h2><p class="muted">Could not read the log: '+esc(e && e.message || e)+'</p><button class="btn" data-close>Close</button>'));
+}
+// Each time the app opens, ask iOS to re-check today's full Screen Time total (iOS 17.4+), then read the numbers again
+// once the re-sent 5-minute steps have landed. At most once a minute.
+let stSyncAt = 0;
+function stResync(){
+  const p = stPlugin(); if (!p || !autoOn() || !p.resync || Date.now() - stSyncAt < 60000) return;
+  stSyncAt = Date.now();
+  p.resync().then(r => { if (r && r.resynced) { setTimeout(stRefresh, 2500); setTimeout(stRefresh, 8000); } }).catch(() => {});
+}
 function stOff(note){ if (!S) return; S.auto = false; stToday = null; stYest = null; stNote = note || ''; save(); render(); }
 function stConnect(){
   const b = $('stgo'); if (b) b.textContent = 'Connecting...';
@@ -758,6 +781,7 @@ function remindCardHTML(){
     (remindNote ? '<div class="verdict" style="background:#fff3d6;color:#6b4a00">'+esc(remindNote)+'</div>' : '')+'</div>';
 }
 function bindRemind(){
+  if ($('stcheck')) $('stcheck').onclick = showStCheck;
   if ($('rmon')) $('rmon').onchange = e => {
     remind.on = e.target.checked; remindNote = ''; remindSave(); render();
     remindSync().then(ok => { if (!ok && remind.on) { remind.on = false; remindSave(); remindNote = 'Notifications are off for Blip. You can turn them on in iPhone Settings > Notifications > Blip.'; render(); } });
@@ -1582,14 +1606,14 @@ const STREAK_LINES = ['{n} days in a row! I\'ve never felt this good.', 'Our str
 const TICKLE_LINES = ['Okay okay, I\'m awake!', 'That tickles! 😆', 'Hey! Personal space!', 'Stop poking me! ...Okay, one more.'];
 
 let taps = [], bubbleTimer;
-function tapCharacter(wrapId, bubId){
+function tapCharacter(wrapId, bubId, upOverride){
   const wrap = $(typeof wrapId === 'string' ? wrapId : 'buddy');
   if (!wrap) return;
   const now = Date.now();
   taps = taps.filter(t => now - t < 3000); taps.push(now);
   const st = stage(S.age);
   const last = S.log.length ? S.log[S.log.length-1] : null;
-  const up = !(last && !(last.tier === 'good' || last.tier === 'great' || last.tier === 'restored' || last.tier === 'quiet')) && S.j >= 30;
+  const up = typeof upOverride === 'boolean' ? upOverride : !(last && !(last.tier === 'good' || last.tier === 'great' || last.tier === 'restored' || last.tier === 'quiet')) && S.j >= 30;
   let line;
   if (taps.length >= 5) line = pick(TICKLE_LINES);
   else if (up && S.streak >= 3 && Math.random() < 0.3) line = pick(STREAK_LINES).replace('{n}', S.streak);
@@ -2736,6 +2760,7 @@ function settingsHTML(){
     stCardHTML()+remindCardHTML()+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
     (!IS_APP || TESTFLIGHT ? '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>' : '')+
+    (IS_APP && TESTFLIGHT && autoOn() ? '<div class="card"><h2>🔍 Screen Time check</h2><p class="muted small">TestFlight only. Shows when each 5-minute step from Apple arrived, to compare with iPhone Screen Time.</p><button class="btn alt" id="stcheck">Show today\'s log</button></div>' : '')+
     (isInstalled() ? '' : '<div class="card"><h2>📲 Put Blip on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
       '<p class="muted">Get '+esc(S.name)+' as an app icon that opens full screen. It also keeps their save safer on iPhone.</p></div></div>'+
       '<p class="small"><b>iPhone:</b> tap the Share button <span class="kbd">⬆︎</span> in Safari, then <b>Add to Home Screen</b>.<br><b>Android:</b> tap the <span class="kbd">⋮</span> menu in Chrome, then <b>Add to Home screen</b> or <b>Install app</b>.</p></div>')+
@@ -2877,6 +2902,8 @@ function bind(){
   document.querySelectorAll('#app [data-tap]').forEach(el => el.onclick = ev => { ev.stopPropagation(); todayTap(el.dataset.tap, el); });
   if ($('buddy')) $('buddy').onclick = tapCharacter;
   if ($('sblip')) $('sblip').onclick = () => tapCharacter('sblip', 'sbub');
+  // Today's window: tap the Blip to talk. Mood follows today so far (upbeat under goal, down near or over). The drawn speech bubble steps aside.
+  if ($('wblip')) $('wblip').onclick = () => { const c = document.querySelector('.wincard[data-up]'), say = $('wsay'); if (say) say.style.display = 'none'; tapCharacter('wblip', 'wbub', goodbye ? true : !c || c.dataset.up === '1'); };
   if ($('ydog')) $('ydog').onclick = tapDog;
   if ($('share')) $('share').onclick = () => shareModal(null);
   if ($('tbpost')) $('tbpost').onclick = postTimeBack;
@@ -3016,16 +3043,16 @@ function scene(o){ const H = 230, F = 196, t = o.t, w = 150;
     s += win(16, wy, 70, 72, t)+beam(16, wy, 70, 72, F, t, t === 'afternoon' ? 90 : 50)+board(176, F-214, 114, 92)+desk(184, F);
     if (o.dog) s += dog(222, F, 58, 'ball');
     const b = o.mood === 'phone' ? noGlow(charSVG(me({pose:'phone'}))) : o.mood === 'sketch' ? front(noGlow(charSVG(me())).replace('<g class="bob">', sketch+'<g class="bob">'), marker) : front(noGlow(charSVG(me())), mug);
-    s += place(b, 128, F, w);
-    if (o.say) s += bubble(16, 8, 160, o.say, 96);
+    s += '<g id="wblip">'+place(b, 128, F, w)+'</g>';
+    if (o.say) s += '<g id="wsay">'+bubble(16, 8, 160, o.say, 96)+'</g>';
   } else {
     const wy = F - 196;
     s += win(18, wy, 64, 80, t);
     if (o.kind === 'couch') {
-      s += lamp(30, F, true)+door(226, F, false)+couchBack(72, F, 136)+nest(noGlow(charSVG(Object.assign({}, S, {log:[{tier:'bad'}], wear:myWear()}))), 140 - w/2, F - 44 - 184*w/200, w)+couchFront(72, F, 136);
+      s += lamp(30, F, true)+door(226, F, false)+couchBack(72, F, 136)+'<g id="wblip">'+nest(noGlow(charSVG(Object.assign({}, S, {log:[{tier:'bad'}], wear:myWear()}))), 140 - w/2, F - 44 - 184*w/200, w)+'</g>'+couchFront(72, F, 136);
       if (o.dog) s += dog(212, F, 58, 'leash');
     } else if (o.kind === 'wave') {
-      s += lamp(30, F, true)+door(226, F, true)+couchBack(72, F, 136)+couchFront(72, F, 136)+(o.dog ? dog(40, F, 56, 'leash') : '')+place(noGlow(charSVG(me({pose:'wave'}))), 150, F, w);
+      s += lamp(30, F, true)+door(226, F, true)+couchBack(72, F, 136)+couchFront(72, F, 136)+(o.dog ? dog(40, F, 56, 'leash') : '')+'<g id="wblip">'+place(noGlow(charSVG(me({pose:'wave'}))), 150, F, w)+'</g>';
     } else s += lamp(30, F, false)+door(226, F, false)+couchBack(72, F, 136)+couchFront(72, F, 136);
   }
   return s+'</svg>'; }
@@ -3046,7 +3073,7 @@ function windowHTML(){
     const art = WIN.scene({t, kind: goodbye === 1 ? 'wave' : 'empty', dog: !!dg});
     const msg = goodbye === 1 ? '<div class="bye"><div class="e">👋</div><h2>'+n+'\'s going for a walk</h2><p class="muted">'+(dg ? dg+' is going too. ' : '')+'Enjoy your '+(t === 'morning' ? 'day' : t === 'afternoon' ? 'afternoon' : 'evening')+'.</p></div>'
       : '<div class="bye card2"><div class="e">🌙</div><h2>See you tomorrow morning</h2><p class="muted">'+n+' turns '+turning+' when you wake up.</p></div>';
-    return '<div class="card wincard"><div class="wart">'+art+'</div></div>'+msg;
+    return '<div class="card wincard"><div class="wart">'+art+'<div class="bubble wbub" id="wbub"></div></div></div>'+msg;
   }
   const kind = over ? 'couch' : 'studio', mood = near ? 'phone' : t === 'morning' ? 'happy' : 'sketch';
   const pool = WIN_LINES[over ? 'over' : near ? 'near' : 'under'], say = pick(pool);
@@ -3055,7 +3082,7 @@ function windowHTML(){
   const art = WIN.scene({t, kind, mood, dog: !!dg, say: kind === 'studio' && !near ? words : null});
   const pct = Math.min(100, Math.round(m / Math.max(1, g) * 100)), col = over ? '#ff5a8a' : near ? '#ffc23d' : '#5cc26b';
   const chip = (e, v, c, k) => '<button class="chip tchip" data-stat="'+k+'">'+e+' '+v+'<span class="chev">›</span><i><u style="width:'+v+'%;background:'+c+'"></u></i></button>';
-  return '<div class="card wincard"><div class="wart">'+art+(pill ? '<span class="wpill" data-tap="dog">'+pill+'</span>' : '')+(SHOP_ON ? closetBtnHTML() : '')+
+  return '<div class="card wincard" data-up="'+(over || near ? 0 : 1)+'"><div class="wart">'+art+'<div class="bubble wbub" id="wbub"></div>'+(pill ? '<span class="wpill" data-tap="dog">'+pill+'</span>' : '')+(SHOP_ON ? closetBtnHTML() : '')+
       '<div class="wname" data-tap="life">'+n+' · '+S.age+'</div></div>'+
       '<div class="chips">'+chip('💪', S.h, 'var(--h)', 'h')+chip('🧠', S.s, 'var(--s)', 's')+chip('😊', S.j, 'var(--j)', 'j')+'</div></div>'+
     '<div class="card wpanel"><div class="wm" data-tap="goal"><div class="wml"><span>📱 Today so far</span><b style="color:'+col+'">'+(over ? fmtTime(m - g)+' over' : fmtTime(g - m)+' left')+'</b></div>'+
@@ -3708,11 +3735,12 @@ if (readMeet()) track('friend-link-opened');
 else if (S && isInstalled()) track('opened-installed');
 window.addEventListener('hashchange', render);
 // If the app sat open overnight, catch up when it comes back on screen.
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { goodbye = 0; catchUp(); render(); stRefresh(); } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { goodbye = 0; catchUp(); render(); stRefresh(); stResync(); } });
 if (remind.on) remindSync(); // keeps the reminder's Blip name current (new generation, renamed)
 // App Store builds never keep testing mode (a save carried over from TestFlight could have it on).
 if (MORNING && stPlugin()) stPlugin().env().then(r => { if (r && r.testflight) { TESTFLIGHT = true; if (tab === 'settings') render(); } else if (S && S.testMode) { S.testMode = false; save(); render(); } }).catch(() => {});
 stRefresh();
+setTimeout(stResync, 1500);
 </script>
 </body>
 </html>
