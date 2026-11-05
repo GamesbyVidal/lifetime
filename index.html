@@ -2982,7 +2982,7 @@ const T = {
   night:{wall:'#f2c27e',wl:'#e3ab66',floor:'#b67a48',fl:'#985f33',sky:'#1c2456',beam:null}
 };
 const noGlow = s => s.replace(/<circle cx="100" cy="122" r="86"[^>]*\/>/, '');
-const front = (s, p) => s.replace(/<\/svg>$/, p+'</svg>');
+const front = (s, p) => s.replace(/<\/g><\/svg>$/, p+'</g></svg>'); // held things go inside the bob group so they move with the Blip
 const mug = '<path d="M146 152 q-4 -6 0 -12 M154 152 q4 -6 0 -12" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>'+
   '<path d="M158 166 h4 q7 0 7 7 q0 7 -7 7 h-4" fill="none" '+W(3)+'/><rect x="138" y="158" width="22" height="26" rx="5" fill="#ffc23d" '+W(3)+'/><path d="M143 168 h12" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
 const sketch = '<g transform="rotate(8 54 168)"><rect x="40" y="164" width="30" height="38" rx="3" fill="#ff8fa8" '+W(3.5)+'/><path d="M40 170 h30" stroke="'+O+'" stroke-width="2.5"/><path d="M47 182 q8 -8 16 0 q-8 8 -16 0z" fill="#fff" stroke="'+O+'" stroke-width="2"/></g>';
@@ -3042,7 +3042,7 @@ function scene(o){ const H = 230, F = 196, t = o.t, w = 150;
     const wy = F - 180;
     s += win(16, wy, 70, 72, t)+beam(16, wy, 70, 72, F, t, t === 'afternoon' ? 90 : 50)+board(176, F-214, 114, 92)+desk(184, F);
     if (o.dog) s += dog(222, F, 58, 'ball');
-    const b = o.mood === 'phone' ? noGlow(charSVG(me({pose:'phone'}))) : o.mood === 'sketch' ? front(noGlow(charSVG(me())).replace('<g class="bob">', sketch+'<g class="bob">'), marker) : front(noGlow(charSVG(me())), mug);
+    const b = o.mood === 'phone' ? noGlow(charSVG(me({pose:'phone'}))) : o.mood === 'sketch' ? front(noGlow(charSVG(me())).replace('<g class="bob">', '<g class="bob">'+sketch), marker) : front(noGlow(charSVG(me())), mug);
     s += '<g id="wblip">'+place(b, 128, F, w)+'</g>';
     if (o.say) s += '<g id="wsay">'+bubble(16, 8, 160, o.say, 96)+'</g>';
   } else {
@@ -3131,7 +3131,7 @@ function statNextHTML(k){
 function statScene(k){
   const O = '#3b2a4a', W = w => 'stroke="'+O+'" stroke-width="'+(w||3.5)+'" stroke-linejoin="round" stroke-linecap="round"', F = 160;
   const me = Object.assign({}, S, {log:[{tier:'good'}], wear:myWear()}), kid = S.age < 18;
-  const nest = (prop, y) => charSVG(me).replace('<g class="bob">', (prop||'')+'<g class="bob">').replace('<svg ', '<svg x="80" y="'+y+'" width="140" height="168" ');
+  const nest = (prop, y) => charSVG(me).replace('<g class="bob">', '<g class="bob">'+(prop||'')).replace('<svg ', '<svg x="80" y="'+y+'" width="140" height="168" ');
   const floor = (c, l) => '<rect x="0" y="'+F+'" width="300" height="40" fill="'+c+'"/><path d="M0 '+F+' H300" '+W(3)+'/><path d="M30 '+(F+20)+' h40 M150 '+(F+28)+' h46 M236 '+(F+14)+' h36" stroke="'+l+'" stroke-width="3" stroke-linecap="round"/>';
   let s = '<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMax slice" width="100%" height="100%" style="display:block">';
   if (k === 'h') {
