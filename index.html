@@ -194,7 +194,7 @@ textarea.code{width:100%;height:110px;border:2px solid #e4ddff;border-radius:12p
 .lcrow{flex-wrap:wrap;margin:8px 0 4px}.lcrow .btn{flex:1;font-size:15px;padding:10px;min-width:120px}
 .install{display:flex;gap:14px;align-items:center}.install img{width:64px;height:64px;border-radius:15px;box-shadow:0 4px 10px rgba(40,20,90,.3);flex:none}
 .kbd{display:inline-block;background:#f1edff;border-radius:6px;padding:0 6px;font-weight:700}
-.sharebtn{margin-top:12px;font-size:16px;padding:12px}
+.sharebtn{margin-top:12px;font-size:16px;padding:12px}.lifeshare{margin-bottom:16px}
 .meet{color:#fff;text-align:center;padding:8px 2px 30px}.meet .k{font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
 .meet h1{font-size:34px;margin:4px 0 0;color:#fff}.meet .sub{color:#d9d2ff;font-size:14px}.meet .pc svg{width:190px;height:220px}
 .mstats{background:#fff;color:var(--ink);border-radius:16px;padding:8px 12px;text-align:left}.mst{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:14px}
@@ -263,7 +263,7 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .tbhero{padding:0;overflow:hidden;background:#fff3dc}.tbsky{position:relative;height:216px;text-align:center;border-bottom:3px solid #3b2a4a}.tbbd{position:absolute;inset:0;width:100%;height:100%}
 .tbn{position:relative;padding-top:18px;font:700 58px Fredoka,system-ui;line-height:1;color:#3b2a4a;text-shadow:0 3px 0 #fff}.tbn em{font-size:26px;font-style:normal;color:#7a6f8f;margin:0 4px 0 1px}
 .tbl{position:relative;display:inline-block;margin-top:6px;font-size:14px;font-weight:500;background:rgba(255,255,255,.85);border-radius:99px;padding:2px 10px}
-.tbbody{padding:14px}.tbrib{display:flex;gap:8px;align-items:center;width:100%;text-align:left;background:#ffe08a;border:2.5px solid #3b2a4a;border-radius:14px;padding:8px 12px;font:inherit;font-size:14.5px;line-height:1.3;color:#3b2a4a}.tbrib svg{flex:none}.tbrib.ask{cursor:pointer}
+.tbbody{padding:14px}.tbbody>.tbeq:first-child{margin-top:0}.tbbody>.tbeq+.tbrib{margin-top:10px}.tbrib{display:flex;gap:8px;align-items:center;width:100%;text-align:left;background:#ffe08a;border:2.5px solid #3b2a4a;border-radius:14px;padding:8px 12px;font:inherit;font-size:14.5px;line-height:1.3;color:#3b2a4a}.tbrib svg{flex:none}.tbrib.ask{cursor:pointer}
 .tbeq{display:flex;gap:9px;align-items:center;margin-top:10px;background:#fffaf0;border:2.5px solid #3b2a4a;border-radius:14px;padding:8px 12px;font-size:14.5px;line-height:1.3;text-align:left}.tbeq .eb{flex:none;font-size:22px}
 .tbwh{display:flex;gap:10px;align-items:center;margin-bottom:6px;text-align:left}.tbhi{flex:none;width:36px;height:36px;border-radius:12px;border:2.5px solid #3b2a4a;display:flex;align-items:center;justify-content:center;font-size:19px}
 .tbsub{margin:2px 0 0;font-size:12.5px;color:#7a6f8f;line-height:1.3}
@@ -2545,7 +2545,7 @@ function trophyInfo(k){
 function lifeHTML(){
   return header().replace('<div class="logo">'+brand()+'<small>One day for you. One year for them.</small></div>', '<div class="logo">'+esc(S.name)+'\'s life<small>Age '+S.age+(S.job ? ' · '+esc(S.job) : '')+'</small></div>')+
     '<div class="card housecard"><span class="hhint">👆 Tap a lit room</span>'+HOUSE.house()+'</div>'+
-    (S.log.length && MORNING && autoOn() ? weekHTML()+'<button class="btn ghost sharebtn" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '')+
+    (S.log.length && MORNING && autoOn() ? weekHTML()+'<button class="btn ghost sharebtn lifeshare" id="share">📤 Share '+esc(S.name)+' with friends</button>' : '')+
     lifeMapHTML()+(S.age < 18 ? growHTML() : '')+chaptersHTML()+familyWallHTML()+trophyRowHTML();
 }
 
@@ -2687,6 +2687,11 @@ function lifeStops(){
   if (nx) up.splice(1, 0, {e:(MOMENT[nx.key] || '✨').split(' ')[0], t:goalName(nx).replace(/^a /, '').replace(/^./, c => c.toUpperCase()), dream:true});
   return {past:past.slice(-7), up};
 }
+// Clouds at the top of the life map: the road fades into them.
+const CLOUDS = '<defs><linearGradient id="lmfade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8f6e4"/><stop offset="1" stop-color="#e8f6e4" stop-opacity="0"/></linearGradient></defs>'+
+  '<rect x="0" y="0" width="300" height="70" fill="url(#lmfade)"/>'+
+  '<g><ellipse cx="78" cy="30" rx="40" ry="15" fill="#fff"/><ellipse cx="112" cy="22" rx="28" ry="14" fill="#fff"/><ellipse cx="150" cy="36" rx="58" ry="18" fill="#fff"/><ellipse cx="190" cy="22" rx="26" ry="13" fill="#fff"/><ellipse cx="224" cy="30" rx="40" ry="15" fill="#fff"/></g>'+
+  '<text x="150" y="40" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="11" fill="#9a90b8">still to come…</text>';
 function lifeMapHTML(){
   const {past, up} = lifeStops(), O = '#3b2a4a';
   const pts = past.map(x => Object.assign({k:'past'}, x)).concat([{k:'now', age:S.age}], up.map((x, i) => Object.assign({k:i ? 'later' : 'next'}, x)));
@@ -2696,9 +2701,11 @@ function lifeMapHTML(){
   pos.forEach((q, i) => { if (i && Math.floor(i / per) !== Math.floor((i - 1) / per)) { const pr = pos[i - 1], side = pr[0] > 150 ? 1 : -1;
       road += ' C'+(pr[0] + side*44)+' '+pr[1]+' '+(q[0] + side*44)+' '+q[1]+' '+q[0]+' '+q[1]; } else road += ' L'+q[0]+' '+q[1]; });
   const last = pos[pos.length - 1];
-  road += ' L'+(last[0] + (Math.floor((pos.length - 1) / per) % 2 ? -30 : 30))+' '+last[1];
-  let g = '<path d="'+road+'" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/><path d="'+road+'" fill="none" stroke="'+O+'" stroke-width="3" stroke-dasharray="0" opacity=".0"/>'+
-    '<path d="'+road+'" fill="none" stroke="#e9dcc8" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><path d="'+road+'" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="7 7"/>';
+  // past the last stop the road curves up and disappears into the clouds ("still to come")
+  const side = Math.floor((pos.length - 1) / per) % 2 ? -1 : 1;
+  road += ' C'+(last[0] + side*50)+' '+last[1]+' '+(last[0] + side*46)+' '+(last[1] - 64)+' '+(150 + side*30)+' '+(last[1] - 72)+' S150 54 150 30';
+  let g = '<path d="'+road+'" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<path d="'+road+'" fill="none" stroke="#e9dcc8" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><path d="'+road+'" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="7 7"/>'+CLOUDS;
   const wrap = t => { if (t.length <= 15) return [t]; const w = t.split(' '); let a = '';
     while (w.length && (a + (a ? ' ' : '') + w[0]).length <= 15) a += (a ? ' ' : '') + w.shift();
     if (!a) a = w.shift(); let b = w.join(' '); if (b.length > 15) b = b.slice(0, 14)+'…'; return b ? [a, b] : [a]; };
@@ -2715,8 +2722,7 @@ function lifeMapHTML(){
       (p.k === 'past' && p.age ? '<circle cx="'+(x+13)+'" cy="'+(y-13)+'" r="6.5" fill="#5cc26b" stroke="'+O+'" stroke-width="2"/><path d="M'+(x+10)+' '+(y-13)+' l2 2.5 4 -4.5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>' : '')+
       (p.k === 'next' ? '<rect x="'+(x-18)+'" y="'+(y-36)+'" width="36" height="15" rx="7.5" fill="#ffc23d" stroke="'+O+'" stroke-width="2"/><text x="'+x+'" y="'+(y-25)+'" text-anchor="middle" font-family="Fredoka,sans-serif" font-weight="700" font-size="10" fill="'+O+'">Next</text>' : '')+
       lab(x, y + 30, p.t, p.dream ? 'someday' : p.age != null ? (p.k === 'past' ? 'age '+p.age : 'at '+p.age) : '')+'</g>'; });
-  const top = '<g opacity=".9"><ellipse cx="80" cy="22" rx="34" ry="13" fill="#fff"/><ellipse cx="112" cy="16" rx="24" ry="12" fill="#fff"/><ellipse cx="220" cy="24" rx="36" ry="13" fill="#fff"/><ellipse cx="190" cy="18" rx="20" ry="10" fill="#fff"/>'+
-    '<text x="150" y="26" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="11" fill="#9a90b8">still to come…</text></g>';
+  const top = '';
   const gs = goalState();
   const nb = up.find(x => !x.dream), hint = nb && PATH_HINT[nb.age], he = S.girl ? 'she' : 'he';
   return '<div class="card"><h2 class="earnh">🗺️ Life map<small>Big moments</small></h2><div class="lmap"><svg viewBox="0 0 300 '+H+'" width="100%" style="display:block">'+
@@ -3897,7 +3903,7 @@ function tbHeroHTML(total, done, next){
   const top = done[done.length - 1];
   const eq = top ? '<div class="tbeq"><span class="eb">'+top[1]+'</span><span>That\'s enough time to <b>'+lowerFirst(top[2])+'</b></span></div>'
     : next ? '<div class="tbeq"><span class="eb">'+next[1]+'</span><span>'+fmtHM(next[0] - total)+' more and you could <b>'+lowerFirst(next[2])+'</b></span></div>' : '';
-  return '<div class="card tbhero"><div class="tbsky">'+tbMeadow()+'<div class="tbn">'+bigHM(total)+'</div><div class="tbl">back in your life since you started</div></div><div class="tbbody">'+rib+eq+'</div></div>';
+  return '<div class="card tbhero"><div class="tbsky">'+tbMeadow()+'<div class="tbn">'+bigHM(total)+'</div><div class="tbl">back in your life since you started</div></div><div class="tbbody">'+eq+rib+'</div></div>';
 }
 function tbWeek(d){ return Math.floor((dayNum(d) + 4) / 7); }  // weeks start on Sunday
 function tbWeekHTML(){
