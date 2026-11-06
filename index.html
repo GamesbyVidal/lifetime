@@ -4054,8 +4054,20 @@ function shareModal(moment, opt){
     if (files) go.onclick = () => navigator.share({files:[file], text}).then(() => { sent(); after(); }, () => {});
     else if (navigator.share) go.onclick = () => navigator.share({text}).then(() => { sent(); after(); }, () => {});
     else go.onclick = () => $('shcopy').click();
-    // Save: phones save from their own share sheet ("Save Image"); computers download the file.
-    sv.onclick = files ? () => navigator.share({files:[file]}).catch(() => {})
+    // Save: the app puts it straight into Photos (add-only access). Websites on phones use the share sheet
+    // ("Save Image"); computers download the file.
+    const photos = nativePlugin('BlipPhotos');
+    const saved = () => { sv.textContent = '✓ Saved to Photos'; sv.disabled = true; };
+    sv.onclick = photos ? () => {
+        sv.disabled = true; sv.textContent = 'Saving...';
+        const r = new FileReader();
+        r.onload = () => photos.save({data: r.result}).then(saved, () => {
+          sv.disabled = false; sv.textContent = '⬇️ Save picture';
+          note.textContent = 'Couldn\'t save. To allow it: iPhone Settings > Blip > Photos.';
+        });
+        r.readAsDataURL(blob);
+      }
+      : files ? () => navigator.share({files:[file]}).catch(() => {})
       : () => { const a = document.createElement('a'); a.href = url; a.download = file.name; a.click(); };
     if (!files && navigator.share) note.textContent = 'Tip: press and hold the picture to save it. Only '+S.name+'\'s story goes in it.';
   }).catch(() => {

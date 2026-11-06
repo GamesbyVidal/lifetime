@@ -6,5 +6,6 @@ class MainViewController: CAPBridgeViewController {
     override func capacitorDidLoad() {
         bridge?.registerPluginInstance(StorePlugin())
         bridge?.registerPluginInstance(ScreenTimePlugin())
+        bridge?.registerPluginInstance(PhotosPlugin())
     }
 }

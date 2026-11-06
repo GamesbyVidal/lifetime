@@ -20,6 +20,7 @@
 		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
 		A1B2C3D40000000000000002 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000000000001 /* MainViewController.swift */; };
 		A1B2C3D40000000000000004 /* StorePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D40000000000000003 /* StorePlugin.swift */; };
+		A1B2C3D400000000000000B2 /* PhotosPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D400000000000000B1 /* PhotosPlugin.swift */; };
 		CF23AC322B1B1DFAAC483B94 /* ScreenTimePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD842C068A3B43E6256D3E9 /* ScreenTimePlugin.swift */; };
 		E2E097B5915E69A37C45A641 /* BlipMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D588CF0A7A2230DD94193823 /* BlipMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -65,6 +66,7 @@
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 		A1B2C3D40000000000000001 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		A1B2C3D40000000000000003 /* StorePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorePlugin.swift; sourceTree = "<group>"; };
+		A1B2C3D400000000000000B1 /* PhotosPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosPlugin.swift; sourceTree = "<group>"; };
 		A3AA586F1275ACCD00BC97FD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		A4242DFDEF86BAAB87FACC69 /* MonitorExtension.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MonitorExtension.swift; sourceTree = "<group>"; };
 		C9A5A1F5C8E3AD43505C2785 /* BlipMonitor.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = BlipMonitor.entitlements; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				A1B2C3D40000000000000003 /* StorePlugin.swift */,
+				A1B2C3D400000000000000B1 /* PhotosPlugin.swift */,
 				A1B2C3D40000000000000001 /* MainViewController.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
@@ -269,6 +272,7 @@
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 				A1B2C3D40000000000000004 /* StorePlugin.swift in Sources */,
+				A1B2C3D400000000000000B2 /* PhotosPlugin.swift in Sources */,
 				A1B2C3D40000000000000002 /* MainViewController.swift in Sources */,
 				CF23AC322B1B1DFAAC483B94 /* ScreenTimePlugin.swift in Sources */,
 			);
