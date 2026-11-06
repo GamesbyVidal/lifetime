@@ -23,18 +23,18 @@ class MonitorExtension: DeviceActivityMonitor {
         let key = "log-" + today()
         var list = defaults?.stringArray(forKey: key) ?? []
         list.append(f.string(from: Date()) + " " + what)
-        if list.count > 400 { list.removeFirst(list.count - 400) }
+        if list.count > 1500 { list.removeFirst(list.count - 1500) }
         defaults?.set(list, forKey: key)
     }
 
     override func intervalDidEnd(for activity: DeviceActivityName) {
         super.intervalDidEnd(for: activity)
-        log("day end")
+        log(activity.rawValue + " end")
     }
 
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
-        log("day start")
+        log(activity.rawValue + " start")
         let key = "minutes-" + today()
         if defaults?.object(forKey: key) == nil { defaults?.set(0, forKey: key) }
         purgeOld()
@@ -56,6 +56,8 @@ class MonitorExtension: DeviceActivityMonitor {
 
     override func eventDidReachThreshold(_ event: DeviceActivityEvent.Name, activity: DeviceActivityName) {
         super.eventDidReachThreshold(event, activity: activity)
+        // TestFlight check: per-category steps ("c3_45" = category #3 passed 45 minutes). Logged only, never counted.
+        if activity == DeviceActivityName("cats") { log("cat " + event.rawValue.dropFirst().replacingOccurrences(of: "_", with: ": ") + "m"); return }
         guard let m = Int(event.rawValue.dropFirst()) else { return }
         log("\(m)m")
         let key = "minutes-" + today()

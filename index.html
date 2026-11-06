@@ -723,9 +723,12 @@ function showStCheck(){
   const day = calKey(Date.now());
   p.checkLog({day}).then(r => {
     const log = (r && r.log) || [];
-    const lines = log.slice().reverse().map(x => esc(x)).join('<br>') || 'Nothing logged yet today.';
+    // Per-category summary (TestFlight check): highest step each picked category reached today.
+    const cat = {}; log.forEach(x => { const m = x.match(/cat (\d+): (\d+)m/); if (m) cat[m[1]] = Math.max(cat[m[1]] || 0, +m[2]); });
+    const catLine = Object.keys(cat).length ? '<br>By category (15-min steps): '+Object.keys(cat).sort((a, b) => a - b).map(k => '#'+k+' '+fmtTime(cat[k])).join(', ') : '';
+    const lines = log.filter(x => !/ cat \d+:/.test(x)).slice().reverse().map(x => esc(x)).join('<br>') || 'Nothing logged yet today.';
     modal('<h2>🔍 Screen Time check</h2><p class="muted small" style="text-align:left">Day: '+day+'<br>Blip\'s total so far: <b>'+(stToday == null ? 'none' : fmtTime(stToday))+'</b><br>'+
-      'Counting: '+(r.categories || 0)+' categories, '+(r.apps || 0)+' apps, '+(r.webDomains || 0)+' websites<br>Watching: '+esc(((r && r.watching) || []).join(', ') || 'nothing')+'</p>'+
+      'Counting: '+(r.categories || 0)+' categories, '+(r.apps || 0)+' apps, '+(r.webDomains || 0)+' websites<br>Watching: '+esc(((r && r.watching) || []).join(', ') || 'nothing')+catLine+'</p>'+
       '<div style="text-align:left;font-family:ui-monospace,Menlo,monospace;font-size:13px;max-height:45vh;overflow:auto;background:#f6f3ff;border-radius:12px;padding:10px">'+lines+'</div>'+
       '<p class="muted small">Newest first. Screenshot this next to iPhone Screen Time.</p><button class="btn" data-close>Close</button>');
   }).catch(e => modal('<h2>Screen Time check</h2><p class="muted">Could not read the log: '+esc(e && e.message || e)+'</p><button class="btn" data-close>Close</button>'));

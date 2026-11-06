@@ -3,6 +3,7 @@ import Capacitor
 import SwiftUI
 import FamilyControls
 import DeviceActivity
+import ManagedSettings
 import UserNotifications
 
 // Bridge between the game (index.html) and Apple's Screen Time API.
@@ -63,13 +64,15 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func pickApps(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            var saved = FamilyActivitySelection()
-            if let data = self.defaults?.data(forKey: Self.selectionKey),
+            // includeEntireCategory: a picked category also covers its websites and apps added later (Safari browsing was being missed).
+            var saved = FamilyActivitySelection(includeEntireCategory: true)
+            if self.defaults?.bool(forKey: "entireCategory") == true, let data = self.defaults?.data(forKey: Self.selectionKey),
                let old = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) { saved = old }
             let picker = PickerView(selection: saved) { picked in
                 self.bridge?.viewController?.dismiss(animated: true)
                 guard let picked = picked else { call.resolve(["picked": false]); return }
                 if let data = try? JSONEncoder().encode(picked) { self.defaults?.set(data, forKey: Self.selectionKey) }
+                self.defaults?.set(true, forKey: "entireCategory")
                 call.resolve(["picked": true])
             }
             self.bridge?.viewController?.present(UIHostingController(rootView: picker), animated: true)
@@ -109,6 +112,28 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         center.stopMonitoring([.daily])
         try center.startMonitoring(.daily, during: schedule, events: events)
         log(d, "counter started (" + reason + ")")
+        // TestFlight check: a second watcher with one counter per picked category (15-minute steps up to 4 hours), logged only.
+        // Shows which category Blip undercounts next to iPhone Screen Time's category totals.
+        // Stable numbering across restarts: sort the opaque tokens by their encoded bytes.
+        let cats = selection.categoryTokens.map { t -> (String, ActivityCategoryToken) in ((try? JSONEncoder().encode(t))?.base64EncodedString() ?? "", t) }.sorted { $0.0 < $1.0 }.map { $0.1 }
+        if !cats.isEmpty {
+            var catEvents: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
+            for (i, t) in cats.enumerated() {
+                for m in stride(from: 15, through: 240, by: 15) {
+                    let name = DeviceActivityEvent.Name("c\(i + 1)_\(m)")
+                    if #available(iOS 17.4, *) {
+                        catEvents[name] = DeviceActivityEvent(categories: [t], threshold: DateComponents(minute: m), includesPastActivity: true)
+                    } else {
+                        catEvents[name] = DeviceActivityEvent(categories: [t], threshold: DateComponents(minute: m))
+                    }
+                }
+            }
+            let catsName = DeviceActivityName("cats")
+            center.stopMonitoring([catsName])
+            do { try center.startMonitoring(catsName, during: schedule, events: catEvents) }
+            catch { log(d, "category watcher failed: " + error.localizedDescription) }
+        }
+        log(d, d?.bool(forKey: "entireCategory") == true ? "whole categories incl. websites: on" : "whole categories incl. websites: OFF (re-pick in Change what counts)")
     }
 
     @objc func start(_ call: CAPPluginCall) {
