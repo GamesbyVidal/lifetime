@@ -757,9 +757,9 @@ function showStCheck(){
     const cat = {}; log.forEach(x => { const m = x.match(/cat (\d+): (\d+)m/); if (m) cat[m[1]] = Math.max(cat[m[1]] || 0, +m[2]); });
     const catLine = Object.keys(cat).length ? '<br>By category (15-min steps): '+Object.keys(cat).sort((a, b) => a - b).map(k => '#'+k+' '+fmtTime(cat[k])).join(', ') : '';
     // Websites-only and apps-only watchers (TestFlight check): highest 5-minute step each reached today.
-    const part = {}; log.forEach(x => { const m = x.match(/ (web|apps) (\d+)m$/); if (m) part[m[1]] = Math.max(part[m[1]] || 0, +m[2]); });
-    const partLine = '<br>Websites only: '+(part.web ? fmtTime(part.web) : 'none yet')+' · Apps only: '+(part.apps ? fmtTime(part.apps) : 'none yet');
-    const lines = log.filter(x => !/ cat \d+:| (web|apps) \d+m$/.test(x)).slice().reverse().map(x => esc(x)).join('<br>') || 'Nothing logged yet today.';
+    const part = {}; log.forEach(x => { const m = x.match(/ (web|apps|picked) (\d+)m$/); if (m) part[m[1]] = Math.max(part[m[1]] || 0, +m[2]); });
+    const partLine = '<br>Old way (picked categories): '+(part.picked ? fmtTime(part.picked) : 'none yet')+'<br>Websites only: '+(part.web ? fmtTime(part.web) : 'none yet')+' · Apps only: '+(part.apps ? fmtTime(part.apps) : 'none yet');
+    const lines = log.filter(x => !/ cat \d+:| (web|apps|picked) \d+m$/.test(x)).slice().reverse().map(x => esc(x)).join('<br>') || 'Nothing logged yet today.';
     modal('<h2>🔍 Screen Time check</h2><p class="muted small" style="text-align:left">Day: '+day+'<br>Blip\'s total so far: <b>'+(stToday == null ? 'none' : fmtTime(stToday))+'</b><br>'+
       'Counting: '+(r.categories || 0)+' categories, '+(r.apps || 0)+' apps, '+(r.webDomains || 0)+' websites<br>Watching: '+esc(((r && r.watching) || []).join(', ') || 'nothing')+catLine+partLine+'</p>'+
       '<div style="text-align:left;font-family:ui-monospace,Menlo,monospace;font-size:13px;max-height:45vh;overflow:auto;background:#f6f3ff;border-radius:12px;padding:10px">'+lines+'</div>'+

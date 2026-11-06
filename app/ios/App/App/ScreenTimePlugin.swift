@@ -90,69 +90,46 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
             intervalStart: DateComponents(hour: 0, minute: 0),
             intervalEnd: DateComponents(hour: 23, minute: 59, second: 59),
             repeats: true)
+        // The counter watches ALL apps and websites: an event with no apps, categories or websites "includes all
+        // applications, categories, and web domains" (Apple's DeviceActivityEvent docs). Category picks miss Safari,
+        // which sits in no category, and most websites. Nov 6 test: picked categories counted 1h, iPhone said 2h21m.
         var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
         for m in stride(from: stepMinutes, through: maxMinutes, by: stepMinutes) {
             let name = DeviceActivityEvent.Name("m\(m)")
             if #available(iOS 17.4, *) {
-                events[name] = DeviceActivityEvent(
-                    applications: selection.applicationTokens,
-                    categories: selection.categoryTokens,
-                    webDomains: selection.webDomainTokens,
-                    threshold: DateComponents(minute: m),
-                    includesPastActivity: true)
+                events[name] = DeviceActivityEvent(applications: [], categories: [], webDomains: [], threshold: DateComponents(minute: m), includesPastActivity: true)
             } else {
-                events[name] = DeviceActivityEvent(
-                    applications: selection.applicationTokens,
-                    categories: selection.categoryTokens,
-                    webDomains: selection.webDomainTokens,
-                    threshold: DateComponents(minute: m))
+                events[name] = DeviceActivityEvent(applications: [], categories: [], webDomains: [], threshold: DateComponents(minute: m))
             }
         }
         let center = DeviceActivityCenter()
         center.stopMonitoring([.daily])
         try center.startMonitoring(.daily, during: schedule, events: events)
-        log(d, "counter started (" + reason + ")")
-        // TestFlight check: a second watcher with one counter per picked category (15-minute steps up to 4 hours), logged only.
-        // Shows which category Blip undercounts next to iPhone Screen Time's category totals.
-        // Stable numbering across restarts: sort the opaque tokens by their encoded bytes.
-        let cats = selection.categoryTokens.map { t -> (String, ActivityCategoryToken) in ((try? JSONEncoder().encode(t))?.base64EncodedString() ?? "", t) }.sorted { $0.0 < $1.0 }.map { $0.1 }
-        if !cats.isEmpty {
-            var catEvents: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
-            for (i, t) in cats.enumerated() {
-                for m in stride(from: 15, through: 240, by: 15) {
-                    let name = DeviceActivityEvent.Name("c\(i + 1)_\(m)")
-                    if #available(iOS 17.4, *) {
-                        catEvents[name] = DeviceActivityEvent(categories: [t], threshold: DateComponents(minute: m), includesPastActivity: true)
-                    } else {
-                        catEvents[name] = DeviceActivityEvent(categories: [t], threshold: DateComponents(minute: m))
-                    }
-                }
-            }
-            let catsName = DeviceActivityName("cats")
-            center.stopMonitoring([catsName])
-            do { try center.startMonitoring(catsName, during: schedule, events: catEvents) }
-            catch { log(d, "category watcher failed: " + error.localizedDescription) }
-        }
-        // TestFlight check: two more watchers, websites only and picked apps only (5-minute steps up to 4 hours), logged only.
-        // Shows whether the missing minutes are web browsing (Safari) or apps.
-        func part(_ name: String, apps: Set<ApplicationToken>, webs: Set<WebDomainToken>) {
-            guard !apps.isEmpty || !webs.isEmpty else { return }
+        log(d, "counter started, all apps and websites (" + reason + ")")
+        // The old per-category watcher ("cats") is retired: the "picked", "web" and "apps" watchers below replace it.
+        center.stopMonitoring([DeviceActivityName("cats")])
+        // TestFlight check: three watchers that are logged only, never counted: websites only, picked apps only, and the old
+        // picked-categories counter. They show what the all-activity counter adds compared with the old way.
+        func part(_ name: String, apps: Set<ApplicationToken> = [], cats: Set<ActivityCategoryToken> = [], webs: Set<WebDomainToken> = [], upTo: Int = 240) {
+            guard !apps.isEmpty || !cats.isEmpty || !webs.isEmpty else { return }
             var ev: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
-            for m in stride(from: stepMinutes, through: 240, by: stepMinutes) {
+            for m in stride(from: Self.stepMinutes, through: upTo, by: Self.stepMinutes) {
                 let n = DeviceActivityEvent.Name("\(name)\(m)")
                 if #available(iOS 17.4, *) {
-                    ev[n] = DeviceActivityEvent(applications: apps, webDomains: webs, threshold: DateComponents(minute: m), includesPastActivity: true)
+                    ev[n] = DeviceActivityEvent(applications: apps, categories: cats, webDomains: webs, threshold: DateComponents(minute: m), includesPastActivity: true)
                 } else {
-                    ev[n] = DeviceActivityEvent(applications: apps, webDomains: webs, threshold: DateComponents(minute: m))
+                    ev[n] = DeviceActivityEvent(applications: apps, categories: cats, webDomains: webs, threshold: DateComponents(minute: m))
                 }
             }
             let a = DeviceActivityName(name)
             center.stopMonitoring([a])
             do { try center.startMonitoring(a, during: schedule, events: ev) }
-            catch { log(d, name + " watcher failed: " + error.localizedDescription) }
+            catch { Self.log(d, name + " watcher failed: " + error.localizedDescription) }
         }
-        part("web", apps: [], webs: selection.webDomainTokens)
-        part("apps", apps: selection.applicationTokens, webs: [])
+        part("web", webs: selection.webDomainTokens)
+        part("apps", apps: selection.applicationTokens)
+        // The old way (the player's picked apps, categories and websites), side by side with the new all-activity counter.
+        part("picked", apps: selection.applicationTokens, cats: selection.categoryTokens, webs: selection.webDomainTokens, upTo: 480)
         log(d, d?.bool(forKey: "entireCategory") == true ? "whole categories incl. websites: on" : "whole categories incl. websites: OFF (re-pick in Change what counts)")
     }
 

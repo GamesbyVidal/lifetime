@@ -58,9 +58,12 @@ class MonitorExtension: DeviceActivityMonitor {
         super.eventDidReachThreshold(event, activity: activity)
         // TestFlight check: per-category steps ("c3_45" = category #3 passed 45 minutes). Logged only, never counted.
         if activity == DeviceActivityName("cats") { log("cat " + event.rawValue.dropFirst().replacingOccurrences(of: "_", with: ": ") + "m"); return }
-        // TestFlight check: websites-only ("web45") and apps-only ("apps45") watchers. Logged only, never counted.
-        if activity == DeviceActivityName("web") || activity == DeviceActivityName("apps") { log(activity.rawValue + " " + event.rawValue.drop(while: { $0.isLetter }) + "m"); return }
+        // TestFlight check: websites-only ("web45"), apps-only ("apps45") and old picked-apps ("picked45") watchers. Logged only, never counted.
+        if ["web", "apps", "picked"].contains(activity.rawValue) { log(activity.rawValue + " " + event.rawValue.drop(while: { $0.isLetter }) + "m"); return }
         guard let m = Int(event.rawValue.dropFirst()) else { return }
+        // iOS 26 sometimes fires steps that can't be real yet (developer forums). A day can't hold more minutes than have passed since midnight.
+        let sinceMidnight = Int(Date().timeIntervalSince(Calendar.current.startOfDay(for: Date())) / 60)
+        if m > sinceMidnight + 1 { log("\(m)m ignored (too early)"); return }
         log("\(m)m")
         let key = "minutes-" + today()
         if m > (defaults?.integer(forKey: key) ?? 0) { defaults?.set(m, forKey: key) }
