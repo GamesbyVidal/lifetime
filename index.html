@@ -1685,11 +1685,14 @@ function tapDog(){
 // In the phone app, visits show under /lifetime-app/ and events start with "lifetime-app-".
 const onRealSite = location.hostname === 'gamesbyvidal.github.io' || IS_APP;
 // The phone app runs no downloaded code (App Review 2.5.2/2.5.19): it sends GoatCounter's plain counting pixel instead of count.js.
+// If the player said they're under 13 (the optional Time back age), this phone sends no stats at all.
+function statsOK(){ const a = playerAge(); return !(a > 0 && a < 13); }
 function gcHit(path, title, event){
+  if (!statsOK()) return;
   try { new Image().src = 'https://gamesbyvidal.goatcounter.com/count?p='+encodeURIComponent(path)+'&t='+encodeURIComponent(title)+(event ? '&e=true' : '')+'&rnd='+Math.random().toString(36).slice(2); } catch(e) {}
 }
 if (onRealSite && IS_APP) gcHit('/lifetime-app/', document.title, false);
-else if (onRealSite) {
+else if (onRealSite && statsOK()) {
   const counter = document.createElement('script');
   counter.async = true;
   counter.src = 'https://gc.zgo.at/count.js';
@@ -1698,7 +1701,7 @@ else if (onRealSite) {
 }
 const trackQueue = [];
 function track(name){
-  if (!onRealSite) return;
+  if (!onRealSite || !statsOK()) return;
   if (IS_APP) return gcHit('lifetime-app-'+name, 'Lifetime: '+name, true);
   const send = n => { try { window.goatcounter.count({path:'lifetime-'+n, title:'Lifetime: '+n, event:true}); } catch(e) {} };
   if (window.goatcounter && window.goatcounter.count) send(name);
