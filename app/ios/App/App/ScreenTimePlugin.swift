@@ -162,6 +162,7 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
     // day: "YYYY-MM-DD" in the phone's time zone. Returns the highest 5-minute step reached, or null.
     @objc func minutesFor(_ call: CAPPluginCall) {
         let day = call.getString("day") ?? ""
+        defaults?.synchronize() // pick up steps the background counter just wrote
         if let m = defaults?.object(forKey: "minutes-" + day) as? Int { call.resolve(["minutes": m]) }
         else { call.resolve(["minutes": NSNull()]) }
     }

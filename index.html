@@ -769,7 +769,7 @@ let stSyncAt = 0;
 function stResync(){
   const p = stPlugin(); if (!p || !autoOn() || !p.resync || Date.now() - stSyncAt < 60000) return;
   stSyncAt = Date.now();
-  p.resync().then(r => { if (r && r.resynced) { setTimeout(stRefresh, 2500); setTimeout(stRefresh, 8000); } }).catch(() => {});
+  p.resync().then(r => { if (r && r.resynced) [2500, 8000, 20000, 60000].forEach(ms => setTimeout(stRefresh, ms)); }).catch(() => {});
 }
 function stOff(note){ if (!S) return; S.auto = false; stToday = null; stYest = null; stNote = note || ''; save(); render(); }
 function stConnect(){
@@ -4213,6 +4213,8 @@ if (remind.on) remindSync(); // keeps the reminder's Blip name current (new gene
 if (MORNING && stPlugin()) stPlugin().env().then(r => { if (r && r.testflight) { TESTFLIGHT = true; if (tab === 'settings') render(); } else if (S && S.testMode) { S.testMode = false; save(); render(); } }).catch(() => {});
 stRefresh();
 setTimeout(stResync, 1500);
+// iOS sends the 5-minute steps in the background, sometimes minutes later. Re-read them every 30 seconds while Blip is on screen.
+setInterval(() => { if (document.visibilityState === 'visible' && S) stRefresh(); }, 30000);
 </script>
 </body>
 </html>
