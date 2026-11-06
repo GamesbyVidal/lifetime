@@ -1210,6 +1210,10 @@ function dayKey(n){ const d = new Date(n * 864e5); return d.getUTCFullYear()+'-'
 function canCheckIn(){ return S.testMode || S.lastDate !== today(); }
 function clamp(v){ return Math.max(0, Math.min(100, Math.round(v))); }
 function fmtTime(m){ const h = Math.floor(m/60), mm = m%60; return h ? (mm ? h+'h '+mm+'m' : h+'h') : mm+'m'; }
+// Live Screen Time arrives in 5-minute steps (rounded down), so the true number is somewhere in the next 5 minutes.
+// Showing that range means iPhone's own Screen Time number almost always sits inside it.
+function fmtRange(m){ const a = fmtTime(m), b = fmtTime(m + 5), ah = Math.floor(m/60), bh = Math.floor((m+5)/60);
+  return ah && ah === bh && m % 60 ? a.replace(/m$/, '')+'–'+(m+5)%60+'m' : !ah && !bh ? m+'–'+(m+5)+'m' : a+'–'+b; }
 function fmtMoney(k){ if (k < 0) return '-'+fmtMoney(-k); if (k >= 1000) return '$'+(k/1000).toFixed(k >= 10000 ? 0 : 1)+'M'; return '$'+Math.round(k)+'K'; }
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
@@ -1998,7 +2002,7 @@ function todayMeterHTML(){
   if (!MORNING || !autoOn() || stToday == null) return '';
   const m = Math.min(960, stToday), pct = Math.min(100, Math.round(m / Math.max(1, S.goal) * 100)), over = m > S.goal;
   return '<div class="card" data-tap="goal"><h2 style="margin:0 0 6px">📱 Today so far</h2>'+
-    '<div class="goalnote"><span><b>'+fmtTime(m)+'</b> of your '+fmtTime(S.goal)+' goal</span><span>'+(over ? 'Over' : fmtTime(S.goal - m)+' left')+'</span></div>'+
+    '<div class="goalnote"><span><b>'+fmtRange(m)+'</b> of your '+fmtTime(S.goal)+' goal</span><span>'+(over ? 'Over' : 'About '+fmtTime(S.goal - m)+' left')+'</span></div>'+
     '<i class="nbar"><u style="width:'+pct+'%'+(over ? ';background:var(--bad)' : '')+'"></u></i>'+
     '<p class="muted small" style="margin:8px 0 0">'+(joinedNote(stDayKey()) ? joinedNote(stDayKey())+' ' : '')+'Nothing is decided until the day ends. Every minute until midnight counts.</p></div>';
 }
@@ -3133,8 +3137,8 @@ function windowHTML(){
   return '<div class="card wincard" data-up="'+(over || near ? 0 : 1)+'"><div class="wart">'+art+'<div class="bubble wbub" id="wbub"></div>'+(pill ? '<span class="wpill" data-tap="dog">'+pill+'</span>' : '')+(SHOP_ON ? closetBtnHTML() : '')+
       '<div class="wname" data-tap="life">'+n+' · '+S.age+'</div></div>'+
       '<div class="chips">'+chip('💪', S.h, 'var(--h)', 'h')+chip('🧠', S.s, 'var(--s)', 's')+chip('😊', S.j, 'var(--j)', 'j')+'</div></div>'+
-    '<div class="card wpanel"><div class="wm" data-tap="goal"><div class="wml"><span>📱 Today so far</span><b style="color:'+col+'">'+(over ? fmtTime(m - g)+' over' : fmtTime(g - m)+' left')+'</b></div>'+
-      '<div class="wmv"><b>'+fmtTime(m)+'</b> of your '+fmtTime(g)+' goal</div><div class="wbar"><u style="width:'+pct+'%;background:'+col+'"></u></div></div>'+
+    '<div class="card wpanel"><div class="wm" data-tap="goal"><div class="wml"><span>📱 Today so far</span><b style="color:'+col+'">'+(over ? fmtTime(m - g)+'+ over' : 'About '+fmtTime(g - m)+' left')+'</b></div>'+
+      '<div class="wmv"><b>'+fmtRange(m)+'</b> of your '+fmtTime(g)+' goal</div><div class="wbar"><u style="width:'+pct+'%;background:'+col+'"></u></div></div>'+
       '<div class="wrow"><div class="wst" data-tap="streak"><span>🔥</span><b>'+S.streak+'</b><small>day streak</small></div>'+tease+'</div>'+
       '<button class="btn wdown" id="phonedown">Put my phone down 👋</button></div>';
 }
