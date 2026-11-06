@@ -246,16 +246,46 @@ h2.ci{margin:0 0 2px;font-size:20px}
 .stop{flex:1;min-width:0;text-align:center;position:relative;font-size:11px;line-height:1.2}.stop .dot{width:38px;height:38px;margin:0 auto 4px;border-radius:50%;background:#f1edff;border:3px solid #3b2a4a;display:grid;place-items:center;font-size:18px;overflow:hidden}
 .stop .dot svg{width:100%;height:100%}.stop b{display:block;font-size:14px}.stop span{color:var(--soft)}.stop.now .dot{background:#9be08f}.stop.next .dot{background:#ffe26b;transform:scale(1.12);box-shadow:0 0 0 5px rgba(255,226,107,.45)}
 .tmr{margin-top:12px;padding:10px 12px;background:#fff6dc;border-radius:14px;font-size:14px}
+.yrow{display:flex;gap:8px;align-items:stretch}.yrow .btn{flex:1;margin:0}.yrow .yshare{flex:0 0 38%}
+.shrow{display:flex;gap:8px;margin-top:8px}.shrow .btn{flex:1;margin:0;font-size:15px;padding-left:6px;padding-right:6px}.shsheet .shwrap{max-width:260px}
 .shwrap{position:relative;margin:10px auto 12px;max-width:300px;aspect-ratio:4/5;border-radius:18px;overflow:hidden;background:#f1edff}.shload{position:absolute;inset:0;display:grid;place-items:center;color:var(--soft);font-size:14px}
 .shimg{position:relative;display:block;width:100%;height:100%;opacity:0;transition:opacity .3s}.shimg.on{opacity:1}.btn.sharebtn{background:linear-gradient(90deg,#ff7a59,#ff5a8a);color:#fff;margin-top:12px}.btn.sharebtn:disabled{opacity:.5}
 .meet .mscene{margin:14px 0;border-radius:20px;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 24px rgba(20,10,60,.3)}.meet .mscene svg{display:block;width:100%;height:auto}.meet .where{color:#3b2a4a;text-align:left}
 .meet .chal{background:#fff6dc;color:#3b2a4a;border-radius:16px;padding:12px;font-size:14px;margin:14px 0;text-align:left;line-height:1.35}
-.tbig{text-align:center;background:linear-gradient(135deg,#fff8e1,#e8fff0)}.tbig .k{font-size:13px;font-weight:600;color:#7c5cff;margin-bottom:6px}.tbig .n{font:700 52px Fredoka,system-ui;color:#2b2350;line-height:1}.tbig .n em{font-size:24px;font-style:normal;color:#7a7195;margin:0 4px 0 2px}.tbig .l{color:#7a7195;margin-top:4px}
-.tbig .eq{margin-top:14px;background:#fff;border-radius:14px;padding:10px;font-size:15px}
+.tbcard{text-align:center;background:linear-gradient(135deg,#fff8e1,#e8fff0)}.tbcard .k{font-size:13px;font-weight:600;color:#7c5cff;margin-bottom:6px}.tbcard .n{font:700 52px Fredoka,system-ui;color:#2b2350;line-height:1}.tbcard .n em{font-size:24px;font-style:normal;color:#7a7195;margin:0 4px 0 2px}.tbig .l{color:#7a7195;margin-top:4px}
+.tbcard .eq{margin-top:14px;background:#fff;border-radius:14px;padding:10px;font-size:15px}
 .tbars{display:flex;gap:6px;align-items:flex-end;height:118px;margin-top:10px}.tbars div{flex:1;min-width:0;text-align:center;font-size:10px;color:#7a7195}.tbars i{display:block;background:linear-gradient(#5cc26b,#3fae5a);border-radius:8px 8px 3px 3px;margin:0 auto 3px;width:70%;min-height:4px}.tbars b{display:block;color:#2b2350;white-space:nowrap}
 .pace{margin-top:12px;background:#eef6ff;border-radius:14px;padding:10px;font-size:14px}
 .tr{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid #f0ecfb;opacity:.6}.tr.on{opacity:1}.tr>span{font-size:24px;width:32px;text-align:center}.tr>div{flex:1;min-width:0}.tr b{display:block;font-size:15px}.tr small{color:#7a7195}.tr .when{color:#7c5cff;font-weight:600}.tr>i{font-style:normal}.tr .nbar{margin-top:5px}.tr .nbar u{background:#ffc23d}
 .tshare{text-align:center}.tshare h2{margin:0 0 2px}
+.tbhero,.tbwk,.tbideas,.tbpcard{border:3px solid #3b2a4a;border-radius:22px;box-shadow:0 5px 0 rgba(0,0,0,.28);color:#3b2a4a}
+.tbhero h3,.tbwk h3,.tbideas h3,.tbpcard h3{margin:0;font-size:18px;line-height:1.2}
+.tbhero{padding:0;overflow:hidden;background:#fff3dc}.tbsky{position:relative;height:216px;text-align:center;border-bottom:3px solid #3b2a4a}.tbbd{position:absolute;inset:0;width:100%;height:100%}
+.tbn{position:relative;padding-top:18px;font:700 58px Fredoka,system-ui;line-height:1;color:#3b2a4a;text-shadow:0 3px 0 #fff}.tbn em{font-size:26px;font-style:normal;color:#7a6f8f;margin:0 4px 0 1px}
+.tbl{position:relative;display:inline-block;margin-top:6px;font-size:14px;font-weight:500;background:rgba(255,255,255,.85);border-radius:99px;padding:2px 10px}
+.tbbody{padding:14px}.tbrib{display:flex;gap:8px;align-items:center;width:100%;text-align:left;background:#ffe08a;border:2.5px solid #3b2a4a;border-radius:14px;padding:8px 12px;font:inherit;font-size:14.5px;line-height:1.3;color:#3b2a4a}.tbrib svg{flex:none}.tbrib.ask{cursor:pointer}
+.tbeq{display:flex;gap:9px;align-items:center;margin-top:10px;background:#fffaf0;border:2.5px solid #3b2a4a;border-radius:14px;padding:8px 12px;font-size:14.5px;line-height:1.3;text-align:left}.tbeq .eb{flex:none;font-size:22px}
+.tbwh{display:flex;gap:10px;align-items:center;margin-bottom:6px;text-align:left}.tbhi{flex:none;width:36px;height:36px;border-radius:12px;border:2.5px solid #3b2a4a;display:flex;align-items:center;justify-content:center;font-size:19px}
+.tbsub{margin:2px 0 0;font-size:12.5px;color:#7a6f8f;line-height:1.3}
+.tbwk{background:#fff6ec}.tbch{display:flex;justify-content:space-around;align-items:flex-end;margin:12px 4px 0;border-bottom:3px solid #3b2a4a;text-align:center}.tbcw{display:flex;flex-direction:column;align-items:center;width:100px}
+.tbv{font-size:24px;line-height:1.05}.tbcw .ad{display:block;font-size:12px;color:#7a6f8f;margin-bottom:5px}.tbc{width:76px;border:3px solid #3b2a4a;border-bottom:0;border-radius:22px 22px 0 0}
+.tbarr{width:58px;display:flex;flex-direction:column;align-items:center;margin-bottom:34px}.tbarr span{font-size:14px;font-weight:700;color:#2f8a40;background:#dff5e2;border:2px solid #3b2a4a;border-radius:99px;padding:0 7px;line-height:20px;margin-bottom:2px}
+.tbrow{display:flex;justify-content:space-around;margin-top:6px;text-align:center}.tbun{display:flex;flex-direction:column;width:100px}.tbun .cl{font-weight:700;font-size:14.5px}.tbun .cs{font-size:12px;color:#7a6f8f;line-height:1.25}
+.tbwin{margin-top:12px;background:#dff5e2;border:2.5px solid #3b2a4a;border-radius:14px;padding:7px 10px;font-size:13.5px;text-align:center}
+.tbbest{margin-top:10px;display:flex;gap:6px;align-items:center;justify-content:center;background:#fff1b8;border:2.5px solid #3b2a4a;border-radius:14px;padding:5px 8px;font-size:12.5px}.tbbest b{color:#a86400}.tbbest svg{flex:none}
+.tbideas{background:#fffaf0}.tbir{display:flex;gap:11px;align-items:center;padding:6px 2px;border-top:2px dotted #eadfcf;text-align:left}.tbir>div{flex:1;min-width:0}.tbir b{display:block;font-size:14px;line-height:1.2}.tbir small{color:#7a6f8f;font-size:12.5px}
+.tbib{flex:none;width:38px;height:38px;border-radius:12px;border:2.5px solid #3b2a4a;display:flex;align-items:center;justify-content:center;font-size:21px}
+.tbck{flex:none;width:24px;height:24px;border-radius:50%;background:#5cc26b;border:2.5px solid #3b2a4a;display:flex;align-items:center;justify-content:center}
+.tbir.lock .tbib{border-style:dashed;opacity:.65}.tbir.lock b{color:#8a7fa0}.tblk{font-style:normal;font-size:16px;opacity:.75}
+.tbnb{display:block;height:9px;border:2px solid #3b2a4a;border-radius:99px;background:#f1edff;overflow:hidden;margin:5px 0 2px}.tbnb u{display:block;height:100%;background:#ffc23d}.tbpc{font-weight:600;color:#b26b00!important}
+.tbpcard{position:relative;background:#fffdf6;padding:12px}.tbpcard:before{content:"";position:absolute;inset:5px;border-radius:15px;border:5px solid transparent;background:repeating-linear-gradient(135deg,#ff6b6b 0 9px,#fffdf6 9px 16px,#7c5cff 16px 25px,#fffdf6 25px 32px) border-box;-webkit-mask:linear-gradient(#000 0 0) padding-box exclude,linear-gradient(#000 0 0) border-box;-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) padding-box exclude,linear-gradient(#000 0 0) border-box;opacity:.85;pointer-events:none}
+.tbpin{position:relative;display:flex;gap:8px;align-items:flex-start;padding:8px 6px 0;text-align:left}.tbpl{flex:1;min-width:0}.tbpl h3{font-size:19px;margin-top:4px}
+.tbptx{position:relative;margin:10px 6px 0;padding-top:10px;border-top:2px dashed #cbbfd9;font-size:14px;line-height:1.38;text-align:left}.tbpr{position:relative;flex:none;width:68px}
+.tbstamp{position:relative;width:64px;height:76px;padding:5px;transform:rotate(5deg);background:radial-gradient(circle,#fffdf6 2.6px,transparent 3px) -4px -4px/8px 8px,#fff;filter:drop-shadow(0 2px 2px rgba(59,42,74,.35))}
+.tbstamp .sin{width:100%;height:48px;background:#bfe6ff;border:2px solid #3b2a4a;overflow:hidden}.tbstamp span{display:block;text-align:center;font-size:10px;font-weight:700;letter-spacing:1.5px;color:#7c5cff;margin-top:2px}
+.tbpm{position:absolute;left:-16px;top:58px;width:62px;opacity:.85;z-index:2}
+.tbgo{position:relative;width:100%;margin-top:14px;border:2.5px solid #3b2a4a;border-radius:16px;padding:11px;font:600 17px Fredoka,system-ui;color:#fff;text-shadow:0 1px 0 rgba(59,42,74,.45);background:linear-gradient(90deg,#ff9f43,#ff6b6b);box-shadow:0 4px 0 #3b2a4a;cursor:pointer}
+.tbfine{position:relative;text-align:center;margin:10px 0 2px;font-size:12px;color:#7a6f8f}
 .tgh{font-weight:600;margin:14px 0 6px;font-size:15px}.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .tile{background:#f4f1fb;border:0;border-radius:14px;padding:6px 3px 8px;text-align:center;font-size:11px;line-height:1.2;color:var(--ink)}.tile svg{display:block;margin:0 auto}.tile b{display:block;font-size:11.5px;margin-top:2px;font-weight:600}.tile span{color:var(--soft)}
 .tile.got{background:linear-gradient(180deg,#fff6d6,#fff);box-shadow:inset 0 0 0 2px #ffd970}.tile.got span{color:#2fae5b;font-weight:600}.tbar{display:block;height:5px;border-radius:9px;background:#e2ddf0;margin:4px 6px 0;overflow:hidden}.tbar u{display:block;height:100%;background:#ffc23d}
@@ -1468,7 +1498,7 @@ function lifeTitle(score){
 function charSVG(c){
   const st = stage(c.age);
   const last = c.log && c.log.length ? c.log[c.log.length-1] : null;
-  const sad = (last && !(last.tier === 'good' || last.tier === 'great' || last.tier === 'restored' || last.tier === 'quiet')) || c.j < 30;
+  const sad = c.mood ? c.mood === 'sad' : ((last && !(last.tier === 'good' || last.tier === 'great' || last.tier === 'restored' || last.tier === 'quiet')) || c.j < 30);
   const O = '#3b2a4a', W = 'stroke="'+O+'" stroke-width="3.5"';
   const sc = {baby:.62, kid:.8, middle:.86, teen:.92, young:.97, adult:1, senior:.95}[st];
   const hair = st === 'senior' ? '#e9e7ef' : c.hair;
@@ -1485,18 +1515,20 @@ function charSVG(c){
   let g = '', b = '';
 
   // background mood: warm glow or a little rain cloud
-  if (!sad) g += '<circle cx="100" cy="122" r="86" fill="#fff6c9" opacity=".75"/>';
+  if (c.nobg) {} else if (!sad) g += '<circle cx="100" cy="122" r="86" fill="#fff6c9" opacity=".75"/>';
   else g += '<g><ellipse cx="146" cy="26" rx="26" ry="14" fill="#a9b0bb"/><ellipse cx="124" cy="30" rx="18" ry="11" fill="#a9b0bb"/><path d="M128 44 l-3 8 M142 44 l-3 8 M156 44 l-3 8" stroke="#5aa9ff" stroke-width="3" stroke-linecap="round"/></g>';
-  g += '<ellipse cx="100" cy="230" rx="'+(46*sc)+'" ry="7" fill="rgba(0,0,0,.12)"/>';
+  if (!c.nobg) g += '<ellipse cx="100" cy="230" rx="'+(46*sc)+'" ry="7" fill="rgba(0,0,0,.12)"/>';
 
   b += '<g transform="translate(100 230) scale('+sc+') translate(-100 -230)">';
   // long hair hangs behind the shoulders
   if (c.girl && ['teen','young','adult'].includes(st)) b += '<path d="M50 84 Q46 38 100 34 Q154 38 150 84 L156 146 Q128 154 100 152 Q72 154 44 146Z" fill="'+hair+'" '+W+' stroke-linejoin="round"'+(sad ? ' transform="rotate(8 100 90)"' : '')+'/>';
   if (st === 'teen' || (st === 'young' && !c.edu)) b += '<ellipse cx="100" cy="122" rx="40" ry="16" fill="'+shirt+'" '+W+'/>'; // hood
-  // legs and shoes
+  // legs and shoes (a scene pose can draw its own)
+  if (c.legs) b += c.legs(st, st === 'baby' ? shirt : pants, W); else {
   const legH = st === 'baby' ? 26 : 40;
   b += '<rect x="80" y="'+(216-legH)+'" width="15" height="'+legH+'" rx="7" fill="'+(st === 'baby' ? shirt : pants)+'" '+W+'/><rect x="105" y="'+(216-legH)+'" width="15" height="'+legH+'" rx="7" fill="'+(st === 'baby' ? shirt : pants)+'" '+W+'/>';
   b += '<ellipse cx="86" cy="218" rx="13" ry="7" fill="#fff" '+W+'/><ellipse cx="114" cy="218" rx="13" ry="7" fill="#fff" '+W+'/>';
+  }
   const bodyY = st === 'baby' ? 128 : 118, bodyH = st === 'baby' ? 66 : 66;
   // arms (a missed year means the phone is in their hand, glowing at their face)
   const ay = sad ? bodyY + 14 : bodyY + 10;
@@ -1505,17 +1537,17 @@ function charSVG(c){
   const handAt = (x, h, a, px) => { const lx = x + arm/2, ly = ay + h - arm*.22, r = a*Math.PI/180, dx = lx - px, dy = ly - ay;
     const cx = px + dx*Math.cos(r) - dy*Math.sin(r), cy = ay + dx*Math.sin(r) + dy*Math.cos(r);
     hands.push('<ellipse cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" rx="'+(arm*.62).toFixed(1)+'" ry="'+(arm*.55).toFixed(1)+'" fill="'+c.skin+'" '+W+' transform="rotate('+a+' '+cx.toFixed(1)+' '+cy.toFixed(1)+')"/>');
-    return [cx, cy]; };
-  b += '<rect x="'+(bodyX-arm+4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate('+(sad?4:14)+' '+(bodyX+4)+' '+ay+')"/>';
-  handAt(bodyX-arm+4, 44, sad?4:14, bodyX+4);
+    (c._h = c._h || []).push([cx, cy]); return [cx, cy]; };
+  b += '<rect x="'+(bodyX-arm+4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate('+((c.la!=null?c.la:(sad?4:14)))+' '+(bodyX+4)+' '+ay+')"/>';
+  handAt(bodyX-arm+4, 44, (c.la!=null?c.la:(sad?4:14)), bodyX+4);
   let phone = '';
-  if ((sad || c.pose === 'phone') && st !== 'baby') {
+  if ((c.phone != null ? c.phone : (sad || c.pose === 'phone')) && st !== 'baby') {
     b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="40" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate(-40 '+(bodyX+bodyW+4)+' '+ay+')"/>';
     const [hx, hy] = handAt(bodyX+bodyW-4, 40, -40, bodyX+bodyW+4);
     // the phone sits in the raised mitten, glowing at their face
     phone = '<g transform="translate('+(hx-154).toFixed(1)+' '+(hy-153).toFixed(1)+')"><rect x="146" y="128" width="16" height="26" rx="3" fill="#222" stroke="'+O+'" stroke-width="2.5"/><rect x="148" y="131" width="12" height="18" fill="#7fd1ff"/><path d="M146 132 L112 104 L112 120Z" fill="#7fd1ff" opacity=".35"/></g>';
   } else {
-    const ra = c.pose === 'wave' ? -118 : -14;   // a wave raises the right arm over the head
+    const ra = c.ra != null ? c.ra : (c.pose === 'wave' ? -118 : -14);   // a wave raises the right arm over the head
     b += '<rect x="'+(bodyX+bodyW-4)+'" y="'+ay+'" width="'+arm+'" height="44" rx="'+(arm/2)+'" fill="'+shirt+'" '+W+' transform="rotate('+ra+' '+(bodyX+bodyW-4)+' '+ay+')"/>';
     handAt(bodyX+bodyW-4, 44, ra, bodyX+bodyW-4);
   }
@@ -1534,7 +1566,7 @@ function charSVG(c){
   if (st === 'senior') b += (outfit ? '' : '<circle cx="100" cy="140" r="3" fill="'+O+'"/><circle cx="100" cy="156" r="3" fill="'+O+'"/><circle cx="100" cy="172" r="3" fill="'+O+'"/>')+
     (sad ? '' : '<path d="M150 150 L156 220 M150 150 q-2 -12 -12 -8" stroke="#8a5a34" stroke-width="6" fill="none" stroke-linecap="round"/>');
 
-  b += phone + hands.join('');
+  b += phone + (c.held ? c.held(c._h || [], st) : '') + hands.join('') + (c.over ? c.over(c._h || [], st) : '');
   // head
   b += '<g'+(sad ? ' transform="rotate(8 100 90)"' : '')+'>';
   if (c.girl) {
@@ -1557,19 +1589,21 @@ function charSVG(c){
   if (st === 'young' && c.edu) b += '<path d="M58 40 L100 22 L142 40 L100 58Z" fill="#2b2350" '+W+' stroke-linejoin="round"/><path d="M140 40 L144 64" stroke="#f5b700" stroke-width="3"/><circle cx="144" cy="66" r="5" fill="#f5b700"/>';
   // face
   if (!sad) {
-    for (const x of [82,118]) b += '<ellipse cx="'+x+'" cy="92" rx="8" ry="10" fill="#2b1d3a"/><circle cx="'+(x-3)+'" cy="88" r="3.2" fill="#fff"/><circle cx="'+(x+3)+'" cy="96" r="1.6" fill="#fff"/>';
+    if (c.mood === 'proud') for (const x of [82,118]) b += '<path d="M'+(x-9)+' 96 Q'+x+' 82 '+(x+9)+' 96" stroke="#2b1d3a" stroke-width="5" fill="none" stroke-linecap="round"/>';
+    else for (const x of [82,118]) b += '<ellipse cx="'+x+'" cy="92" rx="8" ry="10" fill="#2b1d3a"/><circle cx="'+(x-3)+'" cy="88" r="3.2" fill="#fff"/><circle cx="'+(x+3)+'" cy="96" r="1.6" fill="#fff"/>';
     if (c.girl) b += '<path d="M74 88 l-5 -3 M75 84 l-3 -5 M126 88 l5 -3 M125 84 l3 -5" stroke="'+O+'" stroke-width="2.5" stroke-linecap="round"/>';
     b += '<ellipse cx="70" cy="106" rx="8" ry="5" fill="#ff8fa3" opacity=".6"/><ellipse cx="130" cy="106" rx="8" ry="5" fill="#ff8fa3" opacity=".6"/>';
-    b += '<path d="M90 106 Q100 120 110 106 Z" fill="#a33a4f" stroke="'+O+'" stroke-width="2.5" stroke-linejoin="round"/><path d="M95 112 Q100 116 105 112" fill="#ff8fa3"/>';
+    if (!c.mouth) b += '<path d="M90 106 Q100 120 110 106 Z" fill="#a33a4f" stroke="'+O+'" stroke-width="2.5" stroke-linejoin="round"/><path d="M95 112 Q100 116 105 112" fill="#ff8fa3"/>';
   } else {
     for (const x of [82,118]) b += '<ellipse cx="'+x+'" cy="95" rx="7" ry="6" fill="#2b1d3a"/><path d="M'+(x-9)+' 92 L'+(x+9)+' 92" stroke="'+c.skin+'" stroke-width="6"/><path d="M'+(x-9)+' 92 L'+(x+9)+' 92" stroke="'+O+'" stroke-width="2.5"/><path d="M'+(x-7)+' 103 Q'+x+' 106 '+(x+7)+' 103" stroke="#9a7fa0" stroke-width="2" fill="none"/>';
     b += '<path d="M74 80 L88 84 M126 80 L112 84" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/>';
-    b += '<path d="M90 116 Q100 108 110 116" stroke="'+O+'" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M126 102 q-4 8 0 11 q4 -3 0 -11z" fill="#5aa9ff"/>';
+    if (!c.mouth) b += '<path d="M90 116 Q100 108 110 116" stroke="'+O+'" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M126 102 q-4 8 0 11 q4 -3 0 -11z" fill="#5aa9ff"/>';
   }
   if ((st === 'senior' || c.s >= 70) && !wear.face) b += '<g stroke="'+O+'" stroke-width="3" fill="rgba(255,255,255,.3)"><circle cx="82" cy="92" r="13"/><circle cx="118" cy="92" r="13"/><path d="M95 92 L105 92"/></g>';
+  if (c.face) b += c.face(sad);
   for (const k of ['neck', 'head', 'face']) if (wear[k] && GIFT.WEAR[wear[k]]) b += GIFT.WEAR[wear[k]].svg(); // gifts from the shop
   b += '</g></g>';
-  const sparkle = !sad && c.j >= 60 ? '<text x="26" y="70" font-size="20">✨</text><text x="152" y="120" font-size="16">✨</text>' : '';
+  const sparkle = !c.nobg && !sad && c.j >= 60 ? '<text x="26" y="70" font-size="20">✨</text><text x="152" y="120" font-size="16">✨</text>' : '';
   return '<svg viewBox="0 0 200 240"'+(wear.head ? ' overflow="visible"' : '')+' aria-label="'+esc(c.name)+'">'+g+sparkle+'<g class="bob">'+b+'</g></svg>';
 }
 
@@ -2463,9 +2497,8 @@ function showTrophies(){
   modal('<div class="tk">🏆 Trophy'+(list.length > 1 ? ' x'+list.length : '')+' earned!</div><div class="tpair">'+trophySVG(t, false, 120)+'<div class="tblip">'+charSVG(S)+'</div></div>'+
     '<h2>'+esc(t.name)+'</h2><p>'+esc(trophyBrag(t))+'</p>'+
     (rest.length ? '<div class="tmore">'+rest.map(r => '<span>'+trophySVG(r, false, 40)+esc(r.name)+'</span>').join('')+'</div>' : '')+
-    '<button class="btn sharebtn" id="trshare">📸 Share my trophy</button><button class="btn alt" data-close style="margin-top:10px">Nice!</button>', 'twin');
+    '<button class="btn alt" data-close style="margin-top:10px">Nice!</button>', 'twin');
   confetti(['🏆','✨','🎉','⭐']);
-  $('trshare').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); shareTrophy(t); };
 }
 function trophyBrag(t){
   if (t.k.startsWith('tb')) return 'You\'ve saved '+fmtHM(timeBack())+' by staying off your phone.';
@@ -2473,7 +2506,7 @@ function trophyBrag(t){
   if (t.invite) return 'Thanks for inviting '+(t.k === 'fr1' ? 'a friend' : t.have()[1]+' friends')+' to raise their own Blip!';
   return t.how.replace('Your Blip', S.name).replace(' after the first one turns '+SETTINGS.lifeLength, '');
 }
-function shareTrophy(t){ if (stUsed() && /^(st|tb)/.test(t.k)) return shareModal(null); shareModal({emoji:'🏆', title:'Trophy: '+t.name, text:trophyBrag(t)}); }
+function shareTrophy(t){ if (/^(st|tb)/.test(t.k)) return; shareModal({emoji:'🏆', title:S.name+' earned the '+t.name+' trophy!'}); }
 
 function trophyCaseHTML(){
   const got = trophyCase(), n = TROPHIES.filter(t => got[t.k]).length;
@@ -2500,7 +2533,7 @@ function trophyRowHTML(){
 function trophyInfo(k){
   const t = TROPHIES.find(x => x.k === k), e = trophyCase()[k], p = t.have();
   if (e) return modal('<div class="trbig">'+trophySVG(t, false, 130)+'</div><div class="tk">Earned</div><h2>'+esc(t.name)+'</h2><p>'+esc(t.how)+'</p>'+
-    '<p class="muted small">'+esc(e.name)+' was '+e.age+'.</p><button class="btn sharebtn" id="trshare">📸 Share my trophy</button><button class="btn ghost" data-close style="margin-top:10px">Close</button>');
+    '<p class="muted small">'+esc(e.name)+' was '+e.age+'.</p>'+(/^(st|tb)/.test(k) ? '' : '<button class="btn sharebtn" id="trshare">📤 Share</button>')+'<button class="btn ghost" data-close style="margin-top:10px">Close</button>');
   modal('<div class="trbig">'+trophySVG(t, true, 130)+'</div><div class="tk lk">Locked trophy</div><h2>'+esc(t.name)+'</h2><p>'+esc(t.how)+'<br><b>'+esc(t.prog(p))+'</b></p>'+
     '<i class="nbar tnb"><u style="width:'+Math.min(100, Math.round(Math.max(0, p[0]) / p[1] * 100))+'%"></u></i>'+
     (t.invite ? '<button class="btn sharebtn" id="trinvite">🤝 Invite a friend</button>' : '')+'<button class="btn ghost" data-close style="margin-top:10px">Close</button>');
@@ -2719,10 +2752,10 @@ function showPhoto(age){
   const e = S.log.find(x => x.age === age);
   if (!e) return;
   const t = TIER[e.tier];
-  const moment = e.ms ? {emoji:e.ms.emoji, title:e.ms.title, text:e.ms.text} : e.buys ? {emoji:'🔑', title:plain(buyLine(e.buys[0]))} : {emoji:e.emoji, title:e.text};
+  const moment = yearMoment(e);
   modal(polaroidHTML(e)+'<div class="phm"><span class="tpill" style="background:'+t.color+'">'+t.label+'</span><b>Age '+e.age+'</b></div>'+
     '<p class="phs">'+(e.ms ? '<b>'+e.ms.emoji+' '+esc(e.ms.title)+'.</b> '+esc(e.ms.text)+' ' : '')+(e.buys ? esc(e.text) : e.ms ? '' : '')+'</p>'+
-    '<button class="btn sharebtn" id="phshare">📸 Share this photo</button><button class="btn ghost" data-close style="margin-top:8px">Close</button>'+
+    '<button class="btn sharebtn" id="phshare">📤 Share</button><button class="btn ghost" data-close style="margin-top:8px">Close</button>'+
     (e.mins != null ? '<div class="ysmall">'+(e.src === 'st' ? 'That day\'s screen time: ' : '')+fmtTime(e.mins)+'</div>' : ''), 'yearpol');
   $('phshare').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); shareModal(moment); };
   document.querySelectorAll('.yearpol [data-stat]').forEach(b => b.onclick = ev => { ev.stopPropagation(); showStat(b.dataset.stat); });
@@ -2909,8 +2942,8 @@ function bind(){
   if ($('wblip')) $('wblip').onclick = () => { const c = document.querySelector('.wincard[data-up]'), say = $('wsay'); if (say) say.style.display = 'none'; tapCharacter('wblip', 'wbub', goodbye ? true : !c || c.dataset.up === '1'); };
   if ($('ydog')) $('ydog').onclick = tapDog;
   if ($('share')) $('share').onclick = () => shareModal(null);
-  if ($('tbpost')) $('tbpost').onclick = postTimeBack;
   if ($('tbinvite')) $('tbinvite').onclick = inviteFriend;
+  if ($('pageask')) $('pageask').onclick = askPlayerAge;
   const trTap = b => b.onclick = () => { trophyInfo(b.dataset.trophy);
     const t = TROPHIES.find(x => x.k === b.dataset.trophy);
     if ($('trshare')) $('trshare').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); shareTrophy(t); };
@@ -3276,19 +3309,371 @@ function showYears(list){
   showYear(list[0], () => showYears(list.slice(1)));
 }
 
+// ============ YEAR PHOTO SCENES ============
+// Each year photo acts out what happened: a place + props + a pose + a mood (the "scene kit").
+// Rules: phones only in bad-habit years, no screens in good years, only the player's Blip is drawn as a Blip
+// (other people are plain faceless shapes), mitten hands, no money amounts. Big moments get their own scene.
+const YS = (function(){
+const O = '#3b2a4a', W = w => 'stroke="'+O+'" stroke-width="'+(w||3)+'" stroke-linejoin="round" stroke-linecap="round"';
+const VW = 250, VH = 194, F = 156;
+const shadow = (cx, y, rx) => '<ellipse cx="'+cx+'" cy="'+(y+1)+'" rx="'+rx+'" ry="4.5" fill="rgba(59,42,74,.15)"/>';
+const icon = (k, x, y, w) => ICONS[k] ? '<svg x="'+(x-w/2)+'" y="'+(y-w*.92)+'" width="'+w+'" height="'+w+'" viewBox="0 0 100 100">'+ICONS[k]+'</svg>' : '';
+
+// ---------- poses (legs drawn by the scene)
+const legsWalk = spread => (st, fill, Wb) => { const L = st === 'baby' ? 26 : 40, top = 216 - L; let s = '';
+  [[87.5, spread], [112.5, -spread]].forEach(([x, a]) => { const r = a*Math.PI/180, fx = x - Math.sin(r)*L, fy = top + Math.cos(r)*L;
+    s += '<rect x="'+(x-7.5)+'" y="'+top+'" width="15" height="'+L+'" rx="7" fill="'+fill+'" '+Wb+' transform="rotate('+a+' '+x+' '+top+')"/>';
+    s += '<ellipse cx="'+(fx + (a > 0 ? -2 : 2)).toFixed(1)+'" cy="'+(fy+2).toFixed(1)+'" rx="13" ry="7" fill="#fff" '+Wb+'/>'; });
+  return s; };
+const legsSit = (st, fill, Wb) => { const top = st === 'baby' ? 184 : 174, L = st === 'baby' ? 24 : 32; let s = '';
+  [[90, 62], [110, -62]].forEach(([x, a]) => { const r = a*Math.PI/180, fx = x - Math.sin(r)*L, fy = top + Math.cos(r)*L;
+    s += '<rect x="'+(x-8)+'" y="'+top+'" width="16" height="'+L+'" rx="8" fill="'+fill+'" '+Wb+' transform="rotate('+a+' '+x+' '+top+')"/>';
+    s += '<ellipse cx="'+fx.toFixed(1)+'" cy="'+(fy+1).toFixed(1)+'" rx="9" ry="11" fill="#fff" '+Wb+'/><path d="M'+(fx-4).toFixed(1)+' '+(fy+1).toFixed(1)+' h8" stroke="#d6cfe6" stroke-width="2.5" stroke-linecap="round"/>'; });
+  return s; };
+const POSES = {stand:{}, walk:{la:30, ra:-30, legs:legsWalk(10)}, toddle:{la:62, ra:-62, legs:legsWalk(13)},
+  sit:{la:22, ra:-22, legs:legsSit}, wave:{ra:-128}, cheer:{la:118, ra:-118}, slump:{la:2, ra:-2}, up:{ra:-112}, hold:{ra:-26}};
+function blip(age, o){
+  const c = Object.assign({}, S, {age, log:[{tier: o.mood === 'sad' ? 'bad' : 'good'}], wear:myWear(), nobg:true, phone:false}, POSES[o.pose] || {}, o);
+  c._h = [];
+  return charSVG(c).replace('<g class="bob">', '<g>');
+}
+const place = (svg, cx, y, w, k) => svg.replace('<svg ', '<svg x="'+(cx - w/2)+'" y="'+(y - w*1.2*(k || 0.935))+'" width="'+w+'" height="'+(w*1.2)+'" ');
+
+// ---------- things held in the right hand (drawn in the Blip's own 200x240 space)
+const ball = (cx, cy, r, c) => '<g><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+(c||'#ff8a3d')+'" '+W(3)+'/><path d="M'+(cx-r)+' '+cy+' H'+(cx+r)+' M'+cx+' '+(cy-r)+' V'+(cy+r)+' M'+(cx-r*.7)+' '+(cy-r*.7)+' Q'+(cx-r*.2)+' '+cy+' '+(cx-r*.7)+' '+(cy+r*.7)+' M'+(cx+r*.7)+' '+(cy-r*.7)+' Q'+(cx+r*.2)+' '+cy+' '+(cx+r*.7)+' '+(cy+r*.7)+'" stroke="'+O+'" stroke-width="2" fill="none"/></g>';
+const soccer = (cx, cy, r) => '<g><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="#fff" '+W(3)+'/><path d="M'+cx+' '+(cy-r*.42)+' l'+(r*.4)+' '+(r*.3)+' -'+(r*.15)+' '+(r*.45)+' h-'+(r*.5)+' l-'+(r*.15)+' -'+(r*.45)+'z" fill="'+O+'"/></g>';
+const guitar = '<g transform="translate(160 206) rotate(-21.5) scale(.85)"><rect x="-4" y="-80" width="8" height="58" rx="2" fill="#c98c55" '+W(3)+'/><rect x="-7.5" y="-96" width="15" height="19" rx="4" fill="#9b6a43" '+W(3)+'/>'+
+  '<path d="M0 26 C-24 26 -27 6 -16 -3 C-22 -12 -18 -30 0 -30 C18 -30 22 -12 16 -3 C27 6 24 26 0 26Z" fill="#ff8a5c" '+W(3.5)+'/><circle cx="0" cy="-6" r="6" fill="'+O+'"/><rect x="-9" y="10" width="18" height="5" rx="2" fill="#9b6a43" stroke="'+O+'" stroke-width="2"/></g>';
+const trophyAt = (x, y, s) => '<g transform="translate('+x+' '+y+') scale('+(s||1)+')"><rect x="-12" y="-10" width="24" height="10" rx="2" fill="#7c5cff" '+W(2.5)+'/><path d="M-4 -10 V-20 H4 V-10" fill="#ffc23d" '+W(2.5)+'/><path d="M-14 -44 H14 Q14 -20 0 -20 Q-14 -20 -14 -44Z" fill="#ffc23d" '+W(2.5)+'/><path d="M-14 -40 q-9 2 -6 10 q2 4 8 2 M14 -40 q9 2 6 10 q-2 4 -8 2" fill="none" '+W(2.5)+'/></g>';
+const HELD = {
+  ball:h => ball(h[0]+3, h[1]+14, 16),
+  vball:h => '<g><circle cx="'+(h[0]+3)+'" cy="'+(h[1]+14)+'" r="16" fill="#fff" '+W(3)+'/><path d="M'+(h[0]-10)+' '+(h[1]+2)+' Q'+(h[0]+6)+' '+(h[1]+12)+' '+(h[0]+12)+' '+(h[1]+28)+' M'+(h[0]+18)+' '+(h[1]+8)+' Q'+(h[0]+2)+' '+(h[1]+16)+' '+(h[0]-12)+' '+(h[1]+22)+'" stroke="#4da3ff" stroke-width="3" fill="none"/></g>',
+  bowl:h => '<g><path d="M'+(h[0]-16)+' '+(h[1]+2)+' h32 q0 18 -16 18 q-16 0 -16 -18z" fill="#ff8fa8" '+W(3)+'/><path d="M'+(h[0]-6)+' '+(h[1]-6)+' q-3 -5 0 -10 M'+(h[0]+4)+' '+(h[1]-6)+' q-3 -5 0 -10" stroke="#b9b0d0" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>',
+  book:h => '<g transform="rotate(-10 '+h[0]+' '+h[1]+')"><rect x="'+(h[0]-14)+'" y="'+(h[1]-6)+'" width="28" height="22" rx="2" fill="#5cc26b" '+W(3)+'/><path d="M'+(h[0]-14)+' '+(h[1]+12)+' h28" stroke="#fff" stroke-width="3"/></g>',
+  mic:h => '<g><rect x="'+(h[0]-3.5)+'" y="'+(h[1]-16)+'" width="7" height="22" rx="3" fill="#6d6787" '+W(2.5)+'/><circle cx="'+h[0]+'" cy="'+(h[1]-22)+'" r="9" fill="#cfc6ea" '+W(3)+'/></g>',
+  key:h => '<g transform="translate('+h[0]+' '+h[1]+') scale(1.35) translate('+(-h[0])+' '+(-h[1])+')"><path d="M'+h[0]+' '+(h[1]-6)+' V'+(h[1]-38)+'" stroke="'+O+'" stroke-width="9" stroke-linecap="round"/><path d="M'+h[0]+' '+(h[1]-6)+' V'+(h[1]-38)+'" stroke="#ffc23d" stroke-width="4.5" stroke-linecap="round"/>'+
+    '<path d="M'+h[0]+' '+(h[1]-26)+' h7 M'+h[0]+' '+(h[1]-34)+' h6" stroke="'+O+'" stroke-width="7" stroke-linecap="round"/><path d="M'+h[0]+' '+(h[1]-26)+' h7 M'+h[0]+' '+(h[1]-34)+' h6" stroke="#ffc23d" stroke-width="3" stroke-linecap="round"/><circle cx="'+(h[0]-2)+'" cy="'+(h[1]+14)+'" r="7" fill="none" stroke="'+O+'" stroke-width="3"/></g>',
+  guitar:() => guitar,
+  trophy:h => trophyAt(h[0], h[1]-4, .9),
+  mug:h => '<g><path d="M'+(h[0]+8)+' '+(h[1]-4)+' q8 0 8 6 q0 6 -8 6" fill="none" '+W(2.5)+'/><rect x="'+(h[0]-9)+'" y="'+(h[1]-10)+'" width="17" height="20" rx="3" fill="#ff8fa8" '+W(2.5)+'/><path d="M'+(h[0]-3)+' '+(h[1]-15)+' q-3 -4 0 -8 M'+(h[0]+3)+' '+(h[1]-15)+' q-3 -4 0 -8" stroke="#b9b0d0" stroke-width="2" fill="none" stroke-linecap="round"/></g>',
+  brush:h => '<g transform="rotate(-30 '+h[0]+' '+h[1]+')"><rect x="'+(h[0]-3)+'" y="'+(h[1]-30)+'" width="6" height="34" rx="2" fill="#c98c55" '+W(2.5)+'/><path d="M'+(h[0]-4)+' '+(h[1]-30)+' q4 -14 8 0z" fill="#ff5a8a" '+W(2.5)+'/></g>',
+  fish:h => '<g><path d="M'+(h[0]-4)+' '+(h[1]+6)+' q16 -16 34 0 q-18 16 -34 0z" fill="#7fd1ff" '+W(3)+'/><path d="M'+(h[0]-4)+' '+(h[1]+6)+' l-10 -8 v16z" fill="#7fd1ff" '+W(3)+'/><circle cx="'+(h[0]+20)+'" cy="'+(h[1]+3)+'" r="2" fill="'+O+'"/></g>',
+  crayon:h => '<g transform="translate('+(h[0]-2)+' '+(h[1]-14)+') scale(1.7) rotate(-20)"><rect x="-3.5" y="-5" width="7" height="12" rx="1.5" fill="#4d7cff" '+W(1.6)+'/><path d="M-3.5 -5 l2 -2 2 1.5 2 -2 1.5 2.5" fill="none" stroke="'+O+'" stroke-width="1.4"/></g>',
+  paper:h => '<g transform="rotate(8 '+h[0]+' '+h[1]+')"><rect x="'+(h[0]-14)+'" y="'+(h[1]-30)+'" width="28" height="34" rx="2" fill="#fff" '+W(3)+'/><path d="M'+(h[0]-8)+' '+(h[1]-20)+' h16 M'+(h[0]-8)+' '+(h[1]-12)+' h12" stroke="#cfc6ea" stroke-width="2.5"/><text x="'+(h[0]+6)+'" y="'+(h[1]-2)+'" font-family="Fredoka" font-weight="700" font-size="13" fill="#ff5a5a" text-anchor="middle">F</text></g>',
+  cert:h => '<g transform="rotate(-6 '+h[0]+' '+h[1]+')"><rect x="'+(h[0]-18)+'" y="'+(h[1]-30)+'" width="36" height="28" rx="2" fill="#fffdf0" '+W(3)+'/><path d="M'+(h[0]-11)+' '+(h[1]-22)+' h22 M'+(h[0]-11)+' '+(h[1]-15)+' h14" stroke="#cfc6ea" stroke-width="2.5"/><circle cx="'+(h[0]+10)+'" cy="'+(h[1]-9)+'" r="5" fill="#ff5a8a" '+W(2)+'/></g>',
+  shoe:h => '<g><path d="M'+(h[0]-12)+' '+(h[1]-6)+' v10 h28 q2 -8 -8 -10 l-6 -6 z" fill="#ff5a8a" '+W(3)+'/><path d="M'+(h[0]-12)+' '+(h[1]+4)+' h28" stroke="#fff" stroke-width="3"/></g>',
+  pan:h => '<g><path d="M'+h[0]+' '+h[1]+' h-14" stroke="'+O+'" stroke-width="6" stroke-linecap="round"/><ellipse cx="'+(h[0]+16)+'" cy="'+(h[1]+2)+'" rx="16" ry="7" fill="#6d6787" '+W(3)+'/><ellipse cx="'+(h[0]+16)+'" cy="'+(h[1])+'" rx="6" ry="3" fill="#ffd36e"/></g>',
+  bread:h => '<g><path d="M'+(h[0]-16)+' '+(h[1]+8)+' q0 -18 16 -18 q16 0 16 18z" fill="#e8a65c" '+W(3)+'/><path d="M'+(h[0]-6)+' '+(h[1]-4)+' l4 6 M'+(h[0]+4)+' '+(h[1]-4)+' l4 6" stroke="'+O+'" stroke-width="2"/></g>',
+  taco:h => '<g><path d="M'+(h[0]-16)+' '+(h[1]+6)+' a16 14 0 0 1 32 0z" fill="#ffd36e" '+W(3)+'/><path d="M'+(h[0]-10)+' '+(h[1]-2)+' q10 -6 20 0" stroke="#5cc26b" stroke-width="4" fill="none"/></g>',
+  wcan:h => '<g><rect x="'+(h[0]-8)+'" y="'+(h[1]-2)+'" width="22" height="18" rx="3" fill="#4da3ff" '+W(3)+'/><path d="M'+(h[0]+14)+' '+(h[1]+4)+' l14 -10" stroke="'+O+'" stroke-width="5" stroke-linecap="round"/><path d="M'+(h[0]+31)+' '+(h[1]-4)+' l2 6 M'+(h[0]+36)+' '+(h[1]-6)+' l3 6" stroke="#4da3ff" stroke-width="2.5" stroke-linecap="round"/></g>',
+  paddle:h => '<g transform="rotate(20 '+h[0]+' '+h[1]+')"><path d="M'+h[0]+' '+(h[1]-50)+' V'+(h[1]+30)+'" stroke="'+O+'" stroke-width="7" stroke-linecap="round"/><path d="M'+h[0]+' '+(h[1]-50)+' V'+(h[1]+30)+'" stroke="#c98c55" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="'+h[0]+'" cy="'+(h[1]+38)+'" rx="8" ry="15" fill="#ffc23d" '+W(3)+'/></g>',
+  hammer:h => '<g transform="rotate(-20 '+h[0]+' '+h[1]+')"><rect x="'+(h[0]-3)+'" y="'+(h[1]-30)+'" width="6" height="36" rx="2" fill="#c98c55" '+W(2.5)+'/><rect x="'+(h[0]-12)+'" y="'+(h[1]-38)+'" width="24" height="10" rx="2" fill="#8d86a8" '+W(2.5)+'/></g>',
+  cube:h => '<g><rect x="'+(h[0]-12)+'" y="'+(h[1]-12)+'" width="24" height="24" rx="3" fill="#fff" '+W(3)+'/><path d="M'+(h[0]-4)+' '+(h[1]-12)+' v24 M'+(h[0]+4)+' '+(h[1]-12)+' v24 M'+(h[0]-12)+' '+(h[1]-4)+' h24 M'+(h[0]-12)+' '+(h[1]+4)+' h24" stroke="'+O+'" stroke-width="2"/><rect x="'+(h[0]-12)+'" y="'+(h[1]-12)+'" width="8" height="8" fill="#ff5a8a"/><rect x="'+(h[0]+4)+'" y="'+(h[1]+4)+'" width="8" height="8" fill="#5cc26b"/><rect x="'+(h[0]+4)+'" y="'+(h[1]-12)+'" width="8" height="8" fill="#ffc23d"/></g>',
+  controller:h => '<g><rect x="'+(h[0]-16)+'" y="'+(h[1]-8)+'" width="32" height="16" rx="8" fill="#6d6787" '+W(3)+'/><circle cx="'+(h[0]+7)+'" cy="'+(h[1]-1)+'" r="2.5" fill="#ff5a8a"/><path d="M'+(h[0]-10)+' '+h[1]+' h8 M'+(h[0]-6)+' '+(h[1]-4)+' v8" stroke="#fff" stroke-width="2"/></g>',
+  bball:h => '<g><circle cx="'+(h[0]+3)+'" cy="'+(h[1]+14)+'" r="15" fill="#4b3b8f" '+W(3)+'/><circle cx="'+(h[0]-2)+'" cy="'+(h[1]+8)+'" r="2.4" fill="#fff"/><circle cx="'+(h[0]+5)+'" cy="'+(h[1]+6)+'" r="2.4" fill="#fff"/><circle cx="'+(h[0]+3)+'" cy="'+(h[1]+13)+'" r="2.4" fill="#fff"/></g>',
+};
+// things worn over the body (medal, belt, varsity V, barbell)
+// held things are drawn a bit bigger than life so they read in a small photo (1 = as drawn)
+const BIG_HELD = {ball:1, vball:1, bball:1, guitar:1, key:1, paddle:1, trophy:1.2, wcan:1.2};
+const OVER = {
+  medal:() => '<path d="M90 128 L100 152 L110 128" fill="none" stroke="#ff5a8a" stroke-width="6"/><circle cx="100" cy="158" r="10" fill="#ffc23d" '+W(3)+'/><path d="M100 152 v12" stroke="#e0a21d" stroke-width="2.5"/>',
+  belt:() => '<rect x="64" y="176" width="72" height="9" fill="#2b1d3a"/><path d="M96 184 l-6 16 M104 184 l6 16" stroke="#2b1d3a" stroke-width="6" stroke-linecap="round"/>',
+  v:() => '<path d="M104 150 l6 18 6 -18" fill="none" stroke="#ffc23d" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M104 150 l6 18 6 -18" fill="none" stroke="'+O+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  barbell:h => h.length > 1 ? '<path d="M'+(h[0][0]-26)+' '+h[0][1]+' H'+(h[1][0]+26)+'" stroke="'+O+'" stroke-width="5" stroke-linecap="round"/><rect x="'+(h[0][0]-30)+'" y="'+(h[0][1]-16)+'" width="12" height="32" rx="3" fill="#6d6787" '+W(2.5)+'/><rect x="'+(h[1][0]+18)+'" y="'+(h[1][1]-16)+'" width="12" height="32" rx="3" fill="#6d6787" '+W(2.5)+'/>' : '',
+};
+
+// ---------- things on the floor (centered at x, standing on y)
+const P = {
+  dog:(x, y) => shadow(x, y-2, 22)+icon('dog', x, y, 74),
+  cat:(x, y) => shadow(x, y-2, 18)+icon('cat', x, y, 60),
+  crayonbox:(x, y) => '<path d="M'+(x-20)+' '+(y-24)+' L'+(x-14)+' '+(y-40)+' H'+(x+26)+' L'+(x+20)+' '+(y-24)+'Z" fill="#ffe08a" '+W(2.5)+'/><g transform="translate('+x+' '+y+')">'+
+    [['#ff5a8a',-14],['#ffc23d',-5],['#5cc26b',12]].map(([c, dx]) => '<rect x="'+(dx-3)+'" y="-36" width="7" height="22" rx="1.5" fill="'+c+'" '+W(2)+'/><path d="M'+(dx-3)+' -36 l3.5 -7 3.5 7z" fill="'+c+'" '+W(2)+'/>').join('')+
+    '<path d="M-20 -24 H20 V0 H-20Z" fill="#ffc23d" '+W(3)+'/><path d="M-12 -12 h24" stroke="#ff5a8a" stroke-width="4" stroke-linecap="round"/></g>',
+  blocks:(x, y) => shadow(x, y, 22)+'<rect x="'+(x-20)+'" y="'+(y-16)+'" width="16" height="16" rx="2" fill="#ff5a8a" '+W(2.5)+'/><rect x="'+(x-2)+'" y="'+(y-16)+'" width="16" height="16" rx="2" fill="#4da3ff" '+W(2.5)+'/><rect x="'+(x-11)+'" y="'+(y-32)+'" width="16" height="16" rx="2" fill="#ffc23d" '+W(2.5)+'/><rect x="'+(x-9)+'" y="'+(y-48)+'" width="16" height="16" rx="2" fill="#5cc26b" '+W(2.5)+'/><rect x="'+(x-11)+'" y="'+(y-64)+'" width="16" height="16" rx="2" fill="#b9a8ff" '+W(2.5)+'/>',
+  books:(x, y) => shadow(x, y, 24)+[['#ff5a8a',0,46],['#4da3ff',-3,40],['#ffc23d',2,44],['#5cc26b',-2,38]].map(([c, dx, w], i) => '<rect x="'+(x+dx-w/2)+'" y="'+(y-10-i*10)+'" width="'+w+'" height="10" rx="2" fill="'+c+'" '+W(2.5)+'/>').join(''),
+  duck:(x, y) => '<g><ellipse cx="'+x+'" cy="'+(y-10)+'" rx="16" ry="11" fill="#ffd23d" '+W(2.5)+'/><circle cx="'+(x+8)+'" cy="'+(y-24)+'" r="9" fill="#ffd23d" '+W(2.5)+'/><path d="M'+(x+16)+' '+(y-24)+' l8 2 -8 3z" fill="#ff8a3d" '+W(2)+'/><circle cx="'+(x+10)+'" cy="'+(y-26)+'" r="1.8" fill="'+O+'"/></g>',
+  ball:(x, y) => shadow(x, y, 14)+ball(x, y-15, 15),
+  soccer:(x, y) => shadow(x, y, 14)+soccer(x, y-14, 14),
+  trophy:(x, y) => shadow(x, y, 14)+trophyAt(x, y, 1.1),
+  backpack:(x, y) => shadow(x, y, 18)+'<rect x="'+(x-17)+'" y="'+(y-40)+'" width="34" height="40" rx="9" fill="#ff5a8a" '+W(3)+'/><rect x="'+(x-11)+'" y="'+(y-20)+'" width="22" height="14" rx="4" fill="#ffc23d" '+W(2.5)+'/><path d="M'+(x-8)+' '+(y-40)+' q8 -10 16 0" fill="none" '+W(3)+'/>',
+  paint:(x, y) => shadow(x, y, 30)+'<path d="M'+(x-22)+' '+y+' L'+(x-6)+' '+(y-96)+' M'+(x+22)+' '+y+' L'+(x+6)+' '+(y-96)+'" stroke="#9b6a43" stroke-width="5" stroke-linecap="round"/>'+
+    '<rect x="'+(x-30)+'" y="'+(y-100)+'" width="60" height="52" rx="3" fill="#cdeaff" '+W(3)+'/><circle cx="'+(x+14)+'" cy="'+(y-86)+'" r="6" fill="#ffd36e"/><path d="M'+(x-30)+' '+(y-56)+' L'+(x-10)+' '+(y-76)+' L'+(x+4)+' '+(y-64)+' L'+(x+14)+' '+(y-72)+' L'+(x+30)+' '+(y-56)+'Z" fill="#6fd06a" '+W(2)+'/><rect x="'+(x-34)+'" y="'+(y-50)+'" width="68" height="6" rx="2" fill="#c98c55" '+W(2.5)+'/>',
+  chart:(x, y) => shadow(x, y, 30)+'<path d="M'+(x-24)+' '+y+' L'+(x-6)+' '+(y-104)+' M'+(x+24)+' '+y+' L'+(x+6)+' '+(y-104)+'" stroke="#9b6a43" stroke-width="5" stroke-linecap="round"/>'+
+    '<rect x="'+(x-36)+'" y="'+(y-110)+'" width="72" height="62" rx="4" fill="#fff" '+W(3)+'/><rect x="'+(x-40)+'" y="'+(y-50)+'" width="80" height="7" rx="2" fill="#c98c55" '+W(2.5)+'/>'+
+    [[-26,14,'#ff5a8a'],[-12,24,'#ffc23d'],[2,34,'#7c5cff'],[16,46,'#5cc26b']].map(([dx, h, c]) => '<rect x="'+(x+dx-5)+'" y="'+(y-54-h)+'" width="10" height="'+h+'" fill="'+c+'" '+W(2)+'/>').join('')+
+    '<path d="M'+(x-28)+' '+(y-74)+' L'+(x-4)+' '+(y-90)+' L'+(x+8)+' '+(y-84)+' L'+(x+26)+' '+(y-102)+'" stroke="'+O+'" stroke-width="3" fill="none"/>',
+  chartdown:(x, y) => shadow(x, y, 30)+'<path d="M'+(x-24)+' '+y+' L'+(x-6)+' '+(y-104)+' M'+(x+24)+' '+y+' L'+(x+6)+' '+(y-104)+'" stroke="#9b6a43" stroke-width="5" stroke-linecap="round"/>'+
+    '<rect x="'+(x-36)+'" y="'+(y-110)+'" width="72" height="62" rx="4" fill="#fff" '+W(3)+'/><rect x="'+(x-40)+'" y="'+(y-50)+'" width="80" height="7" rx="2" fill="#c98c55" '+W(2.5)+'/><path d="M'+(x-28)+' '+(y-100)+' L'+(x-10)+' '+(y-84)+' L'+(x+4)+' '+(y-90)+' L'+(x+26)+' '+(y-62)+'" stroke="#ff5a5a" stroke-width="4" fill="none"/>',
+  plant:(x, y) => '<g transform="translate('+x+' '+y+')">'+shadow(0, 0, 13)+'<path d="M0 -26 Q-16 -40 -12 -54 Q2 -46 0 -26 M0 -26 Q14 -44 12 -58 Q-2 -48 0 -26 M0 -26 Q-4 -50 2 -64 Q8 -48 0 -26" fill="#5cc26b" '+W(2.5)+'/><path d="M-12 -28 H12 L9 0 H-9Z" fill="#ff8a5c" '+W(3)+'/></g>',
+  deadplant:(x, y) => '<g transform="translate('+x+' '+y+')">'+shadow(0, 0, 13)+'<path d="M0 -26 Q-14 -34 -20 -30 M0 -26 Q10 -40 18 -32 M0 -26 Q0 -42 -6 -48" fill="none" stroke="#a08a5a" stroke-width="3.5" stroke-linecap="round"/><path d="M-12 -28 H12 L9 0 H-9Z" fill="#c9a07c" '+W(3)+'/></g>',
+  pot:(x, y) => shadow(x, y, 24)+'<rect x="'+(x-26)+'" y="'+(y-26)+'" width="52" height="26" rx="4" fill="#fff" '+W(3)+'/><circle cx="'+(x-12)+'" cy="'+(y-13)+'" r="5" fill="'+O+'"/><circle cx="'+(x+12)+'" cy="'+(y-13)+'" r="5" fill="'+O+'"/>'+
+    '<rect x="'+(x-18)+'" y="'+(y-44)+'" width="36" height="18" rx="3" fill="#ff8a5c" '+W(3)+'/><path d="M'+(x-24)+' '+(y-40)+' h6 M'+(x+18)+' '+(y-40)+' h6" stroke="'+O+'" stroke-width="4" stroke-linecap="round"/><path d="M'+(x-6)+' '+(y-50)+' q-4 -6 0 -12 M'+(x+6)+' '+(y-50)+' q-4 -6 0 -12" stroke="#b9b0d0" stroke-width="2.5" fill="none" stroke-linecap="round"/>',
+  cake:(x, y) => shadow(x, y, 24)+'<rect x="'+(x-22)+'" y="'+(y-26)+'" width="44" height="26" rx="4" fill="#ffd2dc" '+W(3)+'/><path d="M'+(x-22)+' '+(y-16)+' q6 6 11 0 q6 6 11 0 q6 6 11 0 q6 6 11 0" stroke="#ff5a8a" stroke-width="3" fill="none"/><path d="M'+x+' '+(y-26)+' v-10" stroke="#4da3ff" stroke-width="4"/><path d="M'+x+' '+(y-38)+' q-4 -5 0 -9 q4 4 0 9" fill="#ffc23d" '+W(1.5)+'/>',
+  gift:(x, y) => shadow(x, y, 18)+'<rect x="'+(x-16)+'" y="'+(y-28)+'" width="32" height="28" rx="3" fill="#7c5cff" '+W(3)+'/><path d="M'+x+' '+(y-28)+' v28 M'+(x-16)+' '+(y-16)+' h32" stroke="#ffc23d" stroke-width="5"/><path d="M'+x+' '+(y-28)+' q-12 -12 -12 -2 q0 4 12 2 q12 2 12 -2 q0 -10 -12 2" fill="#ffc23d" '+W(2)+'/>',
+  suitcase:(x, y) => shadow(x, y, 20)+'<rect x="'+(x-20)+'" y="'+(y-34)+'" width="40" height="32" rx="5" fill="#ffc23d" '+W(3)+'/><path d="M'+(x-8)+' '+(y-34)+' v-7 h16 v7" fill="none" '+W(3)+'/><path d="M'+(x-20)+' '+(y-20)+' h40" stroke="#ff8a3d" stroke-width="4"/><circle cx="'+(x-12)+'" cy="'+y+'" r="3" fill="'+O+'"/><circle cx="'+(x+12)+'" cy="'+y+'" r="3" fill="'+O+'"/>',
+  beachball:(x, y) => shadow(x, y, 14)+'<circle cx="'+x+'" cy="'+(y-15)+'" r="15" fill="#fff" '+W(3)+'/><path d="M'+x+' '+(y-30)+' Q'+(x-13)+' '+(y-15)+' '+x+' '+y+' Q'+(x-4)+' '+(y-15)+' '+x+' '+(y-30)+'Z" fill="#ff5a8a" '+W(2)+'/><path d="M'+x+' '+(y-30)+' Q'+(x+13)+' '+(y-15)+' '+x+' '+y+' Q'+(x+4)+' '+(y-15)+' '+x+' '+(y-30)+'Z" fill="#4da3ff" '+W(2)+'/>',
+  castle:(x, y) => shadow(x, y, 22)+'<path d="M'+(x-20)+' '+y+' V'+(y-18)+' h6 v-5 h5 v5 h6 v-5 h6 v5 h6 v-5 h5 v5 h6 V'+y+'Z" fill="#f4c97a" '+W(2.5)+'/><path d="M'+(x-7)+' '+(y-23)+' V'+(y-36)+' h4 v-4 h6 v4 h4 V'+(y-23)+'" fill="#f4c97a" '+W(2.5)+'/><path d="M'+x+' '+(y-40)+' V'+(y-54)+'" stroke="'+O+'" stroke-width="2"/><path d="M'+x+' '+(y-54)+' l10 4 -10 4z" fill="#ff5a8a" '+W(1.8)+'/>',
+  box:(x, y, label) => { const w = 40, h = 29; return shadow(x, y, 24)+'<rect x="'+(x-w/2)+'" y="'+(y-h)+'" width="'+w+'" height="'+h+'" rx="3" fill="#e0b07a" '+W(3)+'/><path d="M'+(x-w/2-3)+' '+(y-h)+' L'+(x-w/2+4)+' '+(y-h-9)+' H'+(x+w/2-4)+' L'+(x+w/2+3)+' '+(y-h)+'Z" fill="#f0c890" '+W(2.5)+'/><path d="M'+x+' '+(y-h-9)+' V'+(y-h+12)+'" stroke="#c98c55" stroke-width="6"/>'+
+    '<text x="'+x+'" y="'+(y-7)+'" text-anchor="middle" font-family="Fredoka" font-weight="700" font-size="10" fill="'+O+'">'+(label || 'HOME')+'</text>'; },
+  deskbox:(x, y) => P.box(x, y, 'DESK'),
+  boxes:(x, y) => P.box(x, y, 'NEW')+'<g transform="translate(0 -38)">'+P.box(x+4, y, 'NEW')+'</g>',
+  tablet:(x, y) => '<g transform="rotate(-12 '+x+' '+(y-20)+')"><rect x="'+(x-18)+'" y="'+(y-40)+'" width="36" height="28" rx="4" fill="#222" '+W(2.5)+'/><rect x="'+(x-14)+'" y="'+(y-36)+'" width="28" height="20" rx="2" fill="#7fd1ff"/></g>',
+  tv:(x, y) => shadow(x, y, 30)+'<rect x="'+(x-30)+'" y="'+(y-22)+'" width="60" height="22" rx="3" fill="#c98c55" '+W(3)+'/><rect x="'+(x-32)+'" y="'+(y-70)+'" width="64" height="44" rx="5" fill="#2b2350" '+W(3)+'/><rect x="'+(x-27)+'" y="'+(y-65)+'" width="54" height="34" rx="2" fill="#7fd1ff"/><path d="M'+(x-20)+' '+(y-56)+' l10 6 -10 6z" fill="#fff"/>',
+  bike:(x, y) => shadow(x, y, 30)+'<circle cx="'+(x-20)+'" cy="'+(y-14)+'" r="14" fill="none" '+W(3.5)+'/><circle cx="'+(x+22)+'" cy="'+(y-14)+'" r="14" fill="none" '+W(3.5)+'/><path d="M'+(x-20)+' '+(y-14)+' L'+(x-4)+' '+(y-38)+' H'+(x+14)+' L'+(x+22)+' '+(y-14)+' M'+(x-4)+' '+(y-38)+' L'+(x+2)+' '+(y-14)+' L'+(x-20)+' '+(y-14)+' M'+(x+14)+' '+(y-38)+' l-2 -8 h8" fill="none" stroke="#ff5a8a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M'+(x-8)+' '+(y-40)+' h10" stroke="'+O+'" stroke-width="5" stroke-linecap="round"/>',
+  skate:(x, y) => shadow(x, y, 26)+'<rect x="'+(x-26)+'" y="'+(y-12)+'" width="52" height="7" rx="3.5" fill="#7c5cff" '+W(2.5)+'/><circle cx="'+(x-16)+'" cy="'+(y-2)+'" r="4" fill="#ffc23d" '+W(2)+'/><circle cx="'+(x+16)+'" cy="'+(y-2)+'" r="4" fill="#ffc23d" '+W(2)+'/>',
+  tent:(x, y) => shadow(x, y, 34)+'<path d="M'+(x-34)+' '+y+' L'+x+' '+(y-56)+' L'+(x+34)+' '+y+'Z" fill="#ff8a5c" '+W(3)+'/><path d="M'+x+' '+(y-56)+' L'+(x-8)+' '+y+' H'+(x+8)+'Z" fill="#c95a3c" '+W(2.5)+'/>',
+  telescope:(x, y) => shadow(x, y, 18)+'<path d="M'+(x-14)+' '+y+' L'+x+' '+(y-30)+' L'+(x+14)+' '+y+' M'+x+' '+(y-30)+' V'+y+'" stroke="'+O+'" stroke-width="3.5" fill="none" stroke-linecap="round"/><g transform="rotate(-35 '+x+' '+(y-34)+')"><rect x="'+(x-24)+'" y="'+(y-42)+'" width="48" height="16" rx="4" fill="#7c5cff" '+W(3)+'/><rect x="'+(x+20)+'" y="'+(y-45)+'" width="10" height="22" rx="3" fill="#b9a8ff" '+W(3)+'/></g>',
+  tree:(x, y) => '<rect x="'+(x-6)+'" y="'+(y-70)+'" width="12" height="70" fill="#9b6a43" '+W(2.5)+'/><circle cx="'+x+'" cy="'+(y-88)+'" r="30" fill="#6fd06a" '+W(3)+'/><circle cx="'+(x-10)+'" cy="'+(y-94)+'" r="4" fill="#ff5a8a"/><circle cx="'+(x+12)+'" cy="'+(y-80)+'" r="4" fill="#ff5a8a"/>',
+  treehouse:(x, y) => '<rect x="'+(x-7)+'" y="'+(y-110)+'" width="14" height="110" fill="#9b6a43" '+W(2.5)+'/><circle cx="'+x+'" cy="'+(y-118)+'" r="34" fill="#6fd06a" '+W(3)+'/><rect x="'+(x-24)+'" y="'+(y-90)+'" width="48" height="30" fill="#e0b07a" '+W(3)+'/><path d="M'+(x-30)+' '+(y-88)+' L'+x+' '+(y-110)+' L'+(x+30)+' '+(y-88)+'Z" fill="#ff8a5c" '+W(3)+'/><rect x="'+(x-6)+'" y="'+(y-82)+'" width="12" height="16" fill="#cdeaff" '+W(2)+'/><path d="M'+(x+16)+' '+(y-60)+' V'+y+' M'+(x+28)+' '+(y-60)+' V'+y+' M'+(x+16)+' '+(y-44)+' h12 M'+(x+16)+' '+(y-28)+' h12 M'+(x+16)+' '+(y-12)+' h12" stroke="'+O+'" stroke-width="2.5"/>',
+  puzzle:(x, y) => shadow(x, y, 30)+'<path d="M'+(x-30)+' '+(y-8)+' h60 l-6 -14 h-48z" fill="#fff" '+W(2.5)+'/>'+[['#ff5a8a',-22],['#4da3ff',-8],['#ffc23d',6],['#5cc26b',18]].map(([c, dx]) => '<rect x="'+(x+dx-5)+'" y="'+(y-19)+'" width="10" height="8" fill="'+c+'"/>').join(''),
+  board:(x, y) => shadow(x, y, 28)+'<path d="M'+(x-26)+' '+(y-26)+' h52 v26 M'+(x-26)+' '+(y-26)+' v26" stroke="#9b6a43" stroke-width="5" fill="none"/><rect x="'+(x-30)+'" y="'+(y-32)+'" width="60" height="7" rx="2" fill="#c98c55" '+W(2.5)+'/><rect x="'+(x-18)+'" y="'+(y-38)+'" width="36" height="7" rx="1" fill="#fff" '+W(2)+'/><circle cx="'+(x-8)+'" cy="'+(y-42)+'" r="3.5" fill="#ff5a8a" '+W(1.5)+'/><circle cx="'+(x+8)+'" cy="'+(y-42)+'" r="3.5" fill="#4da3ff" '+W(1.5)+'/>',
+  chess:(x, y) => shadow(x, y, 28)+'<path d="M'+(x-26)+' '+(y-26)+' h52 v26 M'+(x-26)+' '+(y-26)+' v26" stroke="#9b6a43" stroke-width="5" fill="none"/><rect x="'+(x-30)+'" y="'+(y-32)+'" width="60" height="7" rx="2" fill="#c98c55" '+W(2.5)+'/>'+
+    '<path d="M'+(x-10)+' '+(y-32)+' v-8 h-4 l4 -4 -2 -6 h8 l-2 6 4 4 h-4 v8z" fill="#fff" '+W(2)+'/><path d="M'+(x+10)+' '+(y-32)+' v-6 h-4 q4 -12 8 -12 q4 0 2 12 h-2 v6z" fill="#3b2a4a" '+W(2)+'/>',
+  volcano:(x, y) => shadow(x, y, 28)+'<path d="M'+(x-30)+' '+y+' L'+(x-10)+' '+(y-40)+' H'+(x+10)+' L'+(x+30)+' '+y+'Z" fill="#c98c55" '+W(3)+'/><path d="M'+(x-10)+' '+(y-40)+' q-6 -14 4 -20 q4 10 6 0 q6 8 6 -6 q10 12 0 26z" fill="#ff5a35" '+W(2.5)+'/>',
+  dino:(x, y) => shadow(x, y, 22)+'<path d="M'+(x-24)+' '+(y-16)+' q10 -20 30 -14 q4 -14 14 -10 q6 4 -2 10 h-6 q4 14 -6 20 v10 h-6 v-8 h-12 v8 h-6 v-10 q-8 0 -16 -6z" fill="#6fd06a" '+W(2.5)+'/><circle cx="'+(x+18)+'" cy="'+(y-34)+'" r="1.8" fill="'+O+'"/>',
+  piano:(x, y) => shadow(x, y, 30)+'<rect x="'+(x-30)+'" y="'+(y-46)+'" width="60" height="30" rx="3" fill="#7c5cff" '+W(3)+'/><rect x="'+(x-26)+'" y="'+(y-26)+'" width="52" height="10" fill="#fff" '+W(2)+'/>'+[-18,-10,-2,6,14].map(d => '<rect x="'+(x+d)+'" y="'+(y-26)+'" width="4" height="6" fill="'+O+'"/>').join('')+'<path d="M'+(x-26)+' '+(y-16)+' V'+y+' M'+(x+26)+' '+(y-16)+' V'+y+'" stroke="'+O+'" stroke-width="4"/>',
+  amp:(x, y) => shadow(x, y, 22)+'<rect x="'+(x-22)+'" y="'+(y-50)+'" width="44" height="50" rx="6" fill="#7c5cff" '+W(3)+'/><circle cx="'+x+'" cy="'+(y-22)+'" r="14" fill="#b9a8ff" '+W(3)+'/><circle cx="'+x+'" cy="'+(y-22)+'" r="5" fill="'+O+'"/>',
+  candy:(x, y) => shadow(x, y, 24)+[[-14,'#ff5a8a'],[0,'#ffc23d'],[14,'#4da3ff'],[-6,'#5cc26b'],[8,'#ff8a3d']].map(([dx, c], i) => '<g transform="rotate('+(i*30)+' '+(x+dx)+' '+(y-4-(i>2?8:0))+')"><ellipse cx="'+(x+dx)+'" cy="'+(y-4-(i>2?8:0))+'" rx="6" ry="4" fill="'+c+'" '+W(1.5)+'/><path d="M'+(x+dx-6)+' '+(y-4-(i>2?8:0))+' l-4 -3 v6z M'+(x+dx+6)+' '+(y-4-(i>2?8:0))+' l4 -3 v6z" fill="'+c+'" '+W(1.5)+'/></g>').join(''),
+  chips:(x, y) => shadow(x, y, 16)+'<path d="M'+(x-14)+' '+y+' l-2 -36 h32 l-2 36z" fill="#ff5a5a" '+W(3)+'/><circle cx="'+x+'" cy="'+(y-18)+'" r="7" fill="#ffd36e" '+W(2)+'/>'+'<rect x="'+(x+18)+'" y="'+(y-28)+'" width="12" height="28" rx="3" fill="#5cc26b" '+W(2.5)+'/>',
+  pizzabox:(x, y) => shadow(x, y, 26)+'<rect x="'+(x-26)+'" y="'+(y-10)+'" width="52" height="10" fill="#e0b07a" '+W(2.5)+'/><rect x="'+(x-24)+'" y="'+(y-20)+'" width="48" height="10" fill="#e0b07a" '+W(2.5)+'/><rect x="'+(x-26)+'" y="'+(y-30)+'" width="52" height="10" fill="#e0b07a" '+W(2.5)+'/>',
+  noodles:(x, y) => shadow(x, y, 14)+'<path d="M'+(x-12)+' '+(y-30)+' h24 l-3 30 h-18z" fill="#fff" '+W(3)+'/><path d="M'+(x-12)+' '+(y-22)+' h24" stroke="#ff5a5a" stroke-width="4"/>'+'<path d="M'+(x+26)+' '+(y-24)+' h20 l-3 24 h-14z" fill="#fff" '+W(2.5)+'/>',
+  donuts:(x, y) => shadow(x, y, 22)+[[-14,0],[4,0],[-5,-12]].map(([dx, dy]) => '<circle cx="'+(x+dx)+'" cy="'+(y-9+dy)+'" r="9" fill="#ff8fa8" '+W(2.5)+'/><circle cx="'+(x+dx)+'" cy="'+(y-9+dy)+'" r="3" fill="#fff1d6" '+W(2)+'/>').join(''),
+  bills:(x, y) => shadow(x, y, 22)+[0,1,2].map(i => '<rect x="'+(x-18+i*3)+'" y="'+(y-8-i*7)+'" width="32" height="8" rx="1" fill="#fff" '+W(2)+'/>').join('')+'<text x="'+(x+2)+'" y="'+(y-26)+'" font-family="Fredoka" font-weight="700" font-size="9" fill="#ff5a5a" text-anchor="middle">LATE</text>',
+  cone:(x, y) => shadow(x, y, 14)+'<path d="M'+(x-14)+' '+y+' L'+(x-4)+' '+(y-34)+' H'+(x+4)+' L'+(x+14)+' '+y+'Z" fill="#ff8a3d" '+W(3)+'/><path d="M'+(x-9)+' '+(y-14)+' h18" stroke="#fff" stroke-width="4"/>',
+  rocket:(x, y) => shadow(x, y, 14)+'<path d="M'+x+' '+(y-52)+' q12 14 10 40 h-20 q-2 -26 10 -40z" fill="#fff" '+W(3)+'/><circle cx="'+x+'" cy="'+(y-30)+'" r="5" fill="#7fd1ff" '+W(2)+'/><path d="M'+(x-10)+' '+(y-20)+' l-8 14 h8z M'+(x+10)+' '+(y-20)+' l8 14 h-8z" fill="#ff5a8a" '+W(2.5)+'/><path d="M'+(x-5)+' '+(y-12)+' q5 12 10 0" fill="#ffc23d" '+W(2)+'/>',
+  robot:(x, y) => shadow(x, y, 18)+'<rect x="'+(x-16)+'" y="'+(y-34)+'" width="32" height="28" rx="5" fill="#cfc6ea" '+W(3)+'/><rect x="'+(x-12)+'" y="'+(y-56)+'" width="24" height="20" rx="4" fill="#cfc6ea" '+W(3)+'/><circle cx="'+(x-5)+'" cy="'+(y-46)+'" r="3" fill="#ff5a8a"/><circle cx="'+(x+5)+'" cy="'+(y-46)+'" r="3" fill="#ff5a8a"/><path d="M'+x+' '+(y-56)+' v-8" stroke="'+O+'" stroke-width="2.5"/><circle cx="'+x+'" cy="'+(y-66)+'" r="3" fill="#ffc23d" '+W(2)+'/><path d="M'+(x-10)+' '+(y-6)+' v6 M'+(x+10)+' '+(y-6)+' v6" stroke="'+O+'" stroke-width="5" stroke-linecap="round"/>',
+  surf:(x, y) => '<ellipse cx="'+x+'" cy="'+(y-44)+'" rx="12" ry="46" fill="#ffc23d" '+W(3)+'/><path d="M'+x+' '+(y-88)+' V'+y+'" stroke="#ff5a8a" stroke-width="4"/>',
+  vase:(x, y) => shadow(x, y, 16)+'<path d="M'+(x-8)+' '+(y-44)+' h16 q-2 8 6 16 q8 10 0 28 h-28 q-8 -18 0 -28 q8 -8 6 -16z" fill="#c9785a" '+W(3)+'/><path d="M'+(x-14)+' '+(y-20)+' h28" stroke="#ffd36e" stroke-width="3"/>',
+  parrot:(x, y) => '<path d="M'+(x-18)+' '+(y-40)+' h36" stroke="#9b6a43" stroke-width="5" stroke-linecap="round"/><path d="M'+x+' '+(y-40)+' V'+y+'" stroke="#9b6a43" stroke-width="5"/><ellipse cx="'+x+'" cy="'+(y-56)+'" rx="10" ry="16" fill="#5cc26b" '+W(2.5)+'/><circle cx="'+x+'" cy="'+(y-72)+'" r="9" fill="#ff5a5a" '+W(2.5)+'/><path d="M'+(x+7)+' '+(y-74)+' q8 2 2 8z" fill="#ffc23d" '+W(2)+'/><circle cx="'+(x+2)+'" cy="'+(y-75)+'" r="1.8" fill="'+O+'"/>',
+  yarn:(x, y) => shadow(x, y, 14)+'<circle cx="'+x+'" cy="'+(y-13)+'" r="13" fill="#ff8fa8" '+W(3)+'/><path d="M'+(x-9)+' '+(y-20)+' q9 6 18 0 M'+(x-11)+' '+(y-10)+' q11 6 22 0" stroke="'+O+'" stroke-width="1.8" fill="none"/><path d="M'+(x+13)+' '+(y-12)+' l14 -20 M'+(x+6)+' '+(y-26)+' l20 -10" stroke="#9b6a43" stroke-width="3" stroke-linecap="round"/>',
+  golf:(x, y) => '<path d="M'+x+' '+y+' V'+(y-70)+'" stroke="'+O+'" stroke-width="3"/><path d="M'+x+' '+(y-70)+' l22 7 -22 7z" fill="#ff5a5a" '+W(2)+'/><ellipse cx="'+x+'" cy="'+y+'" rx="8" ry="3" fill="'+O+'"/>',
+  pins:(x, y) => [-12,0,12,-6,6].map((dx, i) => '<path d="M'+(x+dx)+' '+(y-(i>2?6:0))+' m-5 0 q-2 -12 2 -16 q-2 -6 3 -8 q5 2 3 8 q4 4 2 16z" fill="#fff" '+W(2)+'/>').join(''),
+  hive:(x, y) => '<path d="M'+x+' '+y+' V'+(y-30)+'" stroke="#9b6a43" stroke-width="5"/>'+[0,1,2].map(i => '<rect x="'+(x-16+i*2)+'" y="'+(y-56+i*-0+ i*9)+'" width="'+(32-i*4)+'" height="9" rx="4" fill="#ffc23d" '+W(2)+'/>').join('')+'<circle cx="'+(x+24)+'" cy="'+(y-62)+'" r="3.5" fill="#ffc23d" '+W(1.5)+'/><circle cx="'+(x-22)+'" cy="'+(y-70)+'" r="3.5" fill="#ffc23d" '+W(1.5)+'/>',
+  tomato:(x, y) => shadow(x, y, 20)+'<path d="M'+(x-10)+' '+y+' V'+(y-56)+' M'+(x+10)+' '+y+' V'+(y-50)+'" stroke="#5cc26b" stroke-width="4"/>'+[[-10,-44],[10,-36],[-10,-24],[10,-18]].map(([dx, dy]) => '<circle cx="'+(x+dx)+'" cy="'+(y+dy)+'" r="7" fill="#ff5a5a" '+W(2)+'/>').join('')+'<rect x="'+(x-24)+'" y="'+(y-8)+'" width="48" height="10" rx="2" fill="#9b6a43" '+W(2.5)+'/>',
+  mat:(x, y) => '<path d="M'+(x-34)+' '+(y+2)+' h68 l-6 -10 h-56z" fill="#b9a8ff" '+W(2.5)+'/>',
+  car:(x, y) => '<svg x="'+(x-46)+'" y="'+(y-56)+'" width="92" height="56" viewBox="0 0 200 120">'+(CAR_ART.hatch || {svg:''}).svg+'</svg>',
+};
+
+// ---------- extras drawn over the scene
+const cloudRain = (x, y) => '<g><ellipse cx="'+x+'" cy="'+y+'" rx="24" ry="13" fill="#a9b0bb" '+W(2.5)+'/><ellipse cx="'+(x-18)+'" cy="'+(y+4)+'" rx="15" ry="10" fill="#a9b0bb" '+W(2.5)+'/><ellipse cx="'+x+'" cy="'+y+'" rx="22" ry="11" fill="#a9b0bb"/><ellipse cx="'+(x-18)+'" cy="'+(y+4)+'" rx="13" ry="8" fill="#a9b0bb"/>'+
+  '<path d="M'+(x-20)+' '+(y+20)+' l-3 8 M'+(x-4)+' '+(y+20)+' l-3 8 M'+(x+12)+' '+(y+20)+' l-3 8" stroke="#5aa9ff" stroke-width="3" stroke-linecap="round"/></g>';
+const person = (x, y, h, col) => { const k = h/100; return '<g transform="translate('+x+' '+y+') scale('+k+')" fill="'+(col||'#a99cd6')+'" '+W(3/k)+'><path d="M-24 0 V-46 Q-24 -66 0 -66 Q24 -66 24 -46 V0Z"/><circle cx="0" cy="-82" r="17"/></g>'; };
+const note = (x, y, c, r) => '<g transform="translate('+x+' '+y+') rotate('+(r||0)+')"><path d="M0 0 V-18 L10 -21 V-4" fill="none" '+W(2.5)+'/><ellipse cx="-3" cy="0" rx="5" ry="4" fill="'+c+'" '+W(2)+'/><ellipse cx="7" cy="-4" rx="5" ry="4" fill="'+c+'" '+W(2)+'/></g>';
+const star = (x, y, r) => '<path d="M'+x+' '+(y-r)+' l'+(r*.3)+' '+(r*.6)+' '+(r*.65)+' '+(r*.1)+' -'+(r*.48)+' '+(r*.45)+' '+(r*.12)+' '+(r*.65)+' -'+(r*.59)+' -'+(r*.3)+' -'+(r*.59)+' '+(r*.3)+' '+(r*.12)+' -'+(r*.65)+' -'+(r*.48)+' -'+(r*.45)+' '+(r*.65)+' -'+(r*.1)+'z" fill="#ffc23d" stroke="'+O+'" stroke-width="1.5"/>';
+const heart = (x, y, s) => '<path d="M'+x+' '+(y+6*s)+' l-'+(8*s)+' -'+(8*s)+' a'+(4.5*s)+' '+(4.5*s)+' 0 0 1 '+(8*s)+' -'+(5*s)+' a'+(4.5*s)+' '+(4.5*s)+' 0 0 1 '+(8*s)+' '+(5*s)+'z" fill="#ff5a8a" '+W(2)+'/>';
+const EXTRA = {
+  rain:() => cloudRain(186, 24),
+  notes:() => note(40, 70, '#ff5a8a', -10)+note(214, 60, '#ffc23d', 12),
+  stars:() => star(32, 40, 9)+star(220, 30, 8)+star(204, 70, 6),
+  zzz:() => '<text x="168" y="54" font-family="Fredoka" font-weight="700" font-size="22" fill="#7c5cff" stroke="'+O+'" stroke-width="1">Z</text><text x="186" y="36" font-family="Fredoka" font-weight="700" font-size="16" fill="#7c5cff" stroke="'+O+'" stroke-width="1">z</text>',
+  hearts:() => heart(180, 40, 1)+heart(206, 64, .7),
+  steam:() => '<path d="M96 30 q-6 -8 0 -16 M108 26 q-6 -8 0 -16 M150 30 q6 -8 0 -16" stroke="#ff8a8a" stroke-width="4" fill="none" stroke-linecap="round"/>',
+  crack:() => '<path d="M50 30 l8 12 -6 6 10 10 -4 8 M58 42 l12 -4" stroke="'+O+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>',
+  smoke:() => '<ellipse cx="190" cy="40" rx="20" ry="12" fill="#c9c4d6" '+W(2)+'/><ellipse cx="206" cy="28" rx="14" ry="9" fill="#c9c4d6" '+W(2)+'/>',
+  bubbles:() => [[40,60,8],[56,40,5],[200,50,9],[214,30,5],[186,80,6]].map(([x, y, r]) => '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="#a8f0c0" '+W(2)+'/>').join(''),
+  group:() => person(206, F+14, 74, '#b3a9d9')+person(234, F+18, 66, '#d9b3c8'),
+  kids:() => person(200, F+16, 48, '#ffd2a8')+person(228, F+18, 40, '#b3d9c8'),
+  partner:() => person(196, F+16, 84, '#d9b3c8'),
+  boss:() => person(212, F, 78, '#b3a9d9')+'<path d="M178 14 h36 a6 6 0 0 1 6 6 v16 a6 6 0 0 1 -6 6 h-2 l4 10 -12 -10 h-20 a6 6 0 0 1 -6 -6 v-16 a6 6 0 0 1 6 -6z" fill="#fff" '+W(2.5)+'/>'+star(196, 30, 8),
+  bulb:() => '<circle cx="196" cy="34" r="14" fill="#fff6b0" '+W(2.5)+'/><rect x="190" y="47" width="12" height="9" rx="2" fill="#cfc6ea" '+W(2)+'/><path d="M176 18 l-6 -6 M216 18 l6 -6 M196 12 v-8" stroke="#ffc23d" stroke-width="3" stroke-linecap="round"/>',
+  flag:() => '<path d="M214 '+(F-4)+' V'+(F-64)+'" stroke="'+O+'" stroke-width="3"/><path d="M214 '+(F-64)+' l24 8 -24 8z" fill="#ff5a8a" '+W(2)+'/>',
+  cap:() => '<g transform="rotate(-14 196 40)"><path d="M176 40 L196 30 L216 40 L196 50Z" fill="#2b2350" '+W(2.5)+'/><path d="M214 40 v12" stroke="#ffc23d" stroke-width="2.5"/></g>'+star(40, 36, 7),
+  splat:() => '<path d="M40 50 q8 -10 14 0 q10 -4 6 8 q8 8 -4 10 q-4 10 -12 2 q-10 2 -8 -8 q-8 -6 4 -12z" fill="#ff8a5c" '+W(2)+'/><path d="M50 70 v14 M44 72 v8" stroke="#ff8a5c" stroke-width="3" stroke-linecap="round"/>',
+  sunrise:() => '',
+  aurora:() => '',
+  web:() => '<path d="M0 0 L40 0 M0 0 L0 40 M0 0 L32 32 M8 0 Q10 10 0 8 M18 0 Q20 20 0 18 M28 0 Q28 28 0 28" stroke="#c9c4d6" stroke-width="1.5" fill="none"/>',
+};
+
+// ---------- places (backdrops 250 x 194, floor line at F)
+const floor = (c, line) => '<rect x="0" y="'+F+'" width="'+VW+'" height="'+(VH-F)+'" fill="'+c+'"/><path d="M0 '+F+' H'+VW+'" '+W(3)+'/>'+(line ? '<path d="M20 '+(F+16)+' h40 M110 '+(F+26)+' h50 M196 '+(F+12)+' h36" stroke="'+line+'" stroke-width="3" stroke-linecap="round"/>' : '');
+const frame = (x, y, w, h, inner) => '<path d="M'+(x+w/2)+' '+(y-12)+' L'+(x+6)+' '+y+' M'+(x+w/2)+' '+(y-12)+' L'+(x+w-6)+' '+y+'" stroke="'+O+'" stroke-width="1.5" fill="none"/><circle cx="'+(x+w/2)+'" cy="'+(y-12)+'" r="2.5" fill="'+O+'"/><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="2" fill="#fff" '+W(2.5)+'/>'+inner;
+const win = (x, y, night) => '<rect x="'+x+'" y="'+y+'" width="58" height="50" rx="5" fill="'+(night ? '#2b3a7a' : '#cdeaff')+'" '+W(3)+'/>'+(night ? '<path d="M'+(x+40)+' '+(y+10)+' a9 9 0 1 0 6 14 a7 7 0 1 1 -6 -14z" fill="#fff6b0"/>' : '<circle cx="'+(x+42)+'" cy="'+(y+14)+'" r="6" fill="#fff6b0"/>')+'<path d="M'+(x+29)+' '+y+' V'+(y+50)+' M'+x+' '+(y+25)+' H'+(x+58)+'" stroke="'+O+'" stroke-width="2.5"/>';
+const sky = (c) => '<rect width="'+VW+'" height="'+VH+'" fill="'+(c||'#cdeeff')+'"/><ellipse cx="40" cy="30" rx="22" ry="9" fill="#fff"/><ellipse cx="56" cy="26" rx="14" ry="9" fill="#fff"/>';
+const PLACES = {
+  nursery:() => '<rect width="'+VW+'" height="'+VH+'" fill="#fff1e0"/>'+
+    [...Array(24)].map((_, i) => '<circle cx="'+(14 + (i%8)*32 + (Math.floor(i/8)%2)*16)+'" cy="'+(18 + Math.floor(i/8)*34)+'" r="3" fill="#ffd2dc"/>').join('')+
+    '<path d="M0 '+(F-34)+' H'+VW+'" stroke="#f3d2b4" stroke-width="7"/>'+
+    '<rect x="16" y="24" width="58" height="50" rx="5" fill="#cdeaff" '+W(3)+'/><path d="M45 24 V74 M16 49 H74" stroke="'+O+'" stroke-width="2.5"/><circle cx="60" cy="38" r="6" fill="#fff6b0"/>'+
+    '<path d="M10 20 H80" stroke="'+O+'" stroke-width="3"/><path d="M12 21 Q20 40 14 78 L24 78 Q28 44 28 21Z M78 21 Q70 40 76 78 L66 78 Q62 44 62 21Z" fill="#ffb3c8" '+W(2.5)+'/>'+
+    frame(186, 34, 34, 30, star(203, 50, 9))+
+    floor('#f3d3a8', '#e2bb88')+'<ellipse cx="128" cy="'+(F+20)+'" rx="96" ry="13" fill="#d9ccff" '+W(2.5)+'/><ellipse cx="128" cy="'+(F+20)+'" rx="80" ry="8" fill="none" stroke="#b9a8ff" stroke-width="2.5" stroke-dasharray="5 5"/>',
+  living:() => '<rect width="'+VW+'" height="'+VH+'" fill="#fff1d6"/><path d="M0 '+(F-62)+' H'+VW+'" stroke="#f6dfb4" stroke-width="9"/>'+win(22, 22)+
+    frame(186, 36, 40, 30, '<path d="M190 62 l10 -14 8 8 6 -6 8 12z" fill="#6fd06a"/>')+
+    '<rect x="150" y="'+(F-46)+'" width="96" height="40" rx="10" fill="#b9a8ff" '+W(3)+'/><rect x="144" y="'+(F-30)+'" width="108" height="26" rx="8" fill="#a594f5" '+W(3)+'/>'+
+    floor('#e8b986', '#cf9a66'),
+  bedroom:() => '<rect width="'+VW+'" height="'+VH+'" fill="#e9e2ff"/>'+win(170, 24, true)+
+    '<rect x="4" y="'+(F-70)+'" width="10" height="70" rx="3" fill="#9b6a43" '+W(2.5)+'/><rect x="8" y="'+(F-34)+'" width="96" height="26" rx="5" fill="#fff" '+W(3)+'/><rect x="40" y="'+(F-36)+'" width="64" height="30" rx="6" fill="#ff8fa8" '+W(3)+'/><rect x="14" y="'+(F-50)+'" width="26" height="14" rx="6" fill="#fff" '+W(2.5)+'/>'+
+    floor('#c9b6e8', '#b29fd9'),
+  classroom:() => '<rect width="'+VW+'" height="'+VH+'" fill="#fff6e0"/><rect x="34" y="18" width="150" height="70" rx="4" fill="#3f6b55" stroke="#9b6a43" stroke-width="6"/>'+
+    '<text x="56" y="50" font-family="Fredoka" font-weight="700" font-size="18" fill="#fff" opacity=".85">A B C</text><path d="M120 44 q10 -10 20 0 t20 0 M56 70 h60" stroke="#fff" stroke-width="2.5" fill="none" opacity=".75"/>'+
+    '<circle cx="216" cy="38" r="16" fill="#fff" '+W(2.5)+'/><path d="M216 38 V28 M216 38 l7 4" stroke="'+O+'" stroke-width="2.5" stroke-linecap="round"/>'+floor('#e8c48e', '#d6ab70'),
+  gym:() => '<rect width="'+VW+'" height="'+VH+'" fill="#fff0d6"/><rect x="0" y="'+(F-44)+'" width="'+VW+'" height="10" fill="#7c5cff"/><path d="M0 '+(F-44)+' H'+VW+' M0 '+(F-34)+' H'+VW+'" stroke="'+O+'" stroke-width="2"/>'+
+    [0,1,2].map(i => '<rect x="'+(182+i*10)+'" y="'+(F-18-i*16)+'" width="'+(68-i*10)+'" height="'+(18+i*16)+'" fill="'+['#b9a8ff','#a594f5','#9483ea'][i]+'" '+W(2.5)+'/>').join('')+
+    floor('#f0be7e', '#dda466')+'<path d="M60 '+VH+' Q125 '+(F+8)+' 190 '+VH+'" stroke="#fff" stroke-width="3" fill="none"/>'+
+    '<rect x="14" y="30" width="7" height="'+(F-30)+'" fill="#8d86a8" '+W(2.5)+'/><rect x="4" y="'+(F-8)+'" width="28" height="10" rx="3" fill="#6d6787" '+W(2.5)+'/><path d="M21 44 H36" stroke="'+O+'" stroke-width="5"/>'+
+    '<rect x="34" y="20" width="50" height="38" rx="3" fill="#fff" '+W(3)+'/><rect x="50" y="36" width="18" height="14" fill="none" stroke="#ff5a8a" stroke-width="2.5"/>'+
+    '<path d="M48 60 L52 78 M56 60 L57 78 M63 60 L62 78 M70 60 L66 78 M52 70 H67" stroke="'+O+'" stroke-width="1.6" fill="none"/><ellipse cx="59" cy="59" rx="13" ry="3.5" fill="none" stroke="#ff5a35" stroke-width="3.5"/>'+
+    '<path d="M92 10 V38 L152 24Z" fill="#7c5cff" '+W(2.5)+'/><circle cx="92" cy="10" r="3" fill="#ff5a8a" stroke="'+O+'" stroke-width="1.5"/><text x="96" y="28" font-family="Fredoka" font-weight="700" font-size="9.5" fill="#fff">VARSITY</text>',
+  office:() => '<rect width="'+VW+'" height="'+VH+'" fill="#eceeff"/>'+
+    '<rect x="130" y="16" width="104" height="70" rx="5" fill="#cdeaff" '+W(3)+'/>'+
+    '<path d="M136 86 V60 h12 v-12 h10 v38 M164 86 V54 h14 v32 M184 86 V66 h10 v-8 h12 v28 M210 86 V50 h16 v36" fill="#b9c3ea" stroke="#9aa6d8" stroke-width="2"/><path d="M182 16 V86 M130 51 H234" stroke="'+O+'" stroke-width="2.5"/>'+
+    floor('#cfc6ea', '#b9aee0'),
+  kitchen:() => '<rect width="'+VW+'" height="'+VH+'" fill="#f4fbf6"/>'+[...Array(5)].map((_, r) => '<path d="M0 '+(20+r*22)+' H'+VW+'" stroke="#dcefe2" stroke-width="2"/>').join('')+
+    '<rect x="150" y="12" width="90" height="34" rx="3" fill="#ffd8a8" '+W(2.5)+'/><path d="M195 12 V46" stroke="'+O+'" stroke-width="2"/>'+
+    '<rect x="150" y="'+(F-58)+'" width="100" height="58" fill="#ffd8a8" '+W(3)+'/><rect x="146" y="'+(F-64)+'" width="104" height="8" rx="2" fill="#fff" '+W(2.5)+'/><path d="M200 '+(F-56)+' V'+F+'" stroke="'+O+'" stroke-width="2"/>'+
+    floor('#e3d4f0', '#cdb9e2'),
+  stage:() => '<rect width="'+VW+'" height="'+VH+'" fill="#3a2d6b"/><path d="M125 0 L60 '+F+' H190Z" fill="#fff6b0" opacity=".35"/>'+
+    '<path d="M0 0 H54 Q40 70 50 '+F+' H0Z M250 0 H196 Q210 70 200 '+F+' H250Z" fill="#ff5a6e" '+W(3)+'/><path d="M0 0 H250 V14 Q125 26 0 14Z" fill="#e0405a" '+W(3)+'/>'+
+    floor('#c98c55', '#b0763f'),
+  park:() => sky('#d6f0ff')+'<rect x="44" y="'+(F-70)+'" width="12" height="70" fill="#9b6a43" '+W(2.5)+'/><circle cx="50" cy="'+(F-92)+'" r="36" fill="#6fd06a" '+W(3)+'/><circle cx="36" cy="'+(F-98)+'" r="4" fill="#ff5a8a"/><circle cx="62" cy="'+(F-84)+'" r="4" fill="#ff5a8a"/>'+
+    floor('#9fe08a')+'<rect x="160" y="'+(F-30)+'" width="70" height="8" rx="2" fill="#c98c55" '+W(2.5)+'/><rect x="160" y="'+(F-46)+'" width="70" height="8" rx="2" fill="#c98c55" '+W(2.5)+'/><path d="M168 '+(F-22)+' V'+F+' M222 '+(F-22)+' V'+F+'" stroke="'+O+'" stroke-width="4"/>',
+  field:() => sky('#cdeeff')+'<path d="M180 '+(F-50)+' h56 v50 M180 '+(F-50)+' v50" stroke="#fff" stroke-width="5" fill="none"/><path d="M180 '+(F-50)+' h56 v50 M180 '+(F-50)+' v50" stroke="'+O+'" stroke-width="1.5" fill="none"/>'+
+    '<path d="M184 '+(F-46)+' l48 44 M232 '+(F-46)+' l-48 44" stroke="#dfe8f0" stroke-width="1.5"/>'+floor('#7fd36b')+'<path d="M0 '+(F+18)+' H'+VW+'" stroke="#fff" stroke-width="3"/>',
+  trail:() => sky('#cdeeff')+'<path d="M-10 '+F+' L60 40 L110 100 L160 30 L260 '+F+'Z" fill="#9fa8d6" '+W(3)+'/><path d="M46 56 L60 40 L74 58 L66 54 L58 60Z M146 46 L160 30 L176 50 L166 46 L158 52Z" fill="#fff" '+W(2)+'/>'+
+    floor('#8fd77c')+'<path d="M100 '+VH+' Q130 '+(F+10)+' 150 '+F+'" stroke="#e3c98f" stroke-width="10" fill="none"/>',
+  night:() => '<rect width="'+VW+'" height="'+VH+'" fill="#1c2456"/><path d="M0 50 Q60 20 120 50 T250 40" stroke="#6fe0a8" stroke-width="12" fill="none" opacity=".55"/><path d="M0 70 Q70 40 140 66 T250 58" stroke="#b98aff" stroke-width="8" fill="none" opacity=".45"/>'+
+    [[20,20],[90,14],[150,24],[210,12],[236,80],[30,96],[180,96]].map(([x, y]) => '<circle cx="'+x+'" cy="'+y+'" r="1.8" fill="#fff"/>').join('')+
+    '<path d="M-10 '+F+' L50 100 L100 '+F+'Z M120 '+F+' L190 90 L260 '+F+'Z" fill="#3a4680" '+W(2.5)+'/>'+floor('#e8f0ff'),
+  street:() => sky('#cdeeff')+[[0,60,'#ffb3c8'],[44,40,'#b9a8ff'],[86,74,'#ffd8a8'],[150,50,'#a8dcff'],[200,34,'#c8e8b0']].map(([x, top, c]) => '<rect x="'+x+'" y="'+top+'" width="'+(x === 200 ? 56 : 46)+'" height="'+(F-top)+'" fill="'+c+'" '+W(2.5)+'/>'+
+    [0,1,2].map(r => '<rect x="'+(x+8)+'" y="'+(top+10+r*22)+'" width="10" height="12" fill="#fff6d6" '+W(1.5)+'/><rect x="'+(x+26)+'" y="'+(top+10+r*22)+'" width="10" height="12" fill="#fff6d6" '+W(1.5)+'/>').join('')).join('')+
+    floor('#cfcbd8', '#b9b4c6'),
+  backyard:() => sky('#cdeeff')+'<rect x="0" y="'+(F-46)+'" width="'+VW+'" height="46" fill="#f0d2a8"/>'+[...Array(13)].map((_, i) => '<path d="M'+(i*20)+' '+F+' V'+(F-50)+' l8 -6 8 6 V'+F+'" fill="#ffe4c0" '+W(2)+'/>').join('')+floor('#8fd77c'),
+  beach:() => '<rect width="'+VW+'" height="'+VH+'" fill="#c6ebff"/><circle cx="34" cy="34" r="15" fill="#ffd36e" '+W(2.5)+'/>'+
+    '<path d="M0 '+(F-44)+' H'+VW+' V'+(F-14)+' H0Z" fill="#6fcdf2"/><path d="M0 '+(F-44)+' H'+VW+'" '+W(2.5)+'/><path d="M14 '+(F-32)+' q8 -5 16 0 q8 5 16 0 M120 '+(F-26)+' q8 -5 16 0 q8 5 16 0 M196 '+(F-36)+' q8 -5 16 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
+    '<path d="M0 '+(F-14)+' Q60 '+(F-20)+' 125 '+(F-14)+' T250 '+(F-14)+' V'+VH+' H0Z" fill="#ffe2a8" '+W(2.5)+'/>',
+  pool:() => '<rect width="'+VW+'" height="'+VH+'" fill="#eaf6ff"/>'+[...Array(12)].map((_, i) => '<path d="M'+(i*22)+' 0 V'+(F-40)+'" stroke="#d2e8f6" stroke-width="2"/>').join('')+
+    '<rect x="0" y="'+(F-40)+'" width="'+VW+'" height="'+(VH-F+40)+'" fill="#6fcdf2"/><path d="M0 '+(F-40)+' H'+VW+'" '+W(3)+'/><path d="M20 '+(F-20)+' q10 -6 20 0 q10 6 20 0 M150 '+(F-10)+' q10 -6 20 0 q10 6 20 0 M90 '+(F+20)+' q10 -6 20 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+    '<path d="M0 '+(F-20)+' H'+VW+'" stroke="#ff5a8a" stroke-width="4" stroke-dasharray="10 8"/>',
+  cafe:() => '<rect width="'+VW+'" height="'+VH+'" fill="#ffeedd"/>'+[60,190].map(x => '<path d="M'+x+' 0 V18" stroke="'+O+'" stroke-width="2"/><path d="M'+(x-14)+' 30 q14 -18 28 0z" fill="#ffc23d" '+W(2.5)+'/>').join('')+
+    frame(100, 30, 50, 38, '<circle cx="114" cy="46" r="7" fill="#ff8fa8"/><path d="M104 62 L120 48 L134 58 L146 50 V64 H104Z" fill="#6fd06a"/>')+
+    '<rect x="0" y="'+(F-46)+'" width="70" height="46" fill="#c98c55" '+W(3)+'/><rect x="-4" y="'+(F-52)+'" width="78" height="8" rx="2" fill="#fff" '+W(2.5)+'/>'+floor('#d9b38c', '#c49a70'),
+  clinic:() => '<rect width="'+VW+'" height="'+VH+'" fill="#e6f7f2"/><rect x="24" y="24" width="40" height="40" rx="6" fill="#fff" '+W(2.5)+'/><path d="M44 32 V56 M32 44 H56" stroke="#ff5a6e" stroke-width="7"/>'+
+    '<rect x="190" y="18" width="40" height="56" rx="3" fill="#fff" '+W(2.5)+'/><text x="210" y="40" text-anchor="middle" font-family="Fredoka" font-weight="700" font-size="14" fill="'+O+'">E</text><text x="210" y="56" text-anchor="middle" font-family="Fredoka" font-weight="700" font-size="9" fill="'+O+'">F P</text><text x="210" y="67" text-anchor="middle" font-family="Fredoka" font-weight="700" font-size="6" fill="'+O+'">T O Z</text>'+
+    floor('#cfe6df', '#b8d6cc'),
+  house:() => sky()+'<rect x="116" y="58" width="150" height="'+(F-58)+'" fill="#ffe0ea" '+W(3)+'/><path d="M100 64 L186 6 L270 64Z" fill="#7c5cff" '+W(3.5)+'/>'+
+    '<rect x="128" y="'+(F-84)+'" width="32" height="30" rx="3" fill="#cdeaff" '+W(3)+'/><path d="M144 '+(F-84)+' V'+(F-54)+' M128 '+(F-69)+' H160" stroke="'+O+'" stroke-width="2"/><rect x="124" y="'+(F-56)+'" width="40" height="9" rx="2" fill="#c98c55" '+W(2.5)+'/>'+
+    '<rect x="186" y="'+(F-72)+'" width="38" height="66" rx="3" fill="#5cc26b" '+W(3)+'/><circle cx="216" cy="'+(F-38)+'" r="3" fill="#ffc23d" stroke="'+O+'" stroke-width="1.5"/><rect x="195" y="'+(F-64)+'" width="20" height="14" rx="3" fill="#cdeaff" '+W(2)+'/>'+
+    floor('#8fd77c')+'<rect x="176" y="'+(F-6)+'" width="58" height="9" rx="2" fill="#d9c4a6" '+W(2.5)+'/>',
+};
+
+// ---------- recipes: "place left right held pose extras" (- = none). Keyed by + (good event) or - (bad event) and the emoji,
+// with a stage in front when the same emoji means different things at different ages.
+const R = {
+  'baby+🚀':'nursery rocket - - sit stars', '+🐕':'nursery - dog - toddle', '+😴':'bedroom - - - sit zzz', '+🧱':'nursery blocks - - sit', '+🎵':'nursery - - - cheer notes',
+  'baby+📚':'bedroom books - book sit', 'baby+🏊':'pool duck - - cheer',
+  '-🖍️':'nursery - crayonbox crayon sit', '-✈️':'living suitcase - - stand rain', 'baby-📱':'living - tablet - sit', '-🤧':'clinic - - - stand', '-🥄':'kitchen - - - sit splat', '-😤':'nursery blocks - - stand steam',
+  '+🌋':'classroom volcano - - cheer', 'kid+🏠':'backyard treehouse - - wave', '+🛹':'park - skate - cheer', '+📖':'classroom books - book stand', 'kid+⚽':'field - soccer - cheer',
+  '+🦖':'classroom - dino - wave', '+🏕️':'trail tent - fish hold', '+🎹':'living piano - - stand notes', 'kid+🧪':'living - - - cheer bubbles',
+  'kid-🎮':'living tv - controller sit', 'kid-📝':'classroom - - paper slump', '-🪟':'living - ball - stand crack', 'kid-🚫':'classroom - - - slump', '-🍬':'living candy - - sit',
+  '-😢':'park - - - slump group', 'kid-🪑':'living - - - sit web', 'kid-📵':'kitchen - - - stand !p',
+  'middle+🏆':'classroom trophy - - cheer', '+🚲':'park bike - - wave', 'middle+🎤':'stage - - mic cheer stars', '+🏐':'gym - - vball hold', 'middle+🧩':'living - - cube hold',
+  'middle-🤳':'bedroom - - - sit', 'middle-📉':'classroom - - paper slump', '-😳':'classroom - - - slump group', 'middle-🛋️':'living tv - - sit', 'middle-🌙':'bedroom - - - sit',
+  'teen+🎸':'living amp - guitar stand notes', '+🏀':'gym - - ball hold v', '+💻':'living - - - cheer stars', 'teen+🏔️':'trail - - - cheer flag', '+💵':'street car - key up',
+  '+🥇':'stage - - - cheer medal', 'teen+🎭':'stage - - - wave stars', '+🥋':'gym - - - cheer belt', '+🌎':'street suitcase - - wave',
+  'teen-🌙':'bedroom - - - sit', 'teen-🧪':'classroom - - - slump smoke', '-🔒':'bedroom - - - slump !p', '-💬':'bedroom - - - sit +p', '-🍟':'living chips - - sit', 'teen-🛋️':'living - - - sit', 'teen-📉':'classroom - - - slump',
+  '+🗾':'kitchen pot - bowl stand', 'young+🏅':'classroom - - cert cheer', '+👟':'cafe boxes - shoe hold', '+🏢':'office plant - - wave', 'young+🧗':'trail - - - cheer flag', '+🎙️':'living - - mic hold', 'young+🤝':'trail - - - wave group',
+  'young-📱':'bedroom - - - sit', 'young-🍜':'kitchen noodles - - slump', '-⏰':'office - - - slump', '-💳':'living boxes - - slump +p', '-😪':'bedroom - - - slump zzz', '-🪫':'bedroom - - - sit rain',
+  '+🏃':'street - - - walk medal', '+📈':'office chart - - cheer boss', '+🏄':'beach surf - - wave', '+🌌':'night - - - cheer', 'adult+🏠':'house box - key up', 'adult+⚽':'field - soccer - cheer kids',
+  'adult+📚':'living books - book sit', '+🍳':'kitchen pot - pan hold', '+🚴':'street bike - - cheer', '+🎨':'cafe paint - brush hold', 'adult+🏔️':'trail - - - cheer flag', 'adult+🎸':'cafe - - guitar stand notes',
+  '+🌱':'backyard - tomato wcan hold', '+🐶':'park - dog - wave hearts', '+🧘':'park mat - - cheer', '+🗣️':'cafe - - taco hold', '+💡':'office chart - - cheer bulb', 'adult+🏊':'pool - - - cheer',
+  '+🎲':'living board - - cheer group', '+🍞':'kitchen - - bread hold', '+🚣':'beach - - paddle stand', 'adult+🎓':'classroom - - cert cheer', 'adult+🤝':'office plant - - wave partner', '+🏡':'house box - hammer hold',
+  'adult+🎤':'stage - - mic cheer stars', '+⛺':'trail tent - - wave', '+🎻':'stage - - guitar stand notes', 'adult+🧩':'living puzzle - - sit group', 'adult+🚀':'office chart - - cheer stars', '+🥾':'trail - - - walk flag',
+  'adult+📝':'cafe books - book hold', 'adult+🍜':'cafe - - bowl hold', '+🌅':'park - - mug hold', '+💪':'gym - - - cheer barbell', '+🎉':'living cake gift - cheer group', '+👨‍🍳':'kitchen pot - trophy up',
+  '+🌍':'house box - hammer hold', '+🔭':'night telescope - - wave', '+🛶':'beach - - paddle wave', 'adult+🏆':'office - - trophy up', 'adult+🎭':'stage - - - wave stars', 'adult+🧗':'trail - - - cheer flag',
+  'adult-📵':'beach castle beachball - sit rain', '-🍕':'living pizzabox - - sit !p', '-🍔':'kitchen - - - stand', '-🚗':'street car - - stand', '-🛌':'bedroom - - - sit zzz', '-🏋️':'gym - - - slump !p',
+  'adult-📉':'office chartdown - - slump', '-🦒':'clinic - - - slump', 'adult-📺':'living tv - - sit', '-🙈':'office - - - slump', '-🥱':'office - - - slump', '-🍩':'kitchen donuts - - sit', '-🎂':'living cake - - slump +p',
+  '-🔋':'park - - - slump group', 'adult-🤳':'street - - - stand', '-🌧️':'living - - - sit rain', '-🧠':'living - - book sit !p', 'adult-😴':'office - - - slump zzz !p', '-🛒':'living boxes - - slump +p', '-🥀':'living deadplant - - slump !p',
+  '-🍷':'bedroom - - - sit', 'adult-🚫':'cafe books - - slump !p', 'adult-🏚️':'house - - - slump !p', '-🧾':'kitchen bills - - slump !p', '-🤒':'bedroom - - - slump !p', '-😩':'trail - - - stand', '-👀':'clinic - - - slump',
+  'adult-🐌':'office - - - slump !p', '-😶':'living - - - sit +p', '-💤':'bedroom - - - sit', '-💸':'living boxes - - slump',
+  '+🏺':'cafe vase - - stand', '+🧒':'park - - - wave kids', '+🌶️':'kitchen pot - trophy up', 'senior+🏊':'pool - - - cheer', '+♟️':'park chess - - cheer', '+🚐':'trail car - - wave',
+  'senior+📝':'living books - book hold', '+🌳':'backyard tree - wcan hold', '+🎳':'gym pins - bball hold', '+🦜':'living - parrot - wave', '+🧶':'living yarn - - stand', 'senior+🚲':'street bike - - wave',
+  'senior+🎓':'classroom - - cert cheer', '+🏌️':'park - golf - cheer', '+🍰':'backyard cake - - cheer group', '+🐝':'backyard hive - - wave', '+💃':'stage - - - cheer notes',
+  'senior-📺':'living tv - - sit zzz', '-🤴':'living - - - slump +p', 'senior-🛋️':'living - - - sit', '-☎️':'living - - - sit !p', '-🧓':'living - - - sit', '-🔊':'street - - - stand', '-🍪':'living boxes - - sit',
+  '-📰':'living - - - slump rain', '-🕶️':'living gift - - slump', 'senior-🐌':'living - - - slump !p', '-🛏️':'bedroom - - - sit', 'senior-🏚️':'living - - - slump !p web', 'senior-🦴':'living - - - slump !p', 'adult-🦴':'living - - - slump',
+};
+// Big life moments (milestones) by their emoji: good and rough versions.
+const MS = {
+  '🎒+':'classroom backpack - - wave', '🎒-':'classroom backpack - - slump !p', '🕹️':'living tv - controller sit', '⚡':'field - - - walk medal', '🤖':'classroom - robot - cheer',
+  '🎤':'stage - - mic cheer stars', '🏫+':'classroom - - - wave group', '🏫-':'classroom - - - slump +p', '🚗':'street car - key up', '🚧':'street cone car - slump !p',
+  '🎓':'park - - cert cheer cap', '📘':'classroom books - book hold', '🍔':'kitchen - - - slump !p', '💼':'office plant - - wave', '💞':'park - - - wave partner hearts',
+  '🐈':'living - cat - slump !p', '🚀':'office chart - - cheer stars', '📦':'street deskbox - - slump !p', '🪑':'office - - - slump !p', '🏅':'street - - - cheer medal', '🏍️':'street - - - slump !p',
+  '🏝️':'beach - beachball - cheer', '🛒':'street - - - slump !p',
+};
+// props already drawn at full size
+const NO_GROW = {chart:1, chartdown:1, paint:1, tree:1, treehouse:1, surf:1, golf:1, tent:1, car:1};
+const SCREEN = /phone|scroll|screen|video|tablet|online|text|notification|\bads?\b|email|game|chat|content|meme|comment|follow|headline|news|series|filming/i;
+const FALL = {baby:'nursery blocks - - toddle', kid:'park - - - wave', middle:'park - - - wave', teen:'park - - - wave', young:'park - - - wave', adult:'park - - - wave', senior:'park - - - wave'};
+
+function polarity(e){
+  const st = stage(e.age), list = EVENTS[st];
+  if (list && list.bad.some(x => x[1] === e.text)) return '-';
+  if (list && list.good.some(x => x[1] === e.text)) return '+';
+  return e.tier === 'good' || e.tier === 'great' ? '+' : '-';
+}
+function recipe(e){
+  const st = stage(e.age);
+  if (e.buys) {
+    const k = e.buys[0].key, it = ITEM[k] || {};
+    if (it.kind === 'car') return {r:'street - - key up', car:k};
+    if (it.kind === 'trip' || it.kind === 'extra') return {r:'beach suitcase beachball - cheer'};
+    return {r:'house box - key up'};
+  }
+  if (e.ms) { const good = !(e.ms.fx && Object.values(e.ms.fx).some(v => v < 0));
+    const r = MS[e.ms.emoji+(good ? '+' : '-')] || MS[e.ms.emoji];
+    if (r) return {r, good, ms:true}; }
+  const pol = polarity(e);
+  return {r: R[st+pol+e.emoji] || R[pol+e.emoji] || (pol === '-' ? 'living - - - sit' : FALL[st]), good: pol === '+'};
+}
+
+// The whole photo as SVG (250 x 194).
+function scene(e){
+  const st = stage(e.age), rc = recipe(e);
+  const [pl, left, right, held, pose, ...ex] = rc.r.split(' ');
+  const good = rc.good !== false;
+  const mood = !good ? 'sad' : (e.tier === 'great' || rc.ms || e.buys) ? 'proud' : 'happy';
+  const flags = ex.filter(x => x[0] === '!' || x[0] === '+'), extras = ex.filter(x => EXTRA[x]), overs = ex.filter(x => OVER[x]);
+  // phones only in bad-habit years about screens
+  const phone = !good && st !== 'baby' && (flags.includes('+p') || (!flags.includes('!p') && SCREEN.test(e.text || '') && held === '-'));
+  const crowd = extras.some(x => ['group','kids','partner','boss'].includes(x));
+  const L = left !== '-', Rr = right !== '-' || crowd;
+  const cx = L && !Rr ? 140 : Rr && !L ? 104 : 125;
+  const w = st === 'baby' ? (pose === 'sit' ? 176 : 170) : st === 'kid' ? 146 : 134;
+  const sitting = pose === 'sit';
+  const o = {pose: POSES[pose] ? pose : 'stand', mood, phone};
+  if (held !== '-' && HELD[held]) { const k = BIG_HELD[held] || 1.5;
+    o.held = h => { const p = h[1] || h[0]; return '<g transform="translate('+p[0]+' '+p[1]+') scale('+k+') translate('+(-p[0])+' '+(-p[1])+')">'+HELD[held](p)+'</g>'; }; if (o.pose === 'stand') o.ra = -26; }
+  if (overs.length) o.over = h => overs.map(k => OVER[k](h)).join('');
+  if (pl === 'nursery' && right === 'crayonbox') { o.mouth = true; o.ra = -50;
+    o.face = () => '<path d="M89 106 Q100 122 111 106 Z" fill="#2f5fe0" stroke="'+O+'" stroke-width="2.5" stroke-linejoin="round"/><path d="M84 112 l5 4 M112 116 l6 -3 M96 122 l7 1" stroke="#4d7cff" stroke-width="3.5" stroke-linecap="round"/>'; }
+  const y = F + 20;
+  let s = (PLACES[pl] || PLACES.park)();
+  const big = (x, s) => '<g transform="translate('+x+' '+(y-2)+') scale(1.25) translate('+(-x)+' '+(2-y)+')">'+s+'</g>';
+  const prop = (k, x) => k === 'car' && rc.car ? '<svg x="'+(x-50)+'" y="'+(y-62)+'" width="100" height="60" viewBox="0 0 200 120">'+((CAR_ART[CAR_KEY[rc.car]] || {}).svg || '')+'</svg>' : P[k] ? (NO_GROW[k] ? P[k](x, y - 2) : big(x, P[k](x, y - 2))) : '';
+  if (L) s += prop(left, rc.car && left === 'car' ? 52 : 40);
+  if (right !== '-') s += prop(right, 208);
+  if (rc.car && left === '-' && right === '-') s += prop('car', 200);
+  for (const k of extras) if (['group','kids','partner','boss'].includes(k)) s += EXTRA[k]();
+  s += shadow(cx, y, sitting ? 34 : 28)+place(blip(e.age, o), cx, y, w, sitting ? .87 : 0);
+  for (const k of extras) if (!['group','kids','partner','boss'].includes(k)) s += EXTRA[k]();
+  return s;
+}
+function svg(e, attrs){ return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+VW+' '+VH+'" preserveAspectRatio="xMidYMid slice" '+(attrs || '')+'>'+scene(e)+'</svg>'; }
+return {scene, svg, recipe, R, MS, PLACES, P, VW, VH};
+})();
+
+// The year photo: the event acted out (see YS). A broken recipe falls back to a plain Blip.
+function yearPhoto(e){
+  try { return YS.svg(e, 'class="pbg"'); }
+  catch(err) { return '<div class="pfig">'+blipAt(e.age, e.tier, 120)+'</div>'; }
+}
 function polaroidHTML(e){
   const good = e.tier === 'good' || e.tier === 'great', big = e.buys || e.ms;
   const names = {h:'💪', s:'🧠', j:'😊'}, spots = [['l',22],['r',30],['l',68]];
   let i = 0, stickers = '';
   for (const k of ['h','s','j']) if (e.fx && e.fx[k] && i < 3) { const [side, top] = spots[i++];
     stickers += '<span class="stk '+side+(e.fx[k] < 0 ? ' neg' : '')+'" data-stat="'+k+'" style="top:'+top+'%">'+(e.fx[k] > 0 ? '+' : '−')+Math.abs(e.fx[k])+' '+names[k]+'</span>'; }
-  const art = e.buys ? itemArt(e.buys[0].key, CAR_KEY[e.buys[0].key] ? 'pbuy car' : 'pbuy') : '';
-  const scene = good || e.tier === 'quiet' || e.tier === 'restored'
-    ? '<svg class="pbg" viewBox="0 0 200 150" preserveAspectRatio="none"><rect width="200" height="150" fill="#fff6e0"/><rect y="112" width="200" height="38" fill="#f3d9b5"/><path d="M0 18 Q50 40 100 22 T200 20" stroke="#3b2a4a" stroke-width="2" fill="none"/>'+
-      [14,38,62,86,112,138,162,186].map((x, j) => '<circle cx="'+x+'" cy="'+(27 + Math.sin(j)*5).toFixed(1)+'" r="5" fill="'+['#ff6b8b','#ffc23d','#4da3ff','#6fd06a'][j%4]+'" stroke="#3b2a4a" stroke-width="1.5"/>').join('')+'</svg>'
-    : '<svg class="pbg" viewBox="0 0 200 150" preserveAspectRatio="none"><rect width="200" height="150" fill="#e6e3f3"/><rect y="112" width="200" height="38" fill="#d8d2e8"/><rect x="16" y="16" width="46" height="46" rx="4" fill="#8b9fe0" stroke="#3b2a4a" stroke-width="2.5"/><path d="M39 16 V62 M16 39 H62" stroke="#3b2a4a" stroke-width="2"/><circle cx="50" cy="28" r="6" fill="#fff6b0"/></svg>';
   return '<div class="polaroid'+(good ? '' : ' tilt')+'"><i class="tape a"></i><i class="tape b"></i>'+(big ? '<span class="bigm">Big<br>moment</span>' : '')+
-    '<div class="photo">'+scene+'<div class="pfig">'+blipAt(e.age, e.tier, e.buys ? 104 : 120)+art+'</div>'+stickers+'</div>'+
+    '<div class="photo">'+yearPhoto(e)+stickers+'</div>'+
     '<div class="cap">'+(e.buys ? momentLine(e.buys[0].key) : e.emoji+' '+esc(e.text))+'</div></div>';
 }
 function showYear(e, next){
@@ -3316,15 +3701,15 @@ function showYear(e, next){
   if (newDog) h += '<div class="mscard"><div class="k">A new best friend</div><div class="gdogpic">'+giftDog()+'</div><div class="t">What\'s the family dog\'s name?</div>'+
     '<input type="text" id="yrdog" maxlength="16" placeholder="Biscuit"></div>';
   const card = LIFE_CARD_AGES.includes(e.age) && !next;
-  const moment = e.ms ? {emoji:e.ms.emoji, title:e.ms.title, text:e.ms.text} : e.buys ? {emoji:'🔑', title:plain(buyLine(e.buys[0]))} : null;
-  if (moment) h += '<button class="btn ghost sharebtn" id="mshare">📤 Share this moment</button>';
-  h += card ? '<button class="btn" id="lcard">See '+esc(S.name)+'\'s life card ✨</button>' : next ? '<button class="btn" id="ynext">Next year ➜</button>' : '<button class="btn" data-close>Done</button>';
+  // Every year photo can be shared, good or rough: the button looks the same either way and nothing pops up on its own.
+  const go = card ? '<button class="btn" id="lcard">See '+esc(S.name)+'\'s life card ✨</button>' : next ? '<button class="btn" id="ynext">Next year ➜</button>' : '<button class="btn" data-close>Done</button>';
+  h += '<div class="yrow"><button class="btn ghost yshare" id="mshare">📤 Share</button>'+go+'</div>';
   if (e.mins != null) h += '<div class="ysmall">'+(e.src === 'st' ? 'Yesterday ' : '')+fmtTime(e.mins)+' · goal '+fmtTime(e.goal)+'</div>';
   modal(h, 'yearpol');
   document.querySelectorAll('.yearpol [data-stat]').forEach(b => b.onclick = ev => { ev.stopPropagation(); showStat(b.dataset.stat); });
   if (next) $('ynext').onclick = () => { document.querySelectorAll('.modal.yearpol').forEach(m => m.remove()); next(); };
   if (newDog) { store.dogName = 'Biscuit'; saveStore(); $('yrdog').oninput = ev => { store.dogName = ev.target.value.trim() || 'Biscuit'; saveStore(); }; }
-  if (moment) $('mshare').onclick = () => shareModal(moment);
+  $('mshare').onclick = () => shareModal(yearMoment(e));
   if (card) $('lcard').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); showLifeCard(e.age); };
   if (e.buys) confetti(['🎉','🏠','✨','🔑']);
   else if (e.tier === 'great' || e.ms) confetti(e.tier === 'great' ? ['🎉','⭐','✨','🎊'] : [e.ms.emoji,'✨']);
@@ -3395,17 +3780,14 @@ function showLifeCard(age){
 // ============ SHARING ============
 // "Share my week" builds a Wordle-style message. Its link opens a "Meet my person" page
 // that carries a small snapshot of the character in the link itself (no server needed).
-const SQUARE = {great:'🟩', good:'🟩', meh:'🟨', bad:'🟥', awful:'🟥', skipped:'⬜'};
 const isMet = e => e.tier === 'good' || e.tier === 'great';
 function appURL(){ return IS_APP ? WEB_URL : location.href.split('#')[0].split('?')[0]; }
 function b64url(str){ return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
 function unb64url(str){ str = str.replace(/-/g, '+').replace(/_/g, '/'); while (str.length % 4) str += '='; return decodeURIComponent(escape(atob(str))); }
 function meetLink(){
-  const met = S.log.filter(isMet).length;
+  // Story only: look, age, job, home and best moments. Never streaks, goal results, money or time back.
   const m = {n:S.name, a:S.age, g:S.girl ? 1 : 0, k:Math.max(0, SKINS.indexOf(S.skin)), r:Math.max(0, HAIRS.indexOf(S.hair)),
-    h:S.h, s:S.s, j:S.j, jb:S.job || '', st:S.streak, m:met, t:S.log.length, p:S.pay || 0,
-    b:bestMoments(S.age).map(momentRef)};
-  if (stUsed()) { delete m.st; delete m.m; }
+    h:S.h, s:S.s, j:S.j, jb:S.job || '', b:bestMoments(S.age).map(momentRef)};
   const sc = sceneOpts();
   m.o = sc.key; m.w = sc.art; if (sc.car) m.c = sc.car; if (sc.yard.length) m.y = sc.yard.join('.');
   return appURL() + '#meet=' + b64url(JSON.stringify(m));
@@ -3429,19 +3811,12 @@ function readMeet(){
     return m && m.n && typeof m.a === 'number' ? m : null;
   } catch(e) { return null; }
 }
-function weekText(){
-  const last = S.log.slice(-7), met = last.filter(isMet).length;
-  if (stUsed()) return 'My Blip '+S.name+' is '+S.age+' 🌱\nMeet '+S.name+': '+meetLink();
-  return 'My Blip '+S.name+' is '+S.age+' 🌱\n'+last.map(e => SQUARE[e.tier] || '⬜').join('')+'\n'+
-    met+' of '+last.length+' days on goal'+(S.streak >= 2 ? ' · 🔥 '+S.streak : '')+'\nMeet '+S.name+': '+meetLink();
-}
+function shareText(){ return 'Meet my Blip, '+S.name+'! '+meetLink(); }
 function shareLife(){
-  const text = weekText();
-  const btn = $('share');
-  const copied = () => { if (btn) btn.textContent = '✓ Copied! Paste it in a chat'; };
+  const text = shareText(), btn = $('share');
   const fallback = () => modal('<h2>Share '+esc(S.name)+'</h2><p class="muted">Copy this and paste it in a chat.</p><textarea class="code" readonly>'+esc(text)+'</textarea><button class="btn" data-close>Done</button>');
   if (navigator.share) { navigator.share({text}).catch(() => {}); return; }
-  try { navigator.clipboard.writeText(text).then(copied, fallback); } catch(e) { fallback(); }
+  try { navigator.clipboard.writeText(text).then(() => { if (btn) btn.textContent = '✓ Copied! Paste it in a chat'; }, fallback); } catch(e) { fallback(); }
 }
 // ============ TIME BACK ============
 // Real time you got back: your old daily average minus each day's check-in. Skipped days don't count.
@@ -3474,49 +3849,106 @@ function timeHTML(){
   if (!total) {
     // Nothing saved yet: show what hitting the goal would add up to.
     const year = perDay * 365, yearIdeas = TIME_IDEAS.filter(x => x[0] <= year);
-    h += '<div class="card tbig"><div class="k">Your clock starts with your first check-in</div><div class="n">'+bigHM(0)+'</div>'+
+    h += '<div class="card tbcard"><div class="k">Your clock starts with your first check-in</div><div class="n">'+bigHM(0)+'</div>'+
       '<div class="eq">'+(perDay ? 'Hit your '+fmtTime(S.goal)+' goal and you get back <b>'+fmtHM(perDay)+' a day</b>. That\'s <b>'+Math.round(year / 1440)+' full days</b> in your first year.' :
         'Every minute under your old '+fmtTime(oldAvg())+' a day counts. '+(MORNING ? 'Check in with yesterday\'s screen time to start your clock.' : 'Check in tonight to start your clock.')+'')+'</div></div>';
     h += '<div class="card"><h2 class="earnh">🎁 Waiting for you<small>at your goal</small></h2>'+
       (yearIdeas.length > 6 ? yearIdeas.slice(0, 2).concat(yearIdeas.slice(-4)) : yearIdeas.length ? yearIdeas : TIME_IDEAS.slice(0, 3)).map(x => ideaRow(x, false, perDay ? '<small class="when"> · day '+Math.ceil(x[0] / perDay)+'</small>' : '')).join('')+
       '<p class="muted small" style="margin:10px 0 0">All in your first year. Your Blip gets a great life, and you get your time back.</p></div>';
   } else {
-    const days = counted.slice(-7), mx = Math.max(30, ...days.map(savedOn));
-    const pace = counted.length ? total / counted.length * 365 / 1440 : 0;
-    const top = done[done.length - 1];
-    h += '<div class="card tbig"><div class="n">'+bigHM(total)+'</div><div class="l">back in your life since you started</div>'+
-      (top ? '<div class="eq">That\'s enough time to <b>'+lowerFirst(top[2])+'</b> '+top[1]+'</div>' : '<div class="eq">'+fmtHM(next[0] - total)+' more and you could <b>'+lowerFirst(next[2])+'</b> '+next[1]+'</div>')+'</div>';
-    h += '<div class="card"><h2 class="earnh">📅 Last '+days.length+' check-in'+(days.length > 1 ? 's' : '')+'<small>vs. your old '+fmtTime(oldAvg())+' a day</small></h2><div class="tbars">'+
-      days.map(e => '<div><i style="height:'+Math.round(savedOn(e) / mx * 80)+'px"></i><b>'+fmtHM(savedOn(e))+'</b><span>'+(e.date ? ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][(dayNum(e.date) + 4) % 7] : '')+'</span></div>').join('')+'</div>'+
-      '<div class="pace">At this pace you get back <b>'+Math.round(pace)+' full day'+(Math.round(pace) === 1 ? '' : 's')+'</b> a year'+(pace >= 7 ? ' 🌴' : '')+'</div></div>';
-    h += '<div class="card"><h2 class="earnh">🏆 What you could do with it<small>'+done.length+' of '+TIME_IDEAS.length+'</small></h2>'+done.map(x => ideaRow(x, true)).join('')+
-      (next ? ideaRow(next, false, '<i class="nbar"><u style="width:'+Math.round(total / next[0] * 100)+'%"></u></i>') : '')+'</div>';
+    h += tbHeroHTML(total, done, next) + tbWeekHTML() + tbIdeasHTML(total, done, next);
   }
-  h += '<div class="card tshare"><h2>Better with friends</h2><p class="muted small">Time back is easier when someone\'s doing it with you.</p>'+
-    (stUsed() ? '' : '<button class="btn sharebtn" id="tbpost">📸 Post my time back</button>')+'<button class="btn alt" id="tbinvite"'+(stUsed() ? '' : ' style="margin-top:8px"')+'>🤝 Challenge a friend</button></div>';
+  h += tbPostcardHTML();
   return h;
 }
+// ---- Time back tab (approved 2026-11-04): meadow total, years back by 80, this week vs. last week (time BACK, taller is better),
+// "What you could do with it", and a postcard that invites a friend with only the Blip's picture and a link.
+const TB_O = '#3b2a4a';
+function tbFlower(x, y, c){ const O = TB_O; return '<g transform="translate('+x+' '+y+')"><path d="M0 0 V12" stroke="'+O+'" stroke-width="2.5" stroke-linecap="round"/>'+
+  [0,72,144,216,288].map(a => '<circle cx="'+(5*Math.cos(a*Math.PI/180)).toFixed(1)+'" cy="'+(5*Math.sin(a*Math.PI/180)).toFixed(1)+'" r="4" fill="'+c+'" stroke="'+O+'" stroke-width="2"/>').join('')+'<circle r="3" fill="#ffc23d" stroke="'+O+'" stroke-width="2"/></g>'; }
+function tbMeadow(){ const O = TB_O;
+  const cloud = '<g transform="translate(10 12) scale(.6)"><path d="M0 20 Q0 8 12 9 Q16 0 27 3 Q36 -2 42 8 Q54 8 54 20 Z" fill="#fff" stroke="'+O+'" stroke-width="2.5" stroke-linejoin="round"/></g>';
+  const hg = '<g transform="translate(26 116) rotate(-8)"><rect x="-13" y="-2" width="26" height="6" rx="3" fill="#7c5cff" stroke="'+O+'" stroke-width="2.5"/><path d="M-9 4 H9 Q9 14 2 18 Q9 22 9 32 H-9 Q-9 22 -2 18 Q-9 14 -9 4 Z" fill="#eef8ff" stroke="'+O+'" stroke-width="2.5" stroke-linejoin="round"/>'+
+    '<path d="M-6 26 Q0 20 6 26 L7 31 H-7 Z" fill="#ffc23d"/><path d="M-6 8 H6 Q4 13 0 15 Q-4 13 -6 8 Z" fill="#ffc23d"/><rect x="-13" y="31" width="26" height="6" rx="3" fill="#7c5cff" stroke="'+O+'" stroke-width="2.5"/></g>';
+  return '<svg class="tbbd" viewBox="0 0 270 170" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><defs><linearGradient id="tbsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe4cf"/><stop offset="1" stop-color="#fff6dc"/></linearGradient></defs>'+
+    '<rect width="270" height="170" fill="url(#tbsky)"/><circle cx="250" cy="20" r="20" fill="#ffd977" opacity=".35"/><circle cx="250" cy="20" r="11" fill="#ffc23d" stroke="'+O+'" stroke-width="2.5"/>'+cloud+
+    '<path d="M-5 128 Q60 104 130 122 Q200 140 275 112 V175 H-5 Z" fill="#bfe8b8" stroke="'+O+'" stroke-width="2.5"/><path d="M-5 146 Q80 128 160 146 Q220 158 275 140 V175 H-5 Z" fill="#8fd694" stroke="'+O+'" stroke-width="2.5"/>'+
+    hg+tbFlower(64,140,'#ff8fb1')+tbFlower(208,134,'#b9a6ff')+tbFlower(232,148,'#ff8fb1')+tbFlower(90,152,'#fff')+'</svg>'; }
+// The player's own age (not the Blip's), asked once and kept only on this phone, for the "years back by 80" line.
+function playerAge(){ try { const v = localStorage.getItem('blip-player-age'); return v == null ? null : +v; } catch(e){ return null; } }
+function setPlayerAge(v){ try { localStorage.setItem('blip-player-age', String(v)); } catch(e){} }
+function askPlayerAge(){
+  modal('<div class="mbig">⏳</div><h2 style="margin:4px 0">How old are you?</h2><p class="muted">So Blip can show how much of your life you\'re getting back by age 80. It stays on this phone.</p>'+
+    '<input id="pagein" type="number" inputmode="numeric" min="5" max="79" placeholder="Your age" style="width:120px;text-align:center;font-size:22px;padding:8px;border:2.5px solid #3b2a4a;border-radius:14px;margin:6px auto;display:block">'+
+    '<button class="btn" id="pagego" style="margin-top:10px">Show me</button><button class="linkbtn" id="pageskip">Skip</button>');
+  $('pagego').onclick = () => { const v = Math.round(+$('pagein').value); if (!(v >= 5 && v < 80)) { $('pagein').focus(); return; } setPlayerAge(v); document.querySelector('.modal').remove(); render(); };
+  $('pageskip').onclick = () => { setPlayerAge(0); document.querySelector('.modal').remove(); render(); };
+}
+function tbHeroHTML(total, done, next){
+  const counted = S.log.filter(e => e.mins != null), avg = counted.length ? total / counted.length : 0, age = playerAge();
+  let rib = '';
+  const hgIcon = '<svg width="22" height="26" viewBox="0 0 100 100" aria-hidden="true">'+(typeof NAV_ICONS !== 'undefined' ? NAV_ICONS.time.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') : '')+'</svg>';
+  if (age == null) rib = '<button class="tbrib ask" id="pageask">'+hgIcon+'<span>How much of your life is that by age 80? <b>Tap to see</b></span></button>';
+  else if (age > 0 && avg > 0) { const yrs = avg * (80 - age) / 1440;
+    rib = '<div class="tbrib">'+hgIcon+'<span>At this pace, that\'s about <b>'+(yrs >= 1 ? yrs.toFixed(1)+'&nbsp;years' : Math.round(yrs * 365.25)+'&nbsp;days')+'</b> of your life back by age&nbsp;80.</span></div>'; }
+  const top = done[done.length - 1];
+  const eq = top ? '<div class="tbeq"><span class="eb">'+top[1]+'</span><span>That\'s enough time to <b>'+lowerFirst(top[2])+'</b></span></div>'
+    : next ? '<div class="tbeq"><span class="eb">'+next[1]+'</span><span>'+fmtHM(next[0] - total)+' more and you could <b>'+lowerFirst(next[2])+'</b></span></div>' : '';
+  return '<div class="card tbhero"><div class="tbsky">'+tbMeadow()+'<div class="tbn">'+bigHM(total)+'</div><div class="tbl">back in your life since you started</div></div><div class="tbbody">'+rib+eq+'</div></div>';
+}
+function tbWeek(d){ return Math.floor((dayNum(d) + 4) / 7); }  // weeks start on Sunday
+function tbWeekHTML(){
+  const O = TB_O, wk = {}, cur = tbWeek(today());
+  S.log.forEach(e => { if (e.mins == null || !e.date) return; const w = tbWeek(e.date); (wk[w] = wk[w] || []).push(savedOn(e)); });
+  const avgOf = a => a && a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+  const tA = avgOf(wk[cur]), lA = avgOf(wk[cur - 1]);
+  if (tA == null && lA == null) return '';
+  const ids = Object.keys(wk).map(Number).sort((a, b) => a - b), first = ids[0];
+  let best = null; ids.forEach(w => { if (wk[w].length >= 3) { const a = avgOf(wk[w]); if (!best || a > best[1]) best = [w, a]; } });
+  const mx = Math.max(30, tA || 0, lA || 0), H = 130, hh = m => Math.max(8, Math.round(m / mx * H));
+  const col = (m, c, sh) => '<div class="tbcw"><b class="tbv">'+fmtTime(Math.round(m))+'</b><small class="ad">back a day</small><div class="tbc" style="height:'+hh(m)+'px;background:linear-gradient(90deg,'+c+' 72%,'+sh+' 72%)"></div></div>';
+  const under = (lab, sub) => '<div class="tbun"><span class="cl">'+lab+'</span><small class="cs">'+sub+'</small></div>';
+  const tN = (wk[cur] || []).length, lN = (wk[cur - 1] || []).length, diff = tA != null && lA != null ? Math.round(tA - lA) : null;
+  const arrow = diff != null && diff > 0 ? '<div class="tbarr"><span>+'+fmtTime(diff)+'</span><svg width="58" height="40" viewBox="0 0 58 40"><path d="M6 34 Q26 32 46 10" fill="none" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/><path d="M36 9 L48 7 L47 19" fill="none" stroke="'+O+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : '<div class="tbarr"></div>';
+  const rosette = '<svg width="24" height="28" viewBox="0 0 26 30" aria-hidden="true"><path d="M7 16 L3 29 L9 26 L12 30 L13 18 Z M19 16 L23 29 L17 26 L14 30 L13 18 Z" fill="#ff5a8a" stroke="'+O+'" stroke-width="2" stroke-linejoin="round"/><circle cx="13" cy="11" r="10" fill="#ffc23d" stroke="'+O+'" stroke-width="2.5"/><circle cx="13" cy="11" r="5" fill="#fff3c4" stroke="'+O+'" stroke-width="2"/></svg>';
+  const win = diff == null ? (lA == null ? '🌱 Your first week. <b>'+fmtTime(Math.round(tA))+' back a day</b> so far' : '🗓️ New week. Your first check-in starts this week\'s column')
+    : diff > 0 ? '🎉 <b>'+fmtTime(diff)+' more back a day</b> than last week' : diff === 0 ? '👍 <b>Same as last week</b> so far' : '💪 '+fmtTime(-diff)+' behind last week. Plenty of week left';
+  return '<div class="card tbwk"><div class="tbwh"><span class="tbhi" style="background:#e3dbff">📅</span><div><h3>This week vs. last week</h3><p class="tbsub">Time you got back, a day on average. Taller is better.</p></div></div>'+
+    '<div class="tbch">'+(lA != null ? col(lA, '#cfc4ff', '#b9a6ff') : '<div class="tbcw"></div>')+arrow+(tA != null ? col(tA, '#8fe09a', '#5cc26b') : '<div class="tbcw"></div>')+'</div>'+
+    '<div class="tbrow">'+under('Last week', lN ? lN+' day'+(lN > 1 ? 's' : '') : 'no check-ins')+'<span style="width:58px"></span>'+under('This week', tN ? tN+' day'+(tN > 1 ? 's' : '')+' so far' : 'starts soon')+'</div>'+
+    '<div class="tbwin">'+win+'</div>'+
+    (best ? '<div class="tbbest">'+rosette+'<span><b>Best week:</b> week '+(best[0] - first + 1)+' · '+fmtTime(Math.round(best[1]))+' back</span></div>' : '')+'</div>';
+}
+function tbIdeasHTML(total, done, next){
+  const O = TB_O, TINT = ['#ffe3c2','#ffe0ea','#d9f2dc','#e3dbff','#fff1b8','#ffd6cc','#fff1b8','#e2d6c8','#d9f2dc','#ffe0ea','#e3dbff','#ffe3c2'];
+  const ck = '<i class="tbck"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7.5 L6 10.5 L11 4" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></i>';
+  const row = (x, i, on) => '<div class="tbir'+(on ? ' on' : ' lock')+'"><span class="tbib" style="background:'+(on ? TINT[i % TINT.length] : '#f4f1fb')+'">'+x[1]+'</span><div><b>'+x[2]+'</b><small>'+fmtHrs(x[0])+'</small>'+
+    (on ? '' : '<span class="tbnb"><u style="width:'+Math.round(total / x[0] * 100)+'%"></u></span><small class="tbpc">'+fmtHM(x[0] - total)+' to go</small>')+'</div>'+(on ? ck : '<i class="tblk">🔒</i>')+'</div>';
+  return '<div class="card tbideas"><div class="tbwh"><span class="tbhi" style="background:#fff1b8">🏆</span><div style="flex:1"><h3>What you could do with it</h3><p class="tbsub">'+done.length+' of '+TIME_IDEAS.length+' done</p></div></div>'+
+    done.map((x, i) => row(x, i, true)).join('')+(next ? row(next, done.length, false) : '')+'</div>';
+}
+function tbPostcardHTML(){
+  const O = TB_O, n = esc(S.name);
+  const face = '<svg viewBox="52 30 96 96" width="100%" height="100%" aria-hidden="true">'+charSVG(S).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '').replace(/<circle cx="100" cy="122" r="86"[^>]*\/>/, '')+'</svg>';
+  const pm = '<svg class="tbpm" viewBox="0 0 90 44" aria-hidden="true"><circle cx="22" cy="22" r="18" fill="none" stroke="#c05a7a" stroke-width="2"/><circle cx="22" cy="22" r="13" fill="none" stroke="#c05a7a" stroke-width="1.5"/>'+
+    '<path d="M44 12 q8 -5 16 0 t16 0 t14 0 M44 22 q8 -5 16 0 t16 0 t14 0 M44 32 q8 -5 16 0 t16 0 t14 0" fill="none" stroke="#c05a7a" stroke-width="2" stroke-linecap="round"/></svg>';
+  return '<div class="card tbpcard"><div class="tbpin"><div class="tbpl"><h3>Challenge a friend to raise a Blip</h3></div><div class="tbpr">'+pm+'<div class="tbstamp"><div class="sin">'+face+'</div><span>BLIP</span></div></div></div>'+
+    '<p class="tbptx">Send a friend a picture of '+n+' and a link. They raise their own Blip, and you cheer each other on.</p>'+
+    '<button class="tbgo" id="tbinvite">📸 Raise a Blip with me</button><p class="tbfine">Only '+n+'\'s picture and the link are sent.</p></div>';
+}
 function fmtHrs(m){ return m < 60 ? m+' minutes' : (m / 60)+' hour'+(m === 60 ? '' : 's'); }
+// "Raise a Blip with me": the same Share sheet. It counts as an invite only once it was really sent or copied.
 function inviteFriend(){
   track('invite');
-  S.invites = (S.invites || 0) + 1; save(); checkTrophies();
-  const btn = this && this.id ? this : $('tbinvite');
-  const total = stUsed() ? 0 : timeBack();
-  const text = (total ? 'I\'ve gotten '+fmtHM(total)+' of my life back from my phone with Blip, a screen time game. ' : 'I\'m cutting my screen time with Blip, a screen time game. ')+
-    'Every day you hit your goal, your little Blip has a great year. Want to try it with me? '+appURL();
-  const done = () => { if ($('tbinvite') || document.querySelector('[data-trophy]')) render(); document.querySelectorAll('.modal').forEach(m => m.remove()); showTrophies(); };
-  if (navigator.share) { navigator.share({text}).catch(() => {}).then(done); return; }
-  try { navigator.clipboard.writeText(text).then(() => { if (btn) btn.textContent = '✓ Copied! Paste it in a text'; setTimeout(done, 1200); }, done); } catch(e) { done(); }
+  document.querySelectorAll('.modal').forEach(m => m.remove());
+  shareModal(null, {invite:true});
 }
-function postTimeBack(){
-  const total = timeBack(), top = TIME_IDEAS.filter(x => total >= x[0]).pop();
-  if (!total) return shareModal({emoji:'⏳', title:'I\'m getting my time back', text:'My goal: '+fmtTime(S.goal)+' a day.'});
-  shareModal({emoji:'⏳', title:'I got '+fmtHM(total)+' back', text: top ? 'That\'s enough time to '+lowerFirst(top[2])+'.' : 'And counting.'});
+function countInvite(){
+  S.invites = (S.invites || 0) + 1; save(); checkTrophies();
 }
 
 // ============ SHARE PICTURE ============
 // A 1080x1350 picture of the Blip at home with a headline, drawn from one SVG onto a canvas.
-const SQ_COLOR = {great:'#5cc26b', good:'#5cc26b', meh:'#ffc83d', bad:'#ff6b6b', awful:'#ff6b6b', skipped:'#e6e1f5'};
 function wrapText(t, max){
   const words = String(t).split(' '), lines = [];
   let line = '';
@@ -3530,40 +3962,46 @@ function shareMoment(m){
   if (m) return m;
   const e = S.log[S.log.length-1];
   if (!e) return {emoji:'🌱', title:'Just getting started'};
-  if (e.ms) return {emoji:e.ms.emoji, title:e.ms.title, text:e.ms.text};
-  return {emoji:e.emoji, title:e.text};
+  return yearMoment(e);
+}
+// One year as a share: its photo and its story line.
+function yearMoment(e){
+  if (e.ms) return {emoji:e.ms.emoji, title:e.ms.title, e};
+  if (e.buys) return {emoji:'🔑', title:plain(buyLine(e.buys[0])), e};
+  return {emoji:e.emoji, title:e.text, e};
 }
 // The picture's graphics are one SVG; the words are drawn on top with the app's font.
+// The picture is a Polaroid of the Blip's story: the photo, "Name, age", job and home, one story line, and a footer.
+// Never in it: screen time, streaks, goal results, time back, money or the shop.
 function shareArt(m){
-  const title = wrapText(m.emoji+' '+m.title, 30).slice(0, 2);
-  const first = m.text ? (m.text.match(/^.*?[.!?](?= |$)/) || [m.text])[0] : '';
-  const sub = first && first !== m.title ? wrapText(first, 46).slice(0, 2) : [];
-  // Center the words in the space between the scene and the squares.
-  const hgt = 70 + title.length * 62 + sub.length * 46;
-  let y = 760 + Math.max(40, (1110 - 760 - hgt) / 2) + 50;
-  const texts = [[S.name+' · age '+S.age, y, 58, 700, 1]];
-  y += 76;
-  for (const l of title) { texts.push([l, y, 50, 700, 1]); y += 62; }
-  for (const l of sub) { texts.push([l, y, 34, 500, .92]); y += 46; }
-  texts.push(['@logo', 120, 124, 700, 1]);
-  const tb = stUsed() ? 0 : timeBack(), foot = (!stUsed() && S.streak >= 2 ? ['🔥 '+S.streak+' day streak'] : []).concat(tb >= 60 ? ['⏳ '+Math.floor(tb / 60)+'h of my life back'] : []);
-  if (foot.length) texts.push([foot.join('  ·  '), 1236, 32, 500, 1]);
-  texts.push(['One day for you. One year for them.', 1290, 30, 500, .95]);
-  texts.push([appURL().replace(/^https?:\/\//, '').replace(/\/(index\.html)?$/, ''), 1330, 30, 700, 1]);
-  const days = stUsed() ? [] : S.log.slice(-7);
-  const x0 = 540 - (days.length * 70 - 14) / 2;
-  const sq = days.map((e, i) => '<rect x="'+(x0 + i*70)+'" y="1130" width="56" height="56" rx="12" fill="'+(SQ_COLOR[e.tier] || '#e6e1f5')+'" stroke="#3b2a4a" stroke-width="4"/>').join('');
+  const ink = '#3b2a4a', soft = '#7a7195';
+  const sc = sceneOpts(), where = sceneLabel(sc);
+  const story = wrapText(m.emoji+' '+m.title, 34).slice(0, 2);
+  if (wrapText(m.emoji+' '+m.title, 34).length > 2) story[1] = story[1].replace(/[ .,!?]*$/, '...');
+  const age = m.e ? m.e.age : S.age;
+  const texts = [['@logo', 112, 110, 700, 1]];
+  texts.push([S.name+', '+age, 900, 66, 700, 1, ink]);
+  texts.push([[S.job && age >= 18 ? S.job : null, where].filter(Boolean).join(' · '), 956, 34, 500, 1, soft]);
+  let y = 1030;
+  for (const l of story) { texts.push([l, y, 40, 600, 1, ink]); y += 52; }
+  texts.push(['Blip: a screen time game', 1238, 38, 700, 1]);
+  texts.push([appURL().replace(/^https?:\/\//, '').replace(/\/(index\.html)?$/, ''), 1290, 30, 500, .95]);
+  const box = 'x="160" y="220" width="760" height="590"';
+  const photo = m.e ? YS.svg(m.e, box)
+    : sceneSVG(sc, S).replace('<svg ', '<svg '+box+' preserveAspectRatio="xMidYMax slice" ');
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">'+
-    '<defs><linearGradient id="shbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#ff5a8a"/></linearGradient>'+
-    '<clipPath id="shclip"><rect x="60" y="150" width="960" height="587" rx="36"/></clipPath></defs>'+
+    '<defs><linearGradient id="shbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#ff5a8a"/></linearGradient></defs>'+
     '<rect width="1080" height="1350" fill="url(#shbg)"/>'+
-    '<g clip-path="url(#shclip)">'+sceneSVG(Object.assign(sceneOpts(), stUsed() ? {streak: 0} : {}), S).replace('<svg ', '<svg x="60" y="150" width="960" height="587" ')+'</g>'+
-    '<rect x="60" y="150" width="960" height="587" rx="36" fill="none" stroke="#fff" stroke-width="10"/>'+sq+'</svg>';
+    '<rect x="128" y="196" width="840" height="960" rx="16" fill="rgba(40,20,80,.25)"/>'+
+    '<rect x="120" y="180" width="840" height="960" rx="16" fill="#fff" stroke="'+ink+'" stroke-width="6"/>'+
+    '<rect x="96" y="160" width="150" height="46" fill="#ff9fb8" opacity=".9" transform="rotate(-14 171 183)"/><rect x="836" y="160" width="150" height="46" fill="#a99cff" opacity=".9" transform="rotate(12 911 183)"/>'+
+    '<rect x="160" y="220" width="760" height="590" fill="#fff6e0"/>'+photo+
+    '<rect x="160" y="220" width="760" height="590" fill="none" stroke="'+ink+'" stroke-width="5"/></svg>';
   return {svg, texts};
 }
 function sharePicture(m){
   const art = shareArt(m);
-  const fonts = document.fonts ? Promise.all([document.fonts.load('700 50px Fredoka'), document.fonts.load('500 30px Fredoka')]).catch(() => {}) : Promise.resolve();
+  const fonts = document.fonts ? Promise.all([document.fonts.load('700 50px Fredoka'), document.fonts.load('500 30px Fredoka'), document.fonts.load('600 40px Fredoka')]).catch(() => {}) : Promise.resolve();
   return fonts.then(() => new Promise((ok, bad) => {
     const img = new Image();
     img.onload = () => {
@@ -3572,7 +4010,7 @@ function sharePicture(m){
         const x = c.getContext('2d');
         x.drawImage(img, 0, 0, 1080, 1350);
         x.textAlign = 'center'; x.fillStyle = '#fff';
-        for (const [t, y, size, w, a] of art.texts) { if (t === '@logo') { LOGO.draw(x, 540, y, size); continue; } x.globalAlpha = a; x.font = w+' '+size+'px Fredoka, system-ui, sans-serif'; x.fillText(t, 540, y); }
+        for (const [t, y, size, w, a, col] of art.texts) { if (t === '@logo') { LOGO.draw(x, 540, y, size); continue; } x.globalAlpha = a; x.fillStyle = col || '#fff'; x.font = w+' '+size+'px Fredoka, system-ui, sans-serif'; x.fillText(t, 540, y); }
         c.toBlob(b => b ? ok(b) : bad(), 'image/png');
       } catch(e) { bad(e); }
     };
@@ -3582,47 +4020,53 @@ function sharePicture(m){
 }
 // Opens a preview of the picture with one share button. The picture is made first,
 // so the share happens right on the tap (phones require that).
-function shareModal(moment){
+// One Share sheet everywhere: the picture, Send, Save picture, Copy link. Sharing is always the player's own tap.
+// The picture is made first, so the share happens right on the tap (phones require that).
+function shareModal(moment, opt){
+  opt = opt || {};
   track('share-open');
-  const m = shareMoment(moment);
-  const text = (moment ? S.name+': '+m.emoji+' '+m.title+'\n' : weekText().split('\nMeet ')[0]+'\n')+'Meet '+S.name+': '+meetLink();
-  modal('<h2>Share '+esc(S.name)+'</h2><div class="shwrap"><div class="shload">Drawing the picture...</div><img id="shimg" class="shimg" alt=""></div>'+
-    '<button class="btn sharebtn" id="shgo" disabled>📤 Share</button><p class="muted small" id="shnote"></p>'+
-    '<button class="btn ghost" id="shcopy" style="margin-top:8px">Copy link instead</button><button class="btn ghost" data-close style="margin-top:8px">Close</button>');
-  const go = $('shgo'), note = $('shnote');
-  $('shcopy').onclick = () => { try { navigator.clipboard.writeText(text).then(() => { $('shcopy').textContent = '✓ Copied! Paste it in a chat'; }); } catch(e) {} };
+  const m = shareMoment(moment), link = meetLink();
+  const text = opt.invite ? 'Raise a Blip with me! It\'s a screen time game. Meet '+S.name+': '+link
+    : 'Look at my Blip, '+S.name+'! '+m.emoji+' '+m.title+'\n'+link;
+  modal('<h2>'+(opt.invite ? 'Raise a Blip with me' : 'Share '+esc(S.name))+'</h2><div class="shwrap"><div class="shload">Drawing the picture...</div><img id="shimg" class="shimg" alt=""></div>'+
+    '<button class="btn sharebtn" id="shgo" disabled>📤 Send</button>'+
+    '<div class="shrow"><button class="btn ghost" id="shsave" disabled>⬇️ Save picture</button><button class="btn ghost" id="shcopy">🔗 Copy link</button></div>'+
+    '<p class="muted small" id="shnote">Only '+esc(S.name)+'\'s story goes in the picture.</p><button class="btn ghost" data-close style="margin-top:4px">Close</button>', 'shsheet');
+  const go = $('shgo'), sv = $('shsave'), note = $('shnote');
+  const sent = () => { track('share-sent'); if (opt.invite && !opt.counted) { opt.counted = true; countInvite(); } };
+  const after = () => { if (opt.invite) { document.querySelectorAll('.modal').forEach(x => x.remove()); render(); showTrophies(); } };
+  $('shcopy').onclick = () => { try { navigator.clipboard.writeText(opt.invite ? text : 'Meet my Blip, '+S.name+'! '+link).then(() => { $('shcopy').textContent = '✓ Copied!'; sent(); }); } catch(e) {} };
   sharePicture(m).then(blob => {
     const url = URL.createObjectURL(blob);
     $('shimg').src = url; $('shimg').classList.add('on');
     const file = new File([blob], 'blip-'+S.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')+'.png', {type:'image/png'});
-    go.disabled = false;
-    if (navigator.canShare && navigator.canShare({files:[file]})) {
-      go.onclick = () => { track('share-sent'); navigator.share({files:[file], text}).catch(() => {}); };
-    } else if (navigator.share) {
-      note.textContent = 'Tip: press and hold the picture to save it, then add it to your post.';
-      go.onclick = () => { track('share-sent'); navigator.share({text}).catch(() => {}); };
-    } else {
-      go.textContent = '⬇️ Save picture';
-      go.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = file.name; a.click(); };
-    }
+    const files = navigator.canShare && navigator.canShare({files:[file]});
+    go.disabled = false; sv.disabled = false;
+    if (files) go.onclick = () => navigator.share({files:[file], text}).then(() => { sent(); after(); }, () => {});
+    else if (navigator.share) go.onclick = () => navigator.share({text}).then(() => { sent(); after(); }, () => {});
+    else go.onclick = () => $('shcopy').click();
+    // Save: phones save from their own share sheet ("Save Image"); computers download the file.
+    sv.onclick = files ? () => navigator.share({files:[file]}).catch(() => {})
+      : () => { const a = document.createElement('a'); a.href = url; a.download = file.name; a.click(); };
+    if (!files && navigator.share) note.textContent = 'Tip: press and hold the picture to save it. Only '+S.name+'\'s story goes in it.';
   }).catch(() => {
     $('shimg').parentNode.innerHTML = '<p class="muted">Couldn\'t draw the picture on this phone.</p>';
-    go.disabled = false; go.onclick = shareLife;
+    go.disabled = false; go.onclick = () => (navigator.share ? navigator.share({text}).then(() => { sent(); after(); }, () => {}) : $('shcopy').click());
   });
 }
 
 function meetHTML(m){
-  const c = {name:m.n, age:m.a, girl:!!m.g, skin:SKINS[m.k] || SKINS[1], hair:HAIRS[m.r] || HAIRS[0], h:m.h, s:m.s, j:m.j, job:m.jb, pay:m.p,
-    log:[{tier: m.m >= m.t/2 ? 'great' : 'awful'}]};
+  const c = {name:m.n, age:m.a, girl:!!m.g, skin:SKINS[m.k] || SKINS[1], hair:HAIRS[m.r] || HAIRS[0], h:m.h, s:m.s, j:m.j, job:m.jb,
+    log:[{tier:'great'}]};
   const key = HOME_ART[m.o] || m.o === 'parents' ? m.o : (m.a < 18 ? 'parents' : 'apartment');
-  const p = {key, art: HOME_ART[m.w] ? m.w : key, car: m.c, yard: m.y ? String(m.y).split('.') : [], wx:'sun', streak: m.st};
+  const p = {key, art: HOME_ART[m.w] ? m.w : key, car: m.c, yard: m.y ? String(m.y).split('.') : [], wx:'sun', streak: 0};
   const have = key === 'parents' ? 'is growing up at Mom and Dad\'s house' : key === 'apartment' ? 'lives in a first apartment' : 'owns a '+HOME_ART[key].title.toLowerCase();
-  const sub = ['Age '+m.a].concat(m.jb ? [esc(m.jb)] : []).concat(m.st >= 2 ? ['🔥 '+m.st+' day streak'] : []).join(' · ');
+  const sub = ['Age '+m.a].concat(m.jb ? [esc(m.jb)] : []).join(' · ');
   const best = (m.b || []).slice(0, 3).map(momentFromRef).filter(Boolean);
   return '<div class="meet"><div class="k">Blip · Screen Time Game</div><h1>Meet '+esc(m.n)+'</h1><div class="sub">'+sub+'</div><div class="mscene"><div class="lifescene">'+sceneSVG(p, c)+'<div class="where">'+(key === 'parents' ? '🏡' : '📍')+' '+esc(sceneLabel(p))+'</div></div></div>'+
     (best.length ? '<div class="mbest"><div class="bh">Best moments</div>'+best.map(x => '<div class="be"><span>'+esc(x[0])+'</span><div>'+esc(x[1])+'</div></div>').join('')+'</div>' : '')+
-    '<div class="chal"><b>Can your Blip beat '+esc(m.n)+'?</b><br>'+esc(m.n)+' is '+m.a+' and '+have+'. Their owner hit their screen time goal on <b>'+m.m+' of '+m.t+' days</b>. '+
-    'Every day you hit yours, your Blip has a great year.</div>'+
+    '<div class="chal"><b>Raise a Blip of your own</b><br>'+esc(m.n)+' is '+m.a+' and '+have+'. '+
+    'Every day you hit your screen time goal, your Blip has a great year.</div>'+
     '<button class="cta" id="raise">'+(S ? 'Back to '+esc(S.name)+' →' : 'Raise your own Blip →')+'</button>'+(S ? '' : '<div class="tiny">Free. No sign up. Takes 30 seconds.</div>')+'</div>';
 }
 
