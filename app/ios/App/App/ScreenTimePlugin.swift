@@ -133,6 +133,26 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
             do { try center.startMonitoring(catsName, during: schedule, events: catEvents) }
             catch { log(d, "category watcher failed: " + error.localizedDescription) }
         }
+        // TestFlight check: two more watchers, websites only and picked apps only (5-minute steps up to 4 hours), logged only.
+        // Shows whether the missing minutes are web browsing (Safari) or apps.
+        func part(_ name: String, apps: Set<ApplicationToken>, webs: Set<WebDomainToken>) {
+            guard !apps.isEmpty || !webs.isEmpty else { return }
+            var ev: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
+            for m in stride(from: stepMinutes, through: 240, by: stepMinutes) {
+                let n = DeviceActivityEvent.Name("\(name)\(m)")
+                if #available(iOS 17.4, *) {
+                    ev[n] = DeviceActivityEvent(applications: apps, webDomains: webs, threshold: DateComponents(minute: m), includesPastActivity: true)
+                } else {
+                    ev[n] = DeviceActivityEvent(applications: apps, webDomains: webs, threshold: DateComponents(minute: m))
+                }
+            }
+            let a = DeviceActivityName(name)
+            center.stopMonitoring([a])
+            do { try center.startMonitoring(a, during: schedule, events: ev) }
+            catch { log(d, name + " watcher failed: " + error.localizedDescription) }
+        }
+        part("web", apps: [], webs: selection.webDomainTokens)
+        part("apps", apps: selection.applicationTokens, webs: [])
         log(d, d?.bool(forKey: "entireCategory") == true ? "whole categories incl. websites: on" : "whole categories incl. websites: OFF (re-pick in Change what counts)")
     }
 

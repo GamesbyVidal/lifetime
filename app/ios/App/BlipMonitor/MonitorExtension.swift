@@ -58,6 +58,8 @@ class MonitorExtension: DeviceActivityMonitor {
         super.eventDidReachThreshold(event, activity: activity)
         // TestFlight check: per-category steps ("c3_45" = category #3 passed 45 minutes). Logged only, never counted.
         if activity == DeviceActivityName("cats") { log("cat " + event.rawValue.dropFirst().replacingOccurrences(of: "_", with: ": ") + "m"); return }
+        // TestFlight check: websites-only ("web45") and apps-only ("apps45") watchers. Logged only, never counted.
+        if activity == DeviceActivityName("web") || activity == DeviceActivityName("apps") { log(activity.rawValue + " " + event.rawValue.drop(while: { $0.isLetter }) + "m"); return }
         guard let m = Int(event.rawValue.dropFirst()) else { return }
         log("\(m)m")
         let key = "minutes-" + today()
