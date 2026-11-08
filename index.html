@@ -764,7 +764,9 @@ function stRefresh(){
   }).catch(() => {});
 }
 // TestFlight-only "Screen Time check": the phone's own log of when each step arrived today. Never shared or sent anywhere.
-function devOn(){ try { return localStorage.getItem('blip-dev') === '1'; } catch(e) { return false; } }
+// Developer tools show in every TestFlight build: Matthew is the only TestFlight tester (Nov 8). If friends ever join
+// TestFlight, turn this back into the hidden 3-second hold (Lawyer: 1-minute quick tests only on Matthew's phone).
+function devOn(){ return true; }
 function showStCheck(){
   const p = stPlugin(); if (!p) return;
   const day = calKey(Date.now());
@@ -866,10 +868,6 @@ function remindCardHTML(){
 }
 function bindRemind(){
   if ($('stcheck')) $('stcheck').onclick = showStCheck;
-  // Developer tools unlock (TestFlight only): hold the "Automatic screen time" heading for 3 seconds. Not for other testers.
-  if ($('sthead') && TESTFLIGHT) { let t = 0; const h = $('sthead');
-    h.addEventListener('touchstart', () => { t = setTimeout(() => { try { localStorage.setItem('blip-dev', devOn() ? '0' : '1'); } catch(e) {} render(); }, 3000); }, {passive: true});
-    ['touchend', 'touchmove', 'touchcancel'].forEach(ev => h.addEventListener(ev, () => clearTimeout(t), {passive: true})); }
   if ($('rmon')) $('rmon').onchange = e => {
     remind.on = e.target.checked; remindNote = ''; remindSave(); render();
     remindSync().then(ok => { if (!ok && remind.on) { remind.on = false; remindSave(); remindNote = 'Notifications are off for Blip. You can turn them on in iPhone Settings > Notifications > Blip.'; render(); } });
