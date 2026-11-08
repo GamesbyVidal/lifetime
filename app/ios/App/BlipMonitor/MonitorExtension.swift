@@ -60,6 +60,14 @@ class MonitorExtension: DeviceActivityMonitor {
         // TestFlight check: per-category steps ("c3_45" = category #3 passed 45 minutes). Logged only, never counted.
         if activity == DeviceActivityName("cats") { log("cat " + event.rawValue.dropFirst().replacingOccurrences(of: "_", with: ": ") + "m"); return }
         // TestFlight check: websites-only ("web45"), build 20 way ("picked45") and no-filter ("all45") watchers. Logged only, never counted.
+        // TestFlight quick test ("qt-..." activities, "t7" = 7 minutes since the test started). New highs only.
+        if activity.rawValue.hasPrefix("qt-") {
+            guard let m = Int(event.rawValue.dropFirst()) else { return }
+            let name = String(activity.rawValue.dropFirst(3))
+            var best = defaults?.dictionary(forKey: "qt-best") as? [String: Int] ?? [:]
+            if m > (best[name] ?? 0) { best[name] = m; defaults?.set(best, forKey: "qt-best"); log("test " + name + " \(m)m") }
+            return
+        }
         // Only new highs are logged: every app open makes iOS re-send all of today's steps, which flooded the log.
         if ["web", "apps", "picked", "all"].contains(activity.rawValue) {
             guard let m = Int(event.rawValue.drop(while: { $0.isLetter })) else { return }

@@ -767,20 +767,50 @@ function stRefresh(){
 function showStCheck(){
   const p = stPlugin(); if (!p) return;
   const day = calKey(Date.now());
+  const ft = m => m ? fmtTime(m) : '0m';
   // If the phone doesn't answer in 6 seconds, say so instead of doing nothing.
   Promise.race([p.checkLog({day}), new Promise((_, no) => setTimeout(() => no(new Error('the phone took too long to answer')), 6000))]).then(r => {
-    const log = (r && r.log) || [];
-    // Per-category summary (TestFlight check): highest step each picked category reached today.
-    const cat = {}; log.forEach(x => { const m = x.match(/cat (\d+): (\d+)m/); if (m) cat[m[1]] = Math.max(cat[m[1]] || 0, +m[2]); });
-    const catLine = Object.keys(cat).length ? '<br>By category (15-min steps): '+Object.keys(cat).sort((a, b) => a - b).map(k => '#'+k+' '+fmtTime(cat[k])).join(', ') : '';
-    // Websites-only and apps-only watchers (TestFlight check): highest 5-minute step each reached today.
-    const part = {}; log.forEach(x => { const m = x.match(/ (web|apps|picked|all) (\d+)m$/); if (m) part[m[1]] = Math.max(part[m[1]] || 0, +m[2]); });
-    const partLine = '<br>Build 20 way (with websites): '+(part.picked ? fmtTime(part.picked) : 'none yet')+'<br>Build 21 way (no filter): '+(part.all ? fmtTime(part.all) : 'none yet')+'<br>Websites only: '+(part.web ? fmtTime(part.web) : 'none yet');
-    const lines = log.filter(x => !/ cat \d+:| (web|apps|picked|all) \d+m$/.test(x)).slice().reverse().map(x => esc(x)).join('<br>') || 'Nothing logged yet today.';
-    modal('<h2>🔍 Screen Time check</h2><p class="muted small" style="text-align:left">Day: '+day+'<br>Blip\'s total so far: <b>'+(stToday == null ? 'none' : fmtTime(stToday))+'</b><br>'+
-      'Counting: '+(r.categories || 0)+' categories, '+(r.apps || 0)+' apps, '+(r.webDomains || 0)+' websites<br>Watching: '+esc(((r && r.watching) || []).join(', ') || 'nothing')+catLine+partLine+'</p>'+
-      '<div style="text-align:left;font-family:ui-monospace,Menlo,monospace;font-size:13px;max-height:45vh;overflow:auto;background:#f6f3ff;border-radius:12px;padding:10px">'+lines+'</div>'+
-      '<p class="muted small">Newest first. Screenshot this next to iPhone Screen Time.</p><button class="btn" data-close>Close</button>');
+    r = r || {};
+    const log = r.log || [], dg = r.diag || {}, qt = r.qt || {};
+    let iph = {}; try { iph = JSON.parse(localStorage.getItem('blip-stcheck') || '{}'); } catch(e) {}
+    const qtOn = r.qtStart > 0 && Date.now()/1000 - r.qtStart < 4*3600;
+    const ago = qtOn ? Math.floor((Date.now()/1000 - r.qtStart) / 60) : 0;
+    const qtAt = qtOn ? new Date(r.qtStart * 1000).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}) : '';
+    // The plain-text report that "Copy for Claude" puts on the clipboard.
+    const report = () => {
+      const lines = ['Blip Screen Time check, '+day+' '+new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}),
+        'iPhone Screen Time now: '+($('iphNow') ? $('iphNow').value || '?' : '?'),
+        'Blip counter (categories + apps): '+(stToday == null ? 'none' : fmtTime(stToday)),
+        'With websites (build 20 way): '+ft(dg.picked), 'No filter (build 21 way): '+ft(dg.all), 'Websites only: '+ft(dg.web),
+        'Picked: '+(r.categories || 0)+' categories, '+(r.apps || 0)+' apps, '+(r.webDomains || 0)+' websites. Watching: '+(r.watching || []).join(', ')];
+      if (qtOn) lines.push('', 'Quick test since '+qtAt+' ('+ago+' min ago), iPhone at start: '+($('iphStart') ? $('iphStart').value || '?' : '?'),
+        'counter '+ft(qt.counter)+' | with websites '+ft(qt.web)+' | no filter '+ft(qt.all)+' | categories only '+ft(qt.cats));
+      return lines.concat(['', 'Log (newest first):'], log.slice(-150).reverse()).join('\n');
+    };
+    const row = (k, v) => '<div style="display:flex;justify-content:space-between;gap:8px"><span>'+k+'</span><b>'+v+'</b></div>';
+    modal('<h2>🔍 Screen Time check</h2><div class="small" style="text-align:left;line-height:1.6">'+
+      row('Blip counter', stToday == null ? 'none' : fmtTime(stToday))+row('With websites (build 20)', ft(dg.picked))+row('No filter (build 21)', ft(dg.all))+row('Websites only', ft(dg.web))+
+      '<label style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px">iPhone Screen Time now <input id="iphNow" placeholder="e.g. 1h 10m" value="'+esc(iph.now || '')+'" style="width:110px"></label>'+
+      (qtOn ? '<div style="margin-top:10px;padding:8px;background:#fff3d6;border-radius:10px"><b>Quick test</b> since '+qtAt+' ('+ago+' min)<br>'+
+        row('Counter', ft(qt.counter))+row('With websites', ft(qt.web))+row('No filter', ft(qt.all))+row('Categories only', ft(qt.cats))+
+        '<label style="display:flex;justify-content:space-between;align-items:center;gap:8px">iPhone at start <input id="iphStart" placeholder="e.g. 1h 10m" value="'+esc(iph.start || '')+'" style="width:110px"></label></div>' : '')+
+      '</div><button class="btn" id="stcopy" style="margin-top:10px">📋 Copy for Claude</button>'+
+      '<button class="btn ghost" id="stqt" style="margin-top:8px">⏱️ '+(qtOn ? 'Restart' : 'Start')+' quick test</button>'+
+      '<p class="muted small" style="margin:6px 0">Quick test: type iPhone\'s Screen Time total, tap Start, use your phone (Safari, YouTube, anything) for 10–15 minutes, come back, type iPhone\'s new total, tap Copy and paste it to Claude.</p>'+
+      '<button class="btn ghost" data-close>Close</button>');
+    const keep = () => { try { localStorage.setItem('blip-stcheck', JSON.stringify({now: $('iphNow') ? $('iphNow').value : '', start: $('iphStart') ? $('iphStart').value : (iph.start || '')})); } catch(e) {} };
+    if ($('iphNow')) $('iphNow').oninput = keep;
+    if ($('iphStart')) $('iphStart').oninput = keep;
+    $('stcopy').onclick = () => { keep(); const t = report();
+      const done = () => { $('stcopy').textContent = '✓ Copied. Paste it in your chat with Claude'; };
+      try { navigator.clipboard.writeText(t).then(done, () => navigator.share && navigator.share({text: t})); } catch(e) { if (navigator.share) navigator.share({text: t}); } };
+    $('stqt').onclick = () => {
+      // The iPhone number typed now becomes the test's starting number.
+      try { localStorage.setItem('blip-stcheck', JSON.stringify({now: '', start: $('iphNow') ? $('iphNow').value : ''})); } catch(e) {}
+      $('stqt').disabled = true; $('stqt').textContent = 'Starting...';
+      p.quickTest().then(x => { document.querySelectorAll('.modal').forEach(m => m.remove()); showStCheck(); },
+        e => { $('stqt').disabled = false; $('stqt').textContent = 'Couldn\'t start: '+(e && e.message || e); });
+    };
   }).catch(e => modal('<h2>Screen Time check</h2><p class="muted">Could not read the log: '+esc(e && e.message || e)+'</p><button class="btn" data-close>Close</button>'));
 }
 // Each time the app opens, ask iOS to re-check today's full Screen Time total (iOS 17.4+), then read the numbers again
@@ -2829,7 +2859,7 @@ function settingsHTML(){
     stCardHTML()+remindCardHTML()+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
     (!IS_APP || TESTFLIGHT ? '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>' : '')+
-    (IS_APP && TESTFLIGHT && autoOn() ? '<div class="card"><h2>🔍 Screen Time check</h2><p class="muted small">TestFlight only. Shows when each 5-minute step from Apple arrived, to compare with iPhone Screen Time.</p><button class="btn alt" id="stcheck">Show today\'s log</button></div>' : '')+
+    (IS_APP && TESTFLIGHT && autoOn() ? '<div class="card"><h2>🔍 Screen Time check</h2><p class="muted small">TestFlight only. Compare Blip with iPhone Screen Time, run quick tests, and copy the results for Claude.</p><button class="btn alt" id="stcheck">Open Screen Time check</button></div>' : '')+
     (isInstalled() ? '' : '<div class="card"><h2>📲 Put Blip on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
       '<p class="muted">Get '+esc(S.name)+' as an app icon that opens full screen. It also keeps their save safer on iPhone.</p></div></div>'+
       '<p class="small"><b>iPhone:</b> tap the Share button <span class="kbd">⬆︎</span> in Safari, then <b>Add to Home Screen</b>.<br><b>Android:</b> tap the <span class="kbd">⋮</span> menu in Chrome, then <b>Add to Home screen</b> or <b>Install app</b>.</p></div>')+

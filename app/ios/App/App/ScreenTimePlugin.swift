@@ -19,6 +19,7 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "start", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "minutesFor", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "checkLog", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "quickTest", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resync", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remindOn", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remindOff", returnType: CAPPluginReturnPromise),
@@ -190,7 +191,51 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
             apps = sel.applicationTokens.count; cats = sel.categoryTokens.count; webs = sel.webDomainTokens.count
         }
         let acts = DeviceActivityCenter().activities.map { $0.rawValue }
-        call.resolve(["log": defaults?.stringArray(forKey: "log-" + day) ?? [], "apps": apps, "categories": cats, "webDomains": webs, "watching": acts])
+        call.resolve(["log": defaults?.stringArray(forKey: "log-" + day) ?? [], "apps": apps, "categories": cats, "webDomains": webs, "watching": acts,
+                      "diag": defaults?.dictionary(forKey: "diag-" + day) ?? [:],
+                      "qt": defaults?.dictionary(forKey: "qt-best") ?? [:], "qtStart": defaults?.double(forKey: "qt-start") ?? 0])
+    }
+
+    // TestFlight quick test: four counting methods side by side from this moment for one hour, in 1-minute steps,
+    // counting only use AFTER the tap (includesPastActivity false). Lets us compare against iPhone Screen Time many times a day.
+    // Logged only, never counted toward the Blip.
+    static let qtNames = ["qt-counter", "qt-web", "qt-all", "qt-cats"]
+    @objc func quickTest(_ call: CAPPluginCall) {
+        guard let d = defaults, let data = d.data(forKey: Self.selectionKey),
+              let sel = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) else { call.reject("Pick apps first"); return }
+        let cal = Calendar.current, now = Date()
+        let startDate = now.addingTimeInterval(-120)
+        var endDate = now.addingTimeInterval(3600)
+        if !cal.isDate(endDate, inSameDayAs: now) { endDate = cal.date(bySettingHour: 23, minute: 59, second: 59, of: now) ?? endDate }
+        if endDate.timeIntervalSince(startDate) < 16 * 60 { call.reject("Too close to midnight. Try after 12:05 AM."); return }
+        let comps: (Date) -> DateComponents = { cal.dateComponents([.hour, .minute, .second], from: $0) }
+        let schedule = DeviceActivitySchedule(intervalStart: comps(startDate), intervalEnd: comps(endDate), repeats: false)
+        let center = DeviceActivityCenter()
+        center.stopMonitoring(Self.qtNames.map { DeviceActivityName($0) })
+        d.removeObject(forKey: "qt-best")
+        d.set(now.timeIntervalSince1970, forKey: "qt-start")
+        let sets: [(String, Set<ApplicationToken>, Set<ActivityCategoryToken>, Set<WebDomainToken>)] = [
+            ("qt-counter", sel.applicationTokens, sel.categoryTokens, []),        // the real counter (categories + apps incl. Safari)
+            ("qt-web", sel.applicationTokens, sel.categoryTokens, sel.webDomainTokens), // build 20 way (with websites)
+            ("qt-all", [], [], []),                                               // build 21 way (no filter)
+            ("qt-cats", [], sel.categoryTokens, [])                               // categories only (without Safari and other picked apps)
+        ]
+        var failed: [String] = []
+        for (name, apps, cats, webs) in sets {
+            var ev: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
+            for m in 1...60 {
+                let n = DeviceActivityEvent.Name("t\(m)")
+                if #available(iOS 17.4, *) {
+                    ev[n] = DeviceActivityEvent(applications: apps, categories: cats, webDomains: webs, threshold: DateComponents(minute: m), includesPastActivity: false)
+                } else {
+                    ev[n] = DeviceActivityEvent(applications: apps, categories: cats, webDomains: webs, threshold: DateComponents(minute: m))
+                }
+            }
+            do { try center.startMonitoring(DeviceActivityName(name), during: schedule, events: ev) }
+            catch { failed.append(name + ": " + error.localizedDescription) }
+        }
+        Self.log(d, "quick test started" + (failed.isEmpty ? "" : " (failed: " + failed.joined(separator: "; ") + ")"))
+        call.resolve(["started": failed.count < sets.count, "failed": failed])
     }
 
     // Daily totals are only kept for about a week (privacy policy). Keys look like "minutes-YYYY-MM-DD".
