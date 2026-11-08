@@ -2053,7 +2053,7 @@ function todayMeterHTML(){
   if (!MORNING || !autoOn() || stToday == null) return '';
   const m = Math.min(960, stToday), pct = Math.min(100, Math.round(m / Math.max(1, S.goal) * 100)), over = m > S.goal;
   return '<div class="card" data-tap="goal"><h2 style="margin:0 0 6px">📱 Today so far</h2>'+
-    '<div class="goalnote"><span><b>'+fmtRange(m)+'</b> of your '+fmtTime(S.goal)+' goal</span><span>'+(over ? 'Over' : 'About '+fmtTime(S.goal - m)+' left')+'</span></div>'+
+    '<div class="goalnote"><span><b id="stx" style="display:inline-block;min-width:140px">'+fmtRange(m)+'</b> of your '+fmtTime(S.goal)+' goal</span><span>'+(over ? 'Over' : 'About '+fmtTime(S.goal - m)+' left')+'</span></div>'+
     '<i class="nbar"><u style="width:'+pct+'%'+(over ? ';background:var(--bad)' : '')+'"></u></i>'+
     '<p class="muted small" style="margin:8px 0 0">'+(joinedNote(stDayKey()) ? joinedNote(stDayKey())+' ' : '')+'Nothing is decided until the day ends. Every minute until midnight counts.</p></div>';
 }
@@ -3189,7 +3189,7 @@ function windowHTML(){
       '<div class="wname" data-tap="life">'+n+' · '+S.age+'</div></div>'+
       '<div class="chips">'+chip('💪', S.h, 'var(--h)', 'h')+chip('🧠', S.s, 'var(--s)', 's')+chip('😊', S.j, 'var(--j)', 'j')+'</div></div>'+
     '<div class="card wpanel"><div class="wm" data-tap="goal"><div class="wml"><span>📱 Today so far</span><b style="color:'+col+'">'+(over ? fmtTime(m - g)+'+ over' : 'About '+fmtTime(g - m)+' left')+'</b></div>'+
-      '<div class="wmv"><b>'+fmtRange(m)+'</b> of your '+fmtTime(g)+' goal</div><div class="wbar"><u style="width:'+pct+'%;background:'+col+'"></u></div></div>'+
+      '<div class="wmv"><b id="stx" style="display:inline-block;min-width:140px">'+fmtRange(m)+'</b> of your '+fmtTime(g)+' goal</div><div class="wbar"><u style="width:'+pct+'%;background:'+col+'"></u></div></div>'+
       '<div class="wrow"><div class="wst" data-tap="streak"><span>🔥</span><b>'+S.streak+'</b><small>day streak</small></div>'+tease+'</div>'+
       '<button class="btn wdown" id="phonedown">Put my phone down 👋</button></div>';
 }
@@ -4271,6 +4271,20 @@ if (remind.on) remindSync(); // keeps the reminder's Blip name current (new gene
 if (MORNING && stPlugin()) stPlugin().env().then(r => { if (r && r.testflight) { TESTFLIGHT = true; if (tab === 'settings') render(); } else if (S && S.testMode) { S.testMode = false; save(); render(); } }).catch(() => {});
 stRefresh();
 setTimeout(stResync, 1500);
+// Exact time so far: Apple's Screen Time report view (drawn by iOS, never readable by Blip) is laid over the #stx number.
+// The page's own 5-minute range stays underneath as a fallback. Hidden whenever a pop-up is open or #stx isn't on screen.
+let exactAt = '';
+function syncExact(){
+  const p = stPlugin(); if (!p || !p.showExact) return;
+  const el = document.getElementById('stx'), open = document.querySelector('.modal');
+  if (!el || open) { if (exactAt) { exactAt = ''; p.hideExact().catch(() => {}); } return; }
+  const r = el.getBoundingClientRect(), key = [Math.round(r.left), Math.round(r.top + window.scrollY), Math.round(r.width), Math.round(r.height)].join(',');
+  if (key === exactAt) return;
+  exactAt = key;
+  p.showExact({x: r.left - 2, y: r.top + window.scrollY - 4, w: r.width + 4, h: r.height + 8}).catch(() => { exactAt = ''; });
+}
+if (IS_APP) { let q = 0; new MutationObserver(() => { if (!q) q = requestAnimationFrame(() => { q = 0; syncExact(); }); }).observe(document.body, {childList: true, subtree: true});
+  window.addEventListener('resize', () => setTimeout(syncExact, 100)); setTimeout(syncExact, 800); }
 // iOS sends the 5-minute steps in the background, sometimes minutes later. Re-read them every 30 seconds while Blip is on screen.
 setInterval(() => { if (document.visibilityState === 'visible' && S) stRefresh(); }, 30000);
 </script>
