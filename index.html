@@ -679,6 +679,22 @@ function migrate(o){
   const toy = t => String(t).replace(/Video game designer/g, 'Toy designer').replace(/video game designer/g, 'toy designer');
   if (o.job) o.job = toy(o.job);
   if (o.log) for (const e of o.log) { if (e.text) e.text = toy(e.text); if (e.ms && e.ms.text) e.ms.text = toy(e.ms.text); }
+  // One-time repair (TestFlight build 21 counted idle time, e.g. 12h 30m for a real 1h 10m). Years judged from those
+  // impossible numbers become quiet years: their stat and money changes are undone and the streak is rebuilt.
+  if (o.log && !o.fix21) {
+    o.fix21 = true;
+    const badDay = e => e.src === 'st' && e.mins >= 600 && e.date && dayNum(e.date) >= dayNum('2026-11-7');
+    for (const e of o.log) if (badDay(e)) {
+      for (const k of ['h','s','j']) if (e.fx && e.fx[k]) o[k] = Math.max(0, Math.min(100, (o[k] || 0) - e.fx[k]));
+      if (e.earned) o.money = (o.money || 0) - e.earned;
+      e.tier = 'quiet'; e.mins = null; e.fx = {}; e.earned = 0; e.emoji = '🌙';
+      e.text = 'A quiet year. Blip miscounted this day, so it doesn\'t count.';
+      e.notes = (e.notes || []).filter(n => !/streak/i.test(n));
+    }
+    let st = 0;
+    for (let i = o.log.length - 1; i >= 0; i--) { const t = o.log[i].tier; if (t === 'quiet') continue; if (t === 'great' || t === 'good') st++; else break; }
+    if (st > (o.streak || 0)) { o.streak = st; o.best = Math.max(o.best || 0, st); }
+  }
   return o;
 }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} appBackup(); }
@@ -751,15 +767,16 @@ function stRefresh(){
 function showStCheck(){
   const p = stPlugin(); if (!p) return;
   const day = calKey(Date.now());
-  p.checkLog({day}).then(r => {
+  // If the phone doesn't answer in 6 seconds, say so instead of doing nothing.
+  Promise.race([p.checkLog({day}), new Promise((_, no) => setTimeout(() => no(new Error('the phone took too long to answer')), 6000))]).then(r => {
     const log = (r && r.log) || [];
     // Per-category summary (TestFlight check): highest step each picked category reached today.
     const cat = {}; log.forEach(x => { const m = x.match(/cat (\d+): (\d+)m/); if (m) cat[m[1]] = Math.max(cat[m[1]] || 0, +m[2]); });
     const catLine = Object.keys(cat).length ? '<br>By category (15-min steps): '+Object.keys(cat).sort((a, b) => a - b).map(k => '#'+k+' '+fmtTime(cat[k])).join(', ') : '';
     // Websites-only and apps-only watchers (TestFlight check): highest 5-minute step each reached today.
-    const part = {}; log.forEach(x => { const m = x.match(/ (web|apps|picked) (\d+)m$/); if (m) part[m[1]] = Math.max(part[m[1]] || 0, +m[2]); });
-    const partLine = '<br>Old way (picked categories): '+(part.picked ? fmtTime(part.picked) : 'none yet')+'<br>Websites only: '+(part.web ? fmtTime(part.web) : 'none yet')+' · Apps only: '+(part.apps ? fmtTime(part.apps) : 'none yet');
-    const lines = log.filter(x => !/ cat \d+:| (web|apps|picked) \d+m$/.test(x)).slice().reverse().map(x => esc(x)).join('<br>') || 'Nothing logged yet today.';
+    const part = {}; log.forEach(x => { const m = x.match(/ (web|apps|picked|all) (\d+)m$/); if (m) part[m[1]] = Math.max(part[m[1]] || 0, +m[2]); });
+    const partLine = '<br>Build 20 way (with websites): '+(part.picked ? fmtTime(part.picked) : 'none yet')+'<br>Build 21 way (no filter): '+(part.all ? fmtTime(part.all) : 'none yet')+'<br>Websites only: '+(part.web ? fmtTime(part.web) : 'none yet');
+    const lines = log.filter(x => !/ cat \d+:| (web|apps|picked|all) \d+m$/.test(x)).slice().reverse().map(x => esc(x)).join('<br>') || 'Nothing logged yet today.';
     modal('<h2>🔍 Screen Time check</h2><p class="muted small" style="text-align:left">Day: '+day+'<br>Blip\'s total so far: <b>'+(stToday == null ? 'none' : fmtTime(stToday))+'</b><br>'+
       'Counting: '+(r.categories || 0)+' categories, '+(r.apps || 0)+' apps, '+(r.webDomains || 0)+' websites<br>Watching: '+esc(((r && r.watching) || []).join(', ') || 'nothing')+catLine+partLine+'</p>'+
       '<div style="text-align:left;font-family:ui-monospace,Menlo,monospace;font-size:13px;max-height:45vh;overflow:auto;background:#f6f3ff;border-radius:12px;padding:10px">'+lines+'</div>'+

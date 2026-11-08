@@ -6,10 +6,10 @@ so automatic tracking can ship in TestFlight and App Store builds.
 How it works
 - `app/ios/App/App/ScreenTimePlugin.swift`: Capacitor plugin the game calls from index.html
   (`Capacitor.registerPlugin('ScreenTime')`, registered in MainViewController): `status`, `authorize`
-  (individual authorization), `pickApps` (Apple's picker; since 2026-11-06 it only feeds TestFlight comparison watchers),
-  `start`, `minutesFor(day)`. The daily counter uses DeviceActivityEvents with no app, category or
-  website filter, which Apple counts as ALL apps and websites (the same total as iPhone Screen Time).
-  Picked categories missed Safari (in no category) and most websites.
+  (individual authorization), `pickApps` (Apple's picker: tick All, then search for Safari and add it), `start`, `minutesFor(day)`.
+  The daily counter uses the picked categories + apps, WITHOUT websites (Safari's own time covers them;
+  counting both double counts). Picked categories without Safari missed ~1h on Nov 6. A no-filter event
+  (build 21) counted idle time (12h30m vs 1h10m on Nov 8), so never use it for the real count.
 - `app/ios/App/BlipMonitor/MonitorExtension.swift`: Device Activity Monitor extension (target
   `BlipMonitor`, bundle ID `io.github.gamesbyvidal.lifetime.monitor`). iOS calls it each time the
   day's total passes another 5 minutes; it saves the highest step reached for that day in the
@@ -44,12 +44,12 @@ Tracking is free and never changes what the shop sells or when it's shown.
 
 Legal review of e85c8b1 (2026-11-01): OK for TestFlight. Privacy label unchanged; policy docx updated.
 Before the App Store: live privacy.html URL; App Review note: "Settings > Automatic screen time >
-Connect Screen Time. Uses Family Controls individual authorization and counts total device usage via
-a DeviceActivityEvent with no app/category filter (5-minute thresholds, monitor only). No app blocking. Data stays on device. Manual entry works if permission is
+Connect Screen Time. Uses Family Controls individual authorization; the player picks all categories plus
+Safari in Apple's picker; DeviceActivity monitor only (5-minute thresholds). No app blocking. Data stays on device. Manual entry works if permission is
 declined."; store description and What's New lead with managing your own screen time.
 Never make an analytics event depend on the day's verdict.
-Before submission also (Lawyer 2026-11-06): remove the picker step and "Change what counts", the TestFlight
-"picked", "web" and "apps" watchers, and the Screen Time check log.
+Before submission also (Lawyer 2026-11-06): remove the TestFlight "picked", "web", "all" watchers, the
+diag- keys, and the Screen Time check log. (The picker stays: the no-filter counter failed.)
 
 Shop review note (add to the App Review note): "Style items (bow, tiara, dresses, Style starter set)
 appear in Shop > Style when the Blip is a girl (choose Girl at setup). Baby clothes appear in Shop >

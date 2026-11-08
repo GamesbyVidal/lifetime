@@ -90,28 +90,38 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
             intervalStart: DateComponents(hour: 0, minute: 0),
             intervalEnd: DateComponents(hour: 23, minute: 59, second: 59),
             repeats: true)
-        // The counter watches ALL apps and websites: an event with no apps, categories or websites "includes all
-        // applications, categories, and web domains" (Apple's DeviceActivityEvent docs). Category picks miss Safari,
-        // which sits in no category, and most websites. Nov 6 test: picked categories counted 1h, iPhone said 2h21m.
+        // The counter watches the picked categories and apps (pick All, then search for Safari and add it: Safari is in no category).
+        // Websites are left out on purpose: Safari's own time already covers them, and counting both double counts.
+        // History: picked categories + websites missed Safari (Nov 6: 1h vs iPhone 2h21m). An event with no filter
+        // ("all activity", build 21) counted idle time (Nov 8: 12h30m vs 1h10m), so it is only watched for the log now.
         var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
         for m in stride(from: stepMinutes, through: maxMinutes, by: stepMinutes) {
             let name = DeviceActivityEvent.Name("m\(m)")
             if #available(iOS 17.4, *) {
-                events[name] = DeviceActivityEvent(applications: [], categories: [], webDomains: [], threshold: DateComponents(minute: m), includesPastActivity: true)
+                events[name] = DeviceActivityEvent(applications: selection.applicationTokens, categories: selection.categoryTokens, webDomains: [], threshold: DateComponents(minute: m), includesPastActivity: true)
             } else {
-                events[name] = DeviceActivityEvent(applications: [], categories: [], webDomains: [], threshold: DateComponents(minute: m))
+                events[name] = DeviceActivityEvent(applications: selection.applicationTokens, categories: selection.categoryTokens, webDomains: [], threshold: DateComponents(minute: m))
             }
+        }
+        // One time after build 21: today's stored total came from the no-filter counter (idle time included), so start today
+        // over. The restart below makes iOS re-send today's real steps (includesPastActivity).
+        if d?.bool(forKey: "reset-b22") != true {
+            let f = DateFormatter(); f.calendar = Calendar(identifier: .gregorian); f.locale = Locale(identifier: "en_US_POSIX"); f.dateFormat = "yyyy-MM-dd"
+            let day = f.string(from: Date())
+            d?.removeObject(forKey: "minutes-" + day); d?.removeObject(forKey: "diag-" + day)
+            d?.set(true, forKey: "reset-b22")
+            log(d, "today's total reset (build 21 counted idle time)")
         }
         let center = DeviceActivityCenter()
         center.stopMonitoring([.daily])
         try center.startMonitoring(.daily, during: schedule, events: events)
-        log(d, "counter started, all apps and websites (" + reason + ")")
+        log(d, "counter started, picked categories + apps (" + reason + ")")
         // The old per-category watcher ("cats") is retired: the "picked", "web" and "apps" watchers below replace it.
-        center.stopMonitoring([DeviceActivityName("cats")])
-        // TestFlight check: three watchers that are logged only, never counted: websites only, picked apps only, and the old
-        // picked-categories counter. They show what the all-activity counter adds compared with the old way.
-        func part(_ name: String, apps: Set<ApplicationToken> = [], cats: Set<ActivityCategoryToken> = [], webs: Set<WebDomainToken> = [], upTo: Int = 240) {
-            guard !apps.isEmpty || !cats.isEmpty || !webs.isEmpty else { return }
+        center.stopMonitoring([DeviceActivityName("cats"), DeviceActivityName("apps")])
+        // TestFlight check: three watchers that are logged only, never counted: websites only, the build 20 counter
+        // (categories + apps + websites) and the build 21 counter (no filter).
+        func part(_ name: String, apps: Set<ApplicationToken> = [], cats: Set<ActivityCategoryToken> = [], webs: Set<WebDomainToken> = [], all: Bool = false, upTo: Int = 240) {
+            guard all || !apps.isEmpty || !cats.isEmpty || !webs.isEmpty else { return }
             var ev: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
             for m in stride(from: Self.stepMinutes, through: upTo, by: Self.stepMinutes) {
                 let n = DeviceActivityEvent.Name("\(name)\(m)")
@@ -127,9 +137,9 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
             catch { Self.log(d, name + " watcher failed: " + error.localizedDescription) }
         }
         part("web", webs: selection.webDomainTokens)
-        part("apps", apps: selection.applicationTokens)
-        // The old way (the player's picked apps, categories and websites), side by side with the new all-activity counter.
+        // The build 20 way (picked apps, categories and websites) and the build 21 way (no filter), side by side.
         part("picked", apps: selection.applicationTokens, cats: selection.categoryTokens, webs: selection.webDomainTokens, upTo: 480)
+        part("all", all: true, upTo: 480)
         log(d, d?.bool(forKey: "entireCategory") == true ? "whole categories incl. websites: on" : "whole categories incl. websites: OFF (re-pick in Change what counts)")
     }
 
@@ -196,6 +206,7 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         for key in d.dictionaryRepresentation().keys {
             if key.hasPrefix("minutes-"), String(key.dropFirst(8)) < oldest { d.removeObject(forKey: key) }
             if key.hasPrefix("log-"), String(key.dropFirst(4)) < oldest { d.removeObject(forKey: key) }
+            if key.hasPrefix("diag-"), String(key.dropFirst(5)) < oldest { d.removeObject(forKey: key) }
         }
     }
 
@@ -236,7 +247,7 @@ private struct PickerView: View {
     var body: some View {
         NavigationView {
             FamilyActivityPicker(selection: $selection)
-                .navigationTitle("Choose All apps")
+                .navigationTitle("Tick All, then search Safari")
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) { Button("Cancel") { done(nil) } }
                     ToolbarItem(placement: .confirmationAction) { Button("Done") { done(selection) } }
