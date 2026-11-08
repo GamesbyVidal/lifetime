@@ -772,7 +772,7 @@ function showStCheck(){
   const day = calKey(Date.now());
   const ft = m => m ? fmtTime(m) : '0m';
   // If the phone doesn't answer in 6 seconds, say so instead of doing nothing.
-  Promise.race([p.checkLog({day}), new Promise((_, no) => setTimeout(() => no(new Error('the phone took too long to answer')), 6000))]).then(r => {
+  Promise.race([p.checkLog({day}), new Promise((_, no) => setTimeout(() => no(new Error('the phone took too long to answer')), 12000))]).then(r => {
     r = r || {};
     const log = r.log || [], dg = r.diag || {}, qt = r.qt || {};
     let iph = {}; try { iph = JSON.parse(localStorage.getItem('blip-stcheck') || '{}'); } catch(e) {}

@@ -121,10 +121,10 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         center.stopMonitoring([DeviceActivityName("cats"), DeviceActivityName("apps")])
         // TestFlight check: three watchers that are logged only, never counted: websites only, the build 20 counter
         // (categories + apps + websites) and the build 21 counter (no filter).
-        func part(_ name: String, apps: Set<ApplicationToken> = [], cats: Set<ActivityCategoryToken> = [], webs: Set<WebDomainToken> = [], all: Bool = false, upTo: Int = 240) {
+        func part(_ name: String, apps: Set<ApplicationToken> = [], cats: Set<ActivityCategoryToken> = [], webs: Set<WebDomainToken> = [], all: Bool = false, upTo: Int = 240, step: Int = 15) {
             guard all || !apps.isEmpty || !cats.isEmpty || !webs.isEmpty else { return }
             var ev: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
-            for m in stride(from: Self.stepMinutes, through: upTo, by: Self.stepMinutes) {
+            for m in stride(from: step, through: upTo, by: step) {
                 let n = DeviceActivityEvent.Name("\(name)\(m)")
                 if #available(iOS 17.4, *) {
                     ev[n] = DeviceActivityEvent(applications: apps, categories: cats, webDomains: webs, threshold: DateComponents(minute: m), includesPastActivity: true)
@@ -144,12 +144,20 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         log(d, d?.bool(forKey: "entireCategory") == true ? "whole categories incl. websites: on" : "whole categories incl. websites: OFF (re-pick in Change what counts)")
     }
 
+    // Restarting the watchers is a slow call into iOS. Capacitor runs every plugin call on one shared queue, so a slow restart
+    // used to hold up everything behind it (the Screen Time check timed out on Nov 8). Restarts now run on their own queue.
+    static let work = DispatchQueue(label: "io.github.gamesbyvidal.lifetime.screentime")
+
     @objc func start(_ call: CAPPluginCall) {
-        do {
-            try Self.startMonitor(defaults, reason: "connect or change what counts")
-            call.resolve(["started": true])
-        } catch {
-            call.reject("Could not start: \(error.localizedDescription)")
+        let d = defaults
+        Self.work.async {
+            do {
+                try Self.startMonitor(d, reason: "connect or change what counts")
+                d?.set(Date().timeIntervalSince1970, forKey: "last-resync")
+                call.resolve(["started": true])
+            } catch {
+                call.reject("Could not start: \(error.localizedDescription)")
+            }
         }
     }
 
@@ -158,12 +166,18 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func resync(_ call: CAPPluginCall) {
         guard #available(iOS 17.4, *) else { call.resolve(["resynced": false]); return }
         guard AuthorizationCenter.shared.authorizationStatus == .approved else { call.resolve(["resynced": false]); return }
-        do {
-            try Self.startMonitor(defaults, reason: "app opened, re-sync")
-            call.resolve(["resynced": true])
-        } catch {
-            Self.log(defaults, "re-sync failed: " + error.localizedDescription)
-            call.resolve(["resynced": false])
+        // At most every 10 minutes: each restart makes iOS re-send all of today's steps.
+        let d = defaults
+        if let last = d?.double(forKey: "last-resync"), Date().timeIntervalSince1970 - last < 600 { call.resolve(["resynced": false]); return }
+        d?.set(Date().timeIntervalSince1970, forKey: "last-resync")
+        Self.work.async {
+            do {
+                try Self.startMonitor(d, reason: "app opened, re-sync")
+                call.resolve(["resynced": true])
+            } catch {
+                Self.log(d, "re-sync failed: " + error.localizedDescription)
+                call.resolve(["resynced": false])
+            }
         }
     }
 
@@ -191,7 +205,7 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
             apps = sel.applicationTokens.count; cats = sel.categoryTokens.count; webs = sel.webDomainTokens.count
         }
         let acts = DeviceActivityCenter().activities.map { $0.rawValue }
-        call.resolve(["log": defaults?.stringArray(forKey: "log-" + day) ?? [], "apps": apps, "categories": cats, "webDomains": webs, "watching": acts,
+        call.resolve(["log": Array((defaults?.stringArray(forKey: "log-" + day) ?? []).suffix(300)), "apps": apps, "categories": cats, "webDomains": webs, "watching": acts,
                       "diag": defaults?.dictionary(forKey: "diag-" + day) ?? [:],
                       "qt": defaults?.dictionary(forKey: "qt-best") ?? [:], "qtStart": defaults?.double(forKey: "qt-start") ?? 0])
     }
@@ -203,6 +217,9 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func quickTest(_ call: CAPPluginCall) {
         guard let d = defaults, let data = d.data(forKey: Self.selectionKey),
               let sel = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data) else { call.reject("Pick apps first"); return }
+        Self.work.async { Self.runQuickTest(d, sel, call) }
+    }
+    static func runQuickTest(_ d: UserDefaults, _ sel: FamilyActivitySelection, _ call: CAPPluginCall) {
         let cal = Calendar.current, now = Date()
         let startDate = now.addingTimeInterval(-120)
         var endDate = now.addingTimeInterval(3600)
