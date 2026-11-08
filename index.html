@@ -764,6 +764,7 @@ function stRefresh(){
   }).catch(() => {});
 }
 // TestFlight-only "Screen Time check": the phone's own log of when each step arrived today. Never shared or sent anywhere.
+function devOn(){ try { return localStorage.getItem('blip-dev') === '1'; } catch(e) { return false; } }
 function showStCheck(){
   const p = stPlugin(); if (!p) return;
   const day = calKey(Date.now());
@@ -840,7 +841,7 @@ function stConnect(){
 }
 function stCardHTML(){
   if (!IS_APP) return '';
-  if (autoOn()) return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">On. Blip reads your day\'s total from iPhone Screen Time, rounded to 5 minutes. It never sees which apps you use, and the number never leaves your phone.</p>'+
+  if (autoOn()) return '<div class="card"><h2 id="sthead">📱 Automatic screen time</h2><p class="muted">On. Blip reads your day\'s total from iPhone Screen Time, rounded to 5 minutes. It never sees which apps you use, and the number never leaves your phone.</p>'+
     '<button class="btn ghost" id="stpick">Change what counts</button><button class="btn ghost" id="stoff" style="margin-top:8px">Turn off and enter it myself</button></div>';
   return '<div class="card"><h2>📱 Automatic screen time</h2><p class="muted">Skip typing it in. Blip can read your day\'s total from iPhone Screen Time. It only gets one number a day, rounded to 5 minutes, never which apps, and it stays on your phone. Free, always.</p>'+
     (stNote ? '<div class="verdict" style="background:#fff3d6;color:#6b4a00">'+esc(stNote)+'</div>' : '')+
@@ -865,6 +866,10 @@ function remindCardHTML(){
 }
 function bindRemind(){
   if ($('stcheck')) $('stcheck').onclick = showStCheck;
+  // Developer tools unlock (TestFlight only): hold the "Automatic screen time" heading for 3 seconds. Not for other testers.
+  if ($('sthead') && TESTFLIGHT) { let t = 0; const h = $('sthead');
+    h.addEventListener('touchstart', () => { t = setTimeout(() => { try { localStorage.setItem('blip-dev', devOn() ? '0' : '1'); } catch(e) {} render(); }, 3000); }, {passive: true});
+    ['touchend', 'touchmove', 'touchcancel'].forEach(ev => h.addEventListener(ev, () => clearTimeout(t), {passive: true})); }
   if ($('rmon')) $('rmon').onchange = e => {
     remind.on = e.target.checked; remindNote = ''; remindSave(); render();
     remindSync().then(ok => { if (!ok && remind.on) { remind.on = false; remindSave(); remindNote = 'Notifications are off for Blip. You can turn them on in iPhone Settings > Notifications > Blip.'; render(); } });
@@ -2859,7 +2864,7 @@ function settingsHTML(){
     stCardHTML()+remindCardHTML()+
     '<div class="card"><h2>Name</h2><input type="text" id="nm" maxlength="20" value="'+esc(S.name)+'"></div>'+
     (!IS_APP || TESTFLIGHT ? '<div class="card"><h2>Testing</h2><div class="switch"><span>Let me check in more than once a day (for trying the game out)</span><input type="checkbox" id="tm" '+(S.testMode?'checked':'')+'></div></div>' : '')+
-    (IS_APP && TESTFLIGHT && autoOn() ? '<div class="card"><h2>🔍 Screen Time check</h2><p class="muted small">TestFlight only. Compare Blip with iPhone Screen Time, run quick tests, and copy the results for Claude.</p><button class="btn alt" id="stcheck">Open Screen Time check</button></div>' : '')+
+    (IS_APP && TESTFLIGHT && devOn() && autoOn() ? '<div class="card"><h2>🔍 Screen Time check</h2><p class="muted small">TestFlight only. Compare Blip with iPhone Screen Time, run quick tests, and copy the results for Claude.</p><button class="btn alt" id="stcheck">Open Screen Time check</button></div>' : '')+
     (isInstalled() ? '' : '<div class="card"><h2>📲 Put Blip on your home screen</h2><div class="install"><img id="iconprev" alt="" src="'+(iconURL || 'icon.png')+'"><div>'+
       '<p class="muted">Get '+esc(S.name)+' as an app icon that opens full screen. It also keeps their save safer on iPhone.</p></div></div>'+
       '<p class="small"><b>iPhone:</b> tap the Share button <span class="kbd">⬆︎</span> in Safari, then <b>Add to Home Screen</b>.<br><b>Android:</b> tap the <span class="kbd">⋮</span> menu in Chrome, then <b>Add to Home screen</b> or <b>Install app</b>.</p></div>')+
