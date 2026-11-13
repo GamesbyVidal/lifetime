@@ -304,8 +304,18 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         info["skin"] = call.getString("skin") ?? "#f1c27d"
         info["hair"] = call.getString("hair") ?? "#3b2a4a"
         info["girl"] = call.getBool("girl") ?? false
+        // The player's own Blip, drawn by the app (only sent when the look changes).
+        var newArt = false
+        if let dir = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Self.group) {
+            for name in ["faceHappy", "faceGlum", "faceNeutral", "bodyHappy", "bodyGlum"] {
+                if let b64 = call.getString(name), let data = Data(base64Encoded: b64) {
+                    try? data.write(to: dir.appendingPathComponent("widget-" + name + ".png"), options: .atomic)
+                    newArt = true
+                }
+            }
+        }
         let old = defaults?.dictionary(forKey: "widget") as NSDictionary?
-        if old == nil || !old!.isEqual(to: info) {
+        if newArt || old == nil || !old!.isEqual(to: info) {
             defaults?.set(info, forKey: "widget")
             WidgetCenter.shared.reloadAllTimelines()
         }

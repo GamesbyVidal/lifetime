@@ -709,7 +709,29 @@ function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){
 function widgetSync(){
   if (!IS_APP || !S || !S.auto) return;
   const p = nativePlugin('ScreenTime'); if (!p || !p.widget) return;
-  try { const r = p.widget({goal: S.goal, name: S.name, age: S.age, streak: S.streak, skin: S.skin, hair: S.hair, girl: !!S.girl}); if (r && r.catch) r.catch(() => {}); } catch(e) {}
+  const send = art => { try { const r = p.widget(Object.assign({goal: S.goal, name: S.name, age: S.age, streak: S.streak, skin: S.skin, hair: S.hair, girl: !!S.girl}, art || {})); if (r && r.catch) r.catch(() => {}); } catch(e) {} };
+  // The widget draws the player's own Blip with the app's art: pictures are made here and only re-sent when the look changes.
+  const look = JSON.stringify([stage(S.age), S.skin, S.hair, !!S.girl, S.s >= 70, S.h < 35, myWear(), 2]);
+  let old = null; try { old = localStorage.getItem('blip-widget-look'); } catch(e) {}
+  if (old === look) return send();
+  widgetArt().then(art => { send(art); try { localStorage.setItem('blip-widget-look', look); } catch(e) {} }).catch(() => send());
+}
+// Pictures for the widget: the head (happy, glum, neutral) and the whole Blip (happy, glum). Glum is gentle: no tear (Lawyer).
+function widgetArt(){
+  const sc = {baby:.62, kid:.8, middle:.86, teen:.92, young:.97, adult:1, senior:.95}[stage(S.age)];
+  const O = '#3b2a4a', glum = () => '<path d="M90 115 Q100 109 110 115" stroke="'+O+'" stroke-width="3" fill="none" stroke-linecap="round"/>';
+  const flat = () => '<path d="M91 110 L109 110" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/>';
+  const svg = (mood, extra) => charSVG(Object.assign({}, S, {mood, nobg: true, wear: myWear(), log: [{tier: mood === 'sad' ? 'bad' : 'good'}]}, extra || {}));
+  const cy = 230 - 150 * sc, hw = 58 * sc;
+  const head = t => t.replace(/viewBox="0 0 200 240"/, 'viewBox="'+(100 - hw).toFixed(1)+' '+(cy - hw).toFixed(1)+' '+(2*hw).toFixed(1)+' '+(2*hw).toFixed(1)+'" overflow="hidden"');
+  const png = (t, w, h) => new Promise((ok, no) => {
+    const img = new Image(); img.onload = () => { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; cv.getContext('2d').drawImage(img, 0, 0, w, h); ok(cv.toDataURL('image/png').split(',')[1]); };
+    img.onerror = no; img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(t.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" '));
+  });
+  return Promise.all([
+    png(head(svg('happy')), 240, 240), png(head(svg('sad', {mouth: true, face: glum})), 240, 240), png(head(svg('happy', {mouth: true, face: flat})), 240, 240),
+    png(svg('happy'), 250, 300), png(svg('sad', {mouth: true, face: glum}), 250, 300)
+  ]).then(a => ({faceHappy: a[0], faceGlum: a[1], faceNeutral: a[2], bodyHappy: a[3], bodyGlum: a[4]}));
 }
 
 // ============ PHONE APP (App Store / Google Play version) ============

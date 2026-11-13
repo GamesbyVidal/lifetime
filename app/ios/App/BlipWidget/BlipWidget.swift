@@ -103,7 +103,12 @@ struct Provider: TimelineProvider {
     }
 }
 
-// MARK: - The player's own Blip face
+// MARK: - The player's own Blip (pictures the app draws with its own art; simple drawing only as a fallback)
+
+func blipArt(_ name: String) -> UIImage? {
+    guard let dir = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: group) else { return nil }
+    return UIImage(contentsOfFile: dir.appendingPathComponent("widget-" + name + ".png").path)
+}
 
 struct Mouth: Shape {
     let mood: Int // 1 smile, 0 neutral, -1 glum
@@ -131,6 +136,16 @@ struct BlipFace: View {
     @Environment(\.redactionReasons) private var reasons
 
     var body: some View {
+        // The mood gives the result away, so it goes neutral when the phone hides private widget data.
+        let art = blipArt(reasons.contains(.privacy) ? "faceNeutral" : (e.over ? "faceGlum" : "faceHappy"))
+        if let art = art {
+            Image(uiImage: art).resizable().scaledToFit().clipShape(Circle())
+        } else {
+            drawn
+        }
+    }
+
+    private var drawn: some View {
         GeometryReader { g in
             let s = min(g.size.width, g.size.height)
             let line = max(1.5, s * 0.05)
@@ -219,6 +234,12 @@ struct RoomView: View {
                     .overlay(Ellipse().stroke(ink, lineWidth: 2))
                     .frame(width: w * 0.7, height: h * 0.12).offset(x: w * 0.15, y: h * 0.82)
                 // the Blip
+                if let whole = blipArt(e.over ? "bodyGlum" : "bodyHappy") {
+                    Image(uiImage: whole).resizable().scaledToFit()
+                        .frame(width: w * 0.7, height: h * 0.84)
+                        .frame(width: w).offset(y: h * 0.1)
+                        .privacySensitive()
+                } else {
                 VStack(spacing: -h * 0.03) {
                     BlipFace(e: e).frame(width: w * 0.42, height: w * 0.42)
                     RoundedRectangle(cornerRadius: 8).fill(e.girl ? Color(red: 0.36, green: 0.76, blue: 0.69) : Color(red: 0.22, green: 0.62, blue: 0.56))
@@ -226,6 +247,7 @@ struct RoomView: View {
                         .frame(width: w * 0.3, height: h * 0.26)
                 }
                 .frame(width: w).offset(y: h * 0.3)
+                }
             }
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(ink, lineWidth: 2.5))
