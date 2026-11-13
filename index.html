@@ -356,6 +356,11 @@ h2.earnh{display:flex;justify-content:space-between;align-items:baseline;gap:8px
 .cltile b{display:block;font-weight:700;line-height:1.2;margin-top:2px}.cltile span{display:block;font-size:11px;color:#2f9a4a;font-weight:700}.cltile.on{border-color:#5cc26b;background:#effbf0}.cltile[disabled]{opacity:.5}
 .clnew{position:absolute;right:-4px;top:-6px;background:#ff5a8a;color:#fff;font-style:normal;font-size:10px;font-weight:700;border-radius:99px;padding:1px 6px;border:2px solid #fff}.wname{position:absolute;left:10px;bottom:8px;background:rgba(255,255,255,.85);border-radius:99px;padding:2px 10px;font-weight:700;font-size:14px}
 .wincard .chips{padding:0 10px 10px}
+.linkbtn.whylow{display:block;margin:8px auto 0;font-size:13px;color:#7c5cff;text-decoration:underline;font-weight:600;background:none;border:0;cursor:pointer}
+.modal.bsheet{align-items:flex-end;padding-bottom:0}.modal.bsheet .card{border-radius:24px 24px 0 0;padding-bottom:calc(20px + env(safe-area-inset-bottom));animation:sheetup .3s ease-out}
+@keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}.whyart{display:flex;align-items:flex-end;justify-content:center;gap:2px}.whyart svg:nth-child(2){margin:0 -6px 40px -14px}
+.gaskart{display:flex;justify-content:center}.gaskt{display:inline-block;background:#efeaff;color:#7c5cff;font-weight:700;font-size:12px;border-radius:99px;padding:3px 10px}
+.gdays{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.gdays div{border:2.5px solid #3b2a4a;border-radius:12px;padding:6px 4px;background:#fff}.gdays small{display:block;color:var(--soft);font-size:11px}.gdays b{font-size:16px}
 .wpanel{background:#fffaf0}.wm{border:2.5px solid #3b2a4a;border-radius:16px;padding:10px 12px;background:#fff}.wml{display:flex;justify-content:space-between;font-size:13px;color:var(--soft)}.wml b{font-size:13px}
 .wmv{font-size:15px;color:var(--soft)}.wmv b{font-size:22px;color:var(--ink)}.wbar{height:12px;border-radius:9px;background:#eee9f8;border:2px solid #3b2a4a;overflow:hidden;margin-top:6px}.wbar u{display:block;height:100%}
 .wrow{display:flex;gap:10px;margin-top:10px}.wst{flex:none;width:78px;border:2.5px solid #3b2a4a;border-radius:16px;background:#fff;text-align:center;padding:6px 4px}.wst span{display:block;font-size:22px}.wst b{display:block;font-size:22px;line-height:1}.wst small{font-size:11px;color:var(--soft)}
@@ -1161,7 +1166,7 @@ function shopHTML(){
 
 function shopTop(name){
   return '<div class="top"><div class="logo">'+(shopTab === 'closet' ? name+'\'s closet' : 'Gift shop')+'<small>'+(shopTab === 'closet' ? 'Everything you\'ve given '+name : 'For '+name+' 💜')+'</small></div></div>'+
-    (shopTab === 'closet' ? '' : '<div class="gtag"><b>Your Blip earns their life.<br>You give them their style. 💜</b><span>★ Every gift is an heirloom for the next generation</span></div>');
+    (shopTab === 'closet' ? '' : '<div class="gaskt"><b>Your Blip earns their life.<br>You give them their style. 💜</b><span>★ Every gift is an heirloom for the next generation</span></div>');
 }
 function shopTabs(){
   const baby = stage(S.age) === 'baby';
@@ -1261,10 +1266,6 @@ function dayKey(n){ const d = new Date(n * 864e5); return d.getUTCFullYear()+'-'
 function canCheckIn(){ return S.testMode || S.lastDate !== today(); }
 function clamp(v){ return Math.max(0, Math.min(100, Math.round(v))); }
 function fmtTime(m){ const h = Math.floor(m/60), mm = m%60; return h ? (mm ? h+'h '+mm+'m' : h+'h') : mm+'m'; }
-// Live Screen Time arrives in 5-minute steps (rounded down), so the true number is somewhere in the next 5 minutes.
-// Showing that range means iPhone's own Screen Time number almost always sits inside it.
-function fmtRange(m){ const a = fmtTime(m), b = fmtTime(m + 5), ah = Math.floor(m/60), bh = Math.floor((m+5)/60);
-  return ah && ah === bh && m % 60 ? a.replace(/m$/, '')+'–'+(m+5)%60+'m' : !ah && !bh ? m+'–'+(m+5)+'m' : a+'–'+b; }
 function fmtMoney(k){ if (k < 0) return '-'+fmtMoney(-k); if (k >= 1000) return '$'+(k/1000).toFixed(k >= 10000 ? 0 : 1)+'M'; return '$'+Math.round(k)+'K'; }
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
@@ -1950,6 +1951,42 @@ function showTomorrowCard(){
   const t = $('trm'); if (t) t.onchange = () => { remind.on = t.checked; remindSave();
     remindSync().then(ok => { if (!ok && remind.on) { remind.on = false; remindSave(); t.checked = false; $('trmn').textContent = 'Notifications are off for Blip. You can turn them on in iPhone Settings > Notifications > Blip.'; } }); };
 }
+// "Blip's count" (Matthew 2026-11-12, Lawyer-approved wording): Blip's number comes from Apple's threshold counter and is
+// usually lower than iPhone's Settings, so it always carries its own name and a plain explanation. Never claim it matches Settings.
+function showWhyLower(){
+  const O = '#3b2a4a', tally = '<svg viewBox="0 0 96 110" width="84" aria-hidden="true"><rect x="10" y="8" width="76" height="70" rx="6" fill="#fff6dc" stroke="'+O+'" stroke-width="3"/>'+
+    '<path d="M22 22v24M30 22v24M38 22v24M46 22v24M18 40l32-14M58 22v24M66 22v24M74 22v24" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/><path d="M22 58v12M30 58v12M38 58v12" stroke="'+O+'" stroke-width="3" stroke-linecap="round"/>'+
+    '<path d="M22 78l-8 28M74 78l8 28" stroke="'+O+'" stroke-width="4" stroke-linecap="round"/></svg>';
+  const glass = '<svg viewBox="0 0 40 40" width="34" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="#e8f6ff" stroke="'+O+'" stroke-width="3"/><path d="M24 24l11 11" stroke="'+O+'" stroke-width="5" stroke-linecap="round"/></svg>';
+  modal('<div class="whyart">'+blipAt(S.age, (S.log[S.log.length-1] || {}).tier || 'good', 96)+glass+tally+'</div>'+
+    '<h2 style="margin:6px 0">Why Blip\'s count is lower</h2>'+
+    '<p class="muted" style="text-align:left">Blip counts time in the apps and websites you picked, in 5-minute steps. iPhone\'s Settings can also include time when no app is open, like your home or lock screen, so its number is usually higher.</p>'+
+    '<p class="muted" style="text-align:left">Your goal is set on Blip\'s count, so every day is scored the same fair way.</p>'+
+    '<button class="btn" data-close>Got it</button>', 'bsheet');
+}
+// Day-3 goal check-in: once, after the first 3 automatic days, offer a goal on Blip's own scale. Optional, starts tomorrow,
+// no health wording, never near the shop. Analytics only say the card showed or the goal changed (no numbers).
+function goalAskDue(){
+  if (S.goalAsked || !autoOn() || goodbye || tab !== 'home') return false;
+  return S.log.filter(e => e.src === 'st' && e.mins != null).length >= 3;
+}
+function showGoalAsk(){
+  const days = S.log.filter(e => e.src === 'st' && e.mins != null).slice(-3);
+  const avg = Math.round(days.reduce((a, e) => a + e.mins, 0) / days.length / 5) * 5;
+  const v = Math.min(960, Math.max(30, Math.round(avg / 30) * 30));
+  S.goalAsked = true; save();
+  if (v === S.goal) return;
+  track('goal-card-shown');
+  const wd = e => { const n = dayNum(e.date) - (MORNING ? 1 : 0); return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(n * 864e5).getUTCDay()]; };
+  modal('<div class="gaskart">'+blipAt(S.age, 'great', 92)+'</div><div class="gaskt">🎉 Goal check-in</div>'+
+    '<h2 style="margin:4px 0 10px">Your first 3 days are in!</h2>'+
+    '<div class="gdays">'+days.map(e => '<div><small>'+wd(e)+'</small><b>'+fmtTime(e.mins)+'</b></div>').join('')+'</div>'+
+    '<p style="margin:12px 0 2px">By Blip\'s count you average about <b>'+fmtTime(avg)+'</b> a day. Want your goal at <b>'+fmtTime(v)+'</b>?</p>'+
+    '<p class="muted small" style="margin:0 0 12px">Your goal right now: '+fmtTime(S.goal)+'. A new goal starts tomorrow.</p>'+
+    '<button class="btn wdown" id="gaskyes">Yes, set '+fmtTime(v)+'</button><button class="btn" id="gaskno" style="margin-top:10px;background:#fff;color:#3b2a4a;border:2.5px solid #3b2a4a;box-shadow:0 4px 0 #3b2a4a">Keep my goal</button>');
+  $('gaskyes').onclick = () => { S.goalNext = v; save(); track('goal-changed'); document.querySelector('.modal').remove(); render(); };
+  $('gaskno').onclick = () => document.querySelector('.modal').remove();
+}
 function showGoalCard(){
   const recent = S.log.slice(-7).filter(e => e.mins != null), avg = recent.length ? Math.round(recent.reduce((a, e) => a + e.mins, 0) / recent.length / 5) * 5 : null;
   const cur = S.goal; let v = S.goalNext != null ? S.goalNext : cur;
@@ -2007,9 +2044,9 @@ function homeHTML(){
   if (open && autoOn() && stYest != null) {
     const m = Math.min(960, stYest);
     return header()+hero+
-      '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one?' : 'Yesterday\'s screen time')+'</h2>'+
+      '<div class="card"><h2 class="ci">'+(S.age === 0 ? 'Ready for year one?' : 'Yesterday · Blip\'s count')+'</h2>'+
       '<div class="picker"><div class="v">'+fmtTime(m)+'</div></div>'+
-      '<p class="muted small" style="text-align:center;margin:0 0 8px">'+(joinedNote(stYestKey()) ? 'Yesterday: '+fmtTime(m)+'. '+joinedNote(stYestKey()) : 'Yesterday: '+fmtTime(m)+', the whole day, from iPhone Screen Time.')+'</p>'+
+      '<p class="muted small" style="text-align:center;margin:0 0 8px">'+(joinedNote(stYestKey()) ? 'Yesterday: '+fmtTime(m)+'. '+joinedNote(stYestKey()) : 'Yesterday · Blip\'s count '+fmtTime(m)+', the whole day.')+'</p>'+
       '<div class="goalnote"><span>Your goal: '+fmtTime(S.goal)+' or less</span><span>Best streak: '+S.best+'</span></div>'+
       verdictHTML(m, joinedTier(m))+'<button class="btn" id="goauto">Live year '+(S.age+1)+' ➜</button></div>'+
       (S.log.length ? weekHTML() : '')+teaserHTML(S.age)+share;
@@ -2052,10 +2089,11 @@ let homeMins = null; // what the player has dialed in so far today
 function todayMeterHTML(){
   if (!MORNING || !autoOn() || stToday == null) return '';
   const m = Math.min(960, stToday), pct = Math.min(100, Math.round(m / Math.max(1, S.goal) * 100)), over = m > S.goal;
-  return '<div class="card" data-tap="goal"><h2 style="margin:0 0 6px">📱 Today so far</h2>'+
-    '<div class="goalnote"><span><b>'+fmtRange(m)+'</b> of your '+fmtTime(S.goal)+' goal</span><span>'+(over ? 'Over' : 'About '+fmtTime(S.goal - m)+' left')+'</span></div>'+
+  return '<div class="card" data-tap="goal"><h2 style="margin:0 0 6px">Blip\'s count today</h2>'+
+    '<div class="goalnote"><span><b>'+fmtTime(m)+'</b> of your '+fmtTime(S.goal)+' goal</span><span>'+(over ? fmtTime(m - S.goal)+' over' : 'About '+fmtTime(S.goal - m)+' left')+'</span></div>'+
     '<i class="nbar"><u style="width:'+pct+'%'+(over ? ';background:var(--bad)' : '')+'"></u></i>'+
-    '<p class="muted small" style="margin:8px 0 0">'+(joinedNote(stDayKey()) ? joinedNote(stDayKey())+' ' : '')+'Nothing is decided until the day ends. Every minute until midnight counts.</p></div>';
+    '<p class="muted small" style="margin:8px 0 0">'+(joinedNote(stDayKey()) ? joinedNote(stDayKey())+' ' : '')+'Nothing is decided until the day ends. Every minute until midnight counts.</p>'+
+    '<button class="linkbtn whylow" id="whylow">ⓘ Why is this lower than iPhone\'s Settings?</button></div>';
 }
 
 function opts(a,b,step,sel){ let o=''; for (let i=a;i<=b;i+=step) o+='<option value="'+i+'">'+i+'</option>'; return o; }
@@ -2823,7 +2861,7 @@ function showPhoto(age){
   modal(polaroidHTML(e)+'<div class="phm"><span class="tpill" style="background:'+t.color+'">'+t.label+'</span><b>Age '+e.age+'</b></div>'+
     '<p class="phs">'+(e.ms ? '<b>'+e.ms.emoji+' '+esc(e.ms.title)+'.</b> '+esc(e.ms.text)+' ' : '')+(e.buys ? esc(e.text) : e.ms ? '' : '')+'</p>'+
     '<button class="btn sharebtn" id="phshare">📤 Share</button><button class="btn ghost" data-close style="margin-top:8px">Close</button>'+
-    (e.mins != null ? '<div class="ysmall">'+(e.src === 'st' ? 'That day\'s screen time: ' : '')+fmtTime(e.mins)+'</div>' : ''), 'yearpol');
+    (e.mins != null ? '<div class="ysmall">'+(e.src === 'st' ? 'That day · Blip\'s count ' : '')+fmtTime(e.mins)+'</div>' : ''), 'yearpol');
   $('phshare').onclick = () => { document.querySelectorAll('.modal').forEach(m => m.remove()); shareModal(moment); };
   document.querySelectorAll('.yearpol [data-stat]').forEach(b => b.onclick = ev => { ev.stopPropagation(); showStat(b.dataset.stat); });
 }
@@ -3032,6 +3070,8 @@ function bind(){
       $('cd') && ($('cd').textContent = String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'));
       if (s <= 0) render(); }; tick(); cdTimer = setInterval(tick, 1000); }
   bindST(); bindRemind();
+  if ($('whylow')) $('whylow').onclick = ev => { ev.stopPropagation(); showWhyLower(); };
+  if (goalAskDue() && !document.querySelector('.modal')) setTimeout(() => { if (goalAskDue() && !document.querySelector('.modal')) showGoalAsk(); }, 900);
   if ($('firstremind')) $('firstremind').onclick = () => { remind.on = true; remindSave(); remindSync().then(ok => { if (!ok) { remind.on = false; remindSave(); } render(); }); };
   if ($('goal')) $('goal').oninput = e => { S.goal = +e.target.value; delete S.goalNext; $('gv').textContent = fmtTime(S.goal); save(); };
   if ($('nm')) $('nm').onchange = e => { const v = e.target.value.trim(); if (v) { S.name = v; save(); } };
@@ -3188,8 +3228,9 @@ function windowHTML(){
   return '<div class="card wincard" data-up="'+(over || near ? 0 : 1)+'"><div class="wart">'+art+'<div class="bubble wbub" id="wbub"></div>'+(pill ? '<span class="wpill" data-tap="dog">'+pill+'</span>' : '')+(SHOP_ON ? closetBtnHTML() : '')+
       '<div class="wname" data-tap="life">'+n+' · '+S.age+'</div></div>'+
       '<div class="chips">'+chip('💪', S.h, 'var(--h)', 'h')+chip('🧠', S.s, 'var(--s)', 's')+chip('😊', S.j, 'var(--j)', 'j')+'</div></div>'+
-    '<div class="card wpanel"><div class="wm" data-tap="goal"><div class="wml"><span>📱 Today so far</span><b style="color:'+col+'">'+(over ? fmtTime(m - g)+'+ over' : 'About '+fmtTime(g - m)+' left')+'</b></div>'+
-      '<div class="wmv"><b>'+fmtRange(m)+'</b> of your '+fmtTime(g)+' goal</div><div class="wbar"><u style="width:'+pct+'%;background:'+col+'"></u></div></div>'+
+    '<div class="card wpanel"><div class="wm" data-tap="goal"><div class="wml"><span>Blip\'s count today</span><b style="color:'+col+'">'+(over ? fmtTime(m - g)+' over' : 'About '+fmtTime(g - m)+' left')+'</b></div>'+
+      '<div class="wmv"><b>'+fmtTime(m)+'</b> of your '+fmtTime(g)+' goal</div><div class="wbar"><u style="width:'+pct+'%;background:'+col+'"></u></div></div>'+
+      '<button class="linkbtn whylow" id="whylow">ⓘ Why is this lower than iPhone\'s Settings?</button>'+
       '<div class="wrow"><div class="wst" data-tap="streak"><span>🔥</span><b>'+S.streak+'</b><small>day streak</small></div>'+tease+'</div>'+
       '<button class="btn wdown" id="phonedown">Put my phone down 👋</button></div>';
 }
@@ -3305,7 +3346,7 @@ function cakeSVG(ages, lit){
 }
 function ybarHTML(m, g){
   const max = Math.max(m, g) * 1.25, ok = m <= g;
-  return '<div class="yb"><div class="yl"><span>Yesterday <b>'+fmtTime(m)+'</b></span><span>goal '+fmtTime(g)+'</span></div>'+
+  return '<div class="yb"><div class="yl"><span>Yesterday · Blip\'s count <b>'+fmtTime(m)+'</b></span><span>goal '+fmtTime(g)+'</span></div>'+
     '<div class="ybar"><u style="width:'+(m/max*100)+'%;background:'+(ok ? 'var(--good)' : 'var(--bad)')+'"></u><em style="left:'+(g/max*100)+'%"></em></div></div>';
 }
 function confettiBits(n){ return Array.from({length:n}, (_, i) => '<i class="cf" style="left:'+(4+i*91/n)+'%;top:'+(4+(i*37)%26)+'%;background:'+['#ff6b8b','#ffc23d','#4da3ff','#6fd06a','#7c5cff'][i%5]+';transform:rotate('+(i*47)+'deg)"></i>').join(''); }
@@ -3771,7 +3812,7 @@ function showYear(e, next){
   // Every year photo can be shared, good or rough: the button looks the same either way and nothing pops up on its own.
   const go = card ? '<button class="btn" id="lcard">See '+esc(S.name)+'\'s life card ✨</button>' : next ? '<button class="btn" id="ynext">Next year ➜</button>' : '<button class="btn" data-close>Done</button>';
   h += '<div class="yrow"><button class="btn ghost yshare" id="mshare">📤 Share</button>'+go+'</div>';
-  if (e.mins != null) h += '<div class="ysmall">'+(e.src === 'st' ? 'Yesterday ' : '')+fmtTime(e.mins)+' · goal '+fmtTime(e.goal)+'</div>';
+  if (e.mins != null) h += '<div class="ysmall">'+(e.src === 'st' ? 'Yesterday · Blip\'s count ' : '')+fmtTime(e.mins)+' · goal '+fmtTime(e.goal)+'</div>';
   modal(h, 'yearpol');
   document.querySelectorAll('.yearpol [data-stat]').forEach(b => b.onclick = ev => { ev.stopPropagation(); showStat(b.dataset.stat); });
   if (next) $('ynext').onclick = () => { document.querySelectorAll('.modal.yearpol').forEach(m => m.remove()); next(); };
