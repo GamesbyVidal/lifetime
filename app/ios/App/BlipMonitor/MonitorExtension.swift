@@ -52,7 +52,27 @@ class MonitorExtension: DeviceActivityMonitor {
             if key.hasPrefix("minutes-"), String(key.dropFirst(8)) < oldest { d.removeObject(forKey: key) }
             if key.hasPrefix("log-"), String(key.dropFirst(4)) < oldest { d.removeObject(forKey: key) }
             if key.hasPrefix("diag-"), String(key.dropFirst(5)) < oldest { d.removeObject(forKey: key) }
+            if key.hasPrefix("at-"), let day = key.split(separator: "-", maxSplits: 2).last, String(day) < oldest { d.removeObject(forKey: key) }
         }
+    }
+
+    // iOS 26 sometimes fires a burst of steps that can't be real (Nov 8: 12h 30m; Nov 12: 130m jumped to 940m within two
+    // minutes while iPhone said about 3h 30m). Screen time can't grow faster than the clock: a new high is accepted only if
+    // it is at most the last accepted high + the minutes since then + 5. Re-sent steps at or below the high are never affected.
+    private func possible(_ m: Int, name: String) -> Bool {
+        let now = Date().timeIntervalSince1970
+        let atKey = "at-" + name + "-" + today()
+        var rec = defaults?.dictionary(forKey: atKey) as? [String: Double] ?? [:]
+        let lastM = rec["m"] ?? 0
+        let lastT = rec["t"] ?? Calendar.current.startOfDay(for: Date()).timeIntervalSince1970
+        if Double(m) > lastM + (now - lastT) / 60 + 5 {
+            let minute = floor(now / 60)
+            if rec["warned"] != minute { rec["warned"] = minute; defaults?.set(rec, forKey: atKey); log(name + " jump to \(m)m ignored (faster than the clock)") }
+            return false
+        }
+        rec["m"] = Double(m); rec["t"] = now
+        defaults?.set(rec, forKey: atKey)
+        return true
     }
 
     override func eventDidReachThreshold(_ event: DeviceActivityEvent.Name, activity: DeviceActivityName) {
@@ -73,14 +93,15 @@ class MonitorExtension: DeviceActivityMonitor {
             guard let m = Int(event.rawValue.drop(while: { $0.isLetter })) else { return }
             let key = "diag-" + today()
             var best = defaults?.dictionary(forKey: key) as? [String: Int] ?? [:]
-            if m > (best[activity.rawValue] ?? 0) { best[activity.rawValue] = m; defaults?.set(best, forKey: key); log(activity.rawValue + " \(m)m") }
+            guard m > (best[activity.rawValue] ?? 0) else { return }
+            guard possible(m, name: activity.rawValue) else { return }
+            best[activity.rawValue] = m; defaults?.set(best, forKey: key); log(activity.rawValue + " \(m)m")
             return
         }
         guard let m = Int(event.rawValue.dropFirst()) else { return }
-        // iOS 26 sometimes fires steps that can't be real yet (developer forums). A day can't hold more minutes than have passed since midnight.
-        let sinceMidnight = Int(Date().timeIntervalSince(Calendar.current.startOfDay(for: Date())) / 60)
-        if m > sinceMidnight + 1 { log("\(m)m ignored (too early)"); return }
         let key = "minutes-" + today()
-        if m > (defaults?.integer(forKey: key) ?? 0) { defaults?.set(m, forKey: key); log("\(m)m") }
+        guard m > (defaults?.integer(forKey: key) ?? 0) else { return }
+        guard possible(m, name: "daily") else { return }
+        defaults?.set(m, forKey: key); log("\(m)m")
     }
 }

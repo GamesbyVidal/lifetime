@@ -679,10 +679,11 @@ function migrate(o){
   const toy = t => String(t).replace(/Video game designer/g, 'Toy designer').replace(/video game designer/g, 'toy designer');
   if (o.job) o.job = toy(o.job);
   if (o.log) for (const e of o.log) { if (e.text) e.text = toy(e.text); if (e.ms && e.ms.text) e.ms.text = toy(e.ms.text); }
-  // One-time repair (TestFlight build 21 counted idle time, e.g. 12h 30m for a real 1h 10m). Years judged from those
+  // One-time repair (TestFlight build 21 counted idle time, e.g. 12h 30m for a real 1h 10m; iOS phantom bursts later). Years judged from those
   // impossible numbers become quiet years: their stat and money changes are undone and the streak is rebuilt.
-  if (o.log && !o.fix21) {
-    o.fix21 = true;
+  // Run again in build 24 for the Nov 12 phantom burst (15h 40m for a real 4h 37m).
+  if (o.log && !o.fix24) {
+    o.fix21 = o.fix24 = true;
     const badDay = e => e.src === 'st' && e.mins >= 600 && e.date && dayNum(e.date) >= dayNum('2026-11-7');
     for (const e of o.log) if (badDay(e)) {
       for (const k of ['h','s','j']) if (e.fx && e.fx[k]) o[k] = Math.max(0, Math.min(100, (o[k] || 0) - e.fx[k]));
