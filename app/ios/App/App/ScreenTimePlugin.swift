@@ -20,8 +20,6 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "minutesFor", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "checkLog", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "quickTest", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "showExact", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "hideExact", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "resync", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remindOn", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remindOff", returnType: CAPPluginReturnPromise),
@@ -212,32 +210,6 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
                       "qt": defaults?.dictionary(forKey: "qt-best") ?? [:], "qtStart": defaults?.double(forKey: "qt-start") ?? 0])
     }
 
-    // Exact time so far on Today: Apple's Screen Time report view (BlipReport extension), laid over the web page's number.
-    // iOS draws it; Blip never receives the number. It sits inside the web view's scroll view, so it scrolls with the page.
-    private var exactHost: UIHostingController<AnyView>?
-    @objc func showExact(_ call: CAPPluginCall) {
-        let x = call.getDouble("x") ?? 0, y = call.getDouble("y") ?? 0, w = call.getDouble("w") ?? 0, h = call.getDouble("h") ?? 0
-        DispatchQueue.main.async {
-            guard let web = self.bridge?.webView, w > 0, h > 0 else { call.resolve(["shown": false]); return }
-            let now = Date(), start = Calendar.current.startOfDay(for: now)
-            let filter = DeviceActivityFilter(segment: .daily(during: DateInterval(start: start, end: now)), users: .all, devices: .init([.iPhone]))
-            let view = AnyView(DeviceActivityReport(.total, filter: filter))
-            if let host = self.exactHost { host.rootView = view } else {
-                let host = UIHostingController(rootView: view)
-                host.view.backgroundColor = .clear // if the report can't draw, the web page's own number shows through
-                host.view.isUserInteractionEnabled = false
-                web.scrollView.addSubview(host.view)
-                self.exactHost = host
-            }
-            self.exactHost?.view.frame = CGRect(x: x, y: y, width: w, height: h)
-            self.exactHost?.view.isHidden = false
-            call.resolve(["shown": true])
-        }
-    }
-    @objc func hideExact(_ call: CAPPluginCall) {
-        DispatchQueue.main.async { self.exactHost?.view.isHidden = true; call.resolve() }
-    }
-
     // TestFlight quick test: four counting methods side by side from this moment for one hour, in 1-minute steps,
     // counting only use AFTER the tap (includesPastActivity false). Lets us compare against iPhone Screen Time many times a day.
     // Logged only, never counted toward the Blip.
@@ -330,7 +302,6 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
 }
 
 extension DeviceActivityName { static let daily = Self("daily") }
-extension DeviceActivityReport.Context { static let total = Self("total") } // must match BlipReport
 
 private struct PickerView: View {
     @State var selection: FamilyActivitySelection

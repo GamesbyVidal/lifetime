@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B1E9C0DE0000000000000005 /* ReportExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E9C0DE0000000000000001 /* ReportExtension.swift */; };
-		B1E9C0DE0000000000000006 /* BlipReport.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B1E9C0DE0000000000000002 /* BlipReport.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		102487B447FBA24DCA9EB04C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3AA586F1275ACCD00BC97FD /* Foundation.framework */; };
 		2FAD9763203C412B000D30F8 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 2FAD9762203C412B000D30F8 /* config.xml */; };
 		4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */ = {isa = PBXBuildFile; productRef = 4D22ABE82AF431CB00220026 /* CapApp-SPM */; };
@@ -28,13 +26,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		B1E9C0DE0000000000000007 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B1E9C0DE0000000000000009;
-			remoteInfo = BlipReport;
-		};
 		A98937DBC8DF163E2DC75A87 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
@@ -52,7 +43,6 @@
 			dstSubfolderSpec = 13;
 			files = (
 				E2E097B5915E69A37C45A641 /* BlipMonitor.appex in Embed Foundation Extensions */,
-				B1E9C0DE0000000000000006 /* BlipReport.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -60,10 +50,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B1E9C0DE0000000000000001 /* ReportExtension.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReportExtension.swift; sourceTree = "<group>"; };
-		B1E9C0DE0000000000000003 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B1E9C0DE0000000000000004 /* BlipReport.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = BlipReport.entitlements; sourceTree = "<group>"; };
-		B1E9C0DE0000000000000002 /* BlipReport.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BlipReport.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -88,13 +74,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		B1E9C0DE000000000000000B /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		504EC3011FED79650016851F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -114,17 +93,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B1E9C0DE0000000000000008 /* BlipReport */ = {
-			isa = PBXGroup;
-			children = (
-				B1E9C0DE0000000000000001 /* ReportExtension.swift */,
-				B1E9C0DE0000000000000003 /* Info.plist */,
-				B1E9C0DE0000000000000004 /* BlipReport.entitlements */,
-			);
-			name = BlipReport;
-			path = BlipReport;
-			sourceTree = "<group>";
-		};
 		2B283AC18007AB4304187405 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -152,7 +120,6 @@
 				504EC3051FED79650016851F /* Products */,
 				2B283AC18007AB4304187405 /* Frameworks */,
 				3A08D3E32734C66D6B684CC1 /* BlipMonitor */,
-				B1E9C0DE0000000000000008 /* BlipReport */,
 			);
 			sourceTree = "<group>";
 		};
@@ -161,7 +128,6 @@
 			children = (
 				504EC3041FED79650016851F /* App.app */,
 				D588CF0A7A2230DD94193823 /* BlipMonitor.appex */,
-				B1E9C0DE0000000000000002 /* BlipReport.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -198,23 +164,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B1E9C0DE0000000000000009 /* BlipReport */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B1E9C0DE0000000000000010 /* Build configuration list for PBXNativeTarget "BlipReport" */;
-			buildPhases = (
-				B1E9C0DE000000000000000A /* Sources */,
-				B1E9C0DE000000000000000B /* Frameworks */,
-				B1E9C0DE000000000000000C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = BlipReport;
-			productName = BlipReport;
-			productReference = B1E9C0DE0000000000000002 /* BlipReport.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 		504EC3031FED79650016851F /* App */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 504EC3161FED79650016851F /* Build configuration list for PBXNativeTarget "App" */;
@@ -228,7 +177,6 @@
 			);
 			dependencies = (
 				B2180D1297258100116217E2 /* PBXTargetDependency */,
-				B1E9C0DE000000000000000D /* PBXTargetDependency */,
 			);
 			name = App;
 			packageProductDependencies = (
@@ -289,19 +237,11 @@
 			targets = (
 				504EC3031FED79650016851F /* App */,
 				C59B5DA7393303525A28001D /* BlipMonitor */,
-				B1E9C0DE0000000000000009 /* BlipReport */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		B1E9C0DE000000000000000C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		3CB0326B1A0E7AB58F403716 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -325,14 +265,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		B1E9C0DE000000000000000A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B1E9C0DE0000000000000005 /* ReportExtension.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		504EC3001FED79650016851F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -357,12 +289,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		B1E9C0DE000000000000000D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = BlipReport;
-			target = B1E9C0DE0000000000000009 /* BlipReport */;
-			targetProxy = B1E9C0DE0000000000000007 /* PBXContainerItemProxy */;
-		};
 		B2180D1297258100116217E2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = BlipMonitor;
@@ -391,57 +317,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		B1E9C0DE000000000000000E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_ENTITLEMENTS = BlipReport/BlipReport.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = BlipReport/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.gamesbyvidal.lifetime.report;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Debug;
-		};
-		B1E9C0DE000000000000000F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGN_ENTITLEMENTS = BlipReport/BlipReport.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = BlipReport/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.gamesbyvidal.lifetime.report;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
 		1C8353A917C05D60EBCC4FFA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -651,15 +526,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B1E9C0DE0000000000000010 /* Build configuration list for PBXNativeTarget "BlipReport" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B1E9C0DE000000000000000F /* Release */,
-				B1E9C0DE000000000000000E /* Debug */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		47417C1A525600BDDE99A87F /* Build configuration list for PBXNativeTarget "BlipMonitor" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
