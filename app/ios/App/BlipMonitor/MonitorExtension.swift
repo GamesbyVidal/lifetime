@@ -1,4 +1,5 @@
 import DeviceActivity
+import WidgetKit
 import Foundation
 
 // Runs in the background, separately from the app. iOS calls eventDidReachThreshold each
@@ -103,5 +104,6 @@ class MonitorExtension: DeviceActivityMonitor {
         guard m > (defaults?.integer(forKey: key) ?? 0) else { return }
         guard possible(m, name: "daily") else { return }
         defaults?.set(m, forKey: key); log("\(m)m")
+        WidgetCenter.shared.reloadAllTimelines() // Blip's widget shows the new step
     }
 }

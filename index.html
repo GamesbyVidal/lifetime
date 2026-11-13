@@ -703,7 +703,14 @@ function migrate(o){
   }
   return o;
 }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} appBackup(); }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} appBackup(); widgetSync(); }
+// Blip's home/lock screen widget (app + automatic Screen Time only): hand it the goal and the Blip's look; the count itself
+// comes from the monitor on the phone. Nothing leaves the phone.
+function widgetSync(){
+  if (!IS_APP || !S || !S.auto) return;
+  const p = nativePlugin('ScreenTime'); if (!p || !p.widget) return;
+  try { const r = p.widget({goal: S.goal, name: S.name, age: S.age, streak: S.streak, skin: S.skin, hair: S.hair, girl: !!S.girl}); if (r && r.catch) r.catch(() => {}); } catch(e) {}
+}
 
 // ============ PHONE APP (App Store / Google Play version) ============
 // The same file runs as the website and inside the phone app (see app/README.md).
@@ -4306,7 +4313,8 @@ if (readMeet()) track('friend-link-opened');
 else if (S && isInstalled()) track('opened-installed');
 window.addEventListener('hashchange', render);
 // If the app sat open overnight, catch up when it comes back on screen.
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { goodbye = 0; catchUp(); render(); stRefresh(); stResync(); } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) { goodbye = 0; catchUp(); render(); stRefresh(); stResync(); widgetSync(); } });
+setTimeout(widgetSync, 1500);
 if (remind.on) remindSync(); // keeps the reminder's Blip name current (new generation, renamed)
 // App Store builds never keep testing mode (a save carried over from TestFlight could have it on).
 if (MORNING && stPlugin()) stPlugin().env().then(r => { if (r && r.testflight) { TESTFLIGHT = true; if (tab === 'settings') render(); } else if (S && S.testMode) { S.testMode = false; save(); render(); } }).catch(() => {});

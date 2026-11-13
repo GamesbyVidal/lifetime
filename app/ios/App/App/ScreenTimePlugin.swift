@@ -5,6 +5,7 @@ import FamilyControls
 import DeviceActivity
 import ManagedSettings
 import UserNotifications
+import WidgetKit
 
 // Bridge between the game (index.html) and Apple's Screen Time API.
 // Only "the day's total passed N minutes" comes back; never which apps were used.
@@ -23,7 +24,8 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "resync", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remindOn", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "remindOff", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "env", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "env", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "widget", returnType: CAPPluginReturnPromise)
     ]
 
     static let group = "group.io.github.gamesbyvidal.lifetime"
@@ -292,6 +294,24 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
     // TestFlight builds have a sandbox receipt; App Store builds don't. Testing tools only show in TestFlight.
+    // What Blip's widget draws besides the count: goal, name, age, streak and the Blip's look. On this phone only.
+    @objc func widget(_ call: CAPPluginCall) {
+        var info: [String: Any] = [:]
+        info["goal"] = call.getInt("goal") ?? 120
+        info["name"] = call.getString("name") ?? ""
+        info["age"] = call.getInt("age") ?? 0
+        info["streak"] = call.getInt("streak") ?? 0
+        info["skin"] = call.getString("skin") ?? "#f1c27d"
+        info["hair"] = call.getString("hair") ?? "#3b2a4a"
+        info["girl"] = call.getBool("girl") ?? false
+        let old = defaults?.dictionary(forKey: "widget") as NSDictionary?
+        if old == nil || !old!.isEqual(to: info) {
+            defaults?.set(info, forKey: "widget")
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+        call.resolve()
+    }
+
     @objc func env(_ call: CAPPluginCall) {
         call.resolve(["testflight": Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"])
     }
