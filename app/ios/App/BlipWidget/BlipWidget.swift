@@ -138,7 +138,8 @@ struct BlipFace: View {
     var body: some View {
         // The mood gives the result away, so it goes neutral when the phone hides private widget data.
         let art = blipArt(reasons.contains(.privacy) ? "faceNeutral" : (e.over ? "faceGlum" : "faceHappy"))
-        if let art = art {
+        // Lock screen (one tint): bold white-line face, crisp like the clock (Matthew's pick). Elsewhere: the app's own art.
+        if !mono, let art = art {
             Image(uiImage: art).resizable().scaledToFit().clipShape(Circle())
         } else {
             drawn
