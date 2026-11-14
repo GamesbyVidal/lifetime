@@ -315,10 +315,9 @@ public class ScreenTimePlugin: CAPPlugin, CAPBridgedPlugin {
             }
         }
         let old = defaults?.dictionary(forKey: "widget") as NSDictionary?
-        if newArt || old == nil || !old!.isEqual(to: info) {
-            defaults?.set(info, forKey: "widget")
-            WidgetCenter.shared.reloadAllTimelines()
-        }
+        if newArt || old == nil || !old!.isEqual(to: info) { defaults?.set(info, forKey: "widget") }
+        // Always redraw while Blip is open (free for apps in the foreground), on top of the monitor's redraws.
+        WidgetCenter.shared.reloadAllTimelines()
         call.resolve()
     }
 

@@ -38,7 +38,7 @@ struct BlipEntry: TimelineEntry {
         f.locale = Locale.current
         f.timeStyle = .short
         f.dateStyle = .none
-        return "as of " + f.string(from: date)
+        return "updated " + f.string(from: date)
     }
 
     static let sample = BlipEntry(date: Date(), ready: true, minutes: 95, goal: 120, name: "Pip", age: 24, streak: 3,
